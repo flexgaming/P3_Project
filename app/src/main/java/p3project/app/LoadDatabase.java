@@ -1,7 +1,5 @@
 package p3project.app;
 
-import p3project.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
