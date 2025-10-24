@@ -6,12 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/dockers")
+@RequestMapping("/dockers") //Router starting point
 public class DockerController {
 
     // GET all Dockers
     @GetMapping
     public List<Docker> getAllDockers() {
+        // In a real app, fetch from DB
         return Arrays.asList(
             new Docker("1L", "Alice"),
             new Docker("2L", "Bob")
@@ -19,8 +20,9 @@ public class DockerController {
     }
 
     // GET Docker by ID
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") //Router continuation
     public Docker getDockerById(@PathVariable String id) {
+        // In a real app, fetch from DB
         return new Docker(id, "Docker " + id);
     }
 
