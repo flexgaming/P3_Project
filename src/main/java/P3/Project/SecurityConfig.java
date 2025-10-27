@@ -20,6 +20,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())  // Disable CSRF for REST API
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/dockers/**").permitAll()  // Allow all Docker endpoints
+                .requestMatchers("/dashboard/**").permitAll() // Allow all Dashboard endpoints
                 .anyRequest().authenticated()
             );
         
