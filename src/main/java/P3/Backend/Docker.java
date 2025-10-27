@@ -1,4 +1,4 @@
-package P3.Project;
+package P3.Backend;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
