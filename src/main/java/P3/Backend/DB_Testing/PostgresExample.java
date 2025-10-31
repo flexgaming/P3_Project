@@ -2,7 +2,7 @@ package P3.Backend.DB_Testing;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -12,8 +12,9 @@ public class PostgresExample {
         String user = "postgres";
         String password = "SQLvmDBaccess";
 
-        insertDeeper(url, user, password);
+        insertStuff2(url, user, password);
         readStuff(url, user, password);
+        readStuff2(url, user, password);
     }
 
     static void readStuff(String url, String user, String password) {
@@ -45,6 +46,29 @@ public class PostgresExample {
         }
     }
 
+    static void readStuff2(String url, String user, String password) {
+        // SQL query to get servers where the diagnostics network is false
+        String sql = "SELECT DISTINCT d.Server " +
+                "FROM Docker d " +
+                "JOIN Container c ON d.Docker_ID = c.Docker_ID " +
+                "JOIN Diagnostics diag ON c.Container_ID = diag.Container_ID " +
+                "WHERE diag.Network = FALSE;";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            System.out.println("Servers with network = FALSE:");
+            while (rs.next()) {
+                String server = rs.getString("Server");
+                System.out.println(" - " + server);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static void insertStuff(String url, String user, String password) {
         String sql = "INSERT INTO Docker (Server) VALUES " +
                 "('Server_E'), " +
@@ -57,6 +81,66 @@ public class PostgresExample {
 
             int rowsInserted = stmt.executeUpdate(sql);
             System.out.println(rowsInserted + " rows inserted successfully.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void insertStuff2(String url, String user, String password) {
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            conn.setAutoCommit(false); // so we can commit all inserts together
+
+            // 1️⃣ Insert the new Docker server
+            String insertDocker = "INSERT INTO Docker (Server) VALUES (?) RETURNING Docker_ID;";
+            int dockerId;
+
+            try (PreparedStatement dockerStmt = conn.prepareStatement(insertDocker)) {
+                dockerStmt.setString(1, "Server_I");
+                try (ResultSet rs = dockerStmt.executeQuery()) {
+                    rs.next();
+                    dockerId = rs.getInt("Docker_ID");
+                }
+            }
+
+            // 2️⃣ Insert multiple Containers linked to that Docker_ID
+            String insertContainer = "INSERT INTO Container (Docker_ID) VALUES (?) RETURNING Container_ID;";
+            int[] containerIds = new int[3]; // for example, 3 containers
+
+            try (PreparedStatement containerStmt = conn.prepareStatement(insertContainer)) {
+                for (int i = 0; i < containerIds.length; i++) {
+                    containerStmt.setInt(1, dockerId);
+                    try (ResultSet rs = containerStmt.executeQuery()) {
+                        rs.next();
+                        containerIds[i] = rs.getInt("Container_ID");
+                    }
+                }
+            }
+
+            // 3️⃣ Insert Diagnostics for each container where Network = FALSE
+            String insertDiag = "INSERT INTO Diagnostics (" +
+                    "Container_ID, Timestamp, Running, Ram_Total, Ram_Free, Network, " +
+                    "CPU_Total, CPU_Free, Status, Disk_Usage_Total, Disk_Usage_Free" +
+                    ") VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+            try (PreparedStatement diagStmt = conn.prepareStatement(insertDiag)) {
+                for (int containerId : containerIds) {
+                    diagStmt.setInt(1, containerId);
+                    diagStmt.setBoolean(2, true); // Running
+                    diagStmt.setDouble(3, 16.0);
+                    diagStmt.setDouble(4, 10.0);
+                    diagStmt.setBoolean(5, false); // Network = FALSE
+                    diagStmt.setDouble(6, 4.0);
+                    diagStmt.setDouble(7, 1.0);
+                    diagStmt.setString(8, "NetworkDown");
+                    diagStmt.setDouble(9, 500.0);
+                    diagStmt.setDouble(10, 200.0);
+                    diagStmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+            System.out.println("✅ Server 'Server_I' with containers (Network = FALSE) inserted successfully!");
 
         } catch (Exception e) {
             e.printStackTrace();
