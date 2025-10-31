@@ -6,6 +6,11 @@ public class Region {
 
     private Company[] companies;
 
+    public Region(int regionID, String name) {
+        this.regionID = regionID;
+        this.name = name;
+    }
+
     public int getRegionID() {
         return regionID;
     }

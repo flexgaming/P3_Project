@@ -1,9 +1,12 @@
 package P3.Backend;
 
+import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class Database {
     String url = "jdbc:postgresql://localhost:5432/P3DB";
@@ -108,5 +111,25 @@ public class Database {
         }
     }
 
+    ArrayList<Region> getRegions() {
+        String sql = "SELECT * FROM Region";
+        ArrayList<Region> regions = new ArrayList<>();
 
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("Region_ID");
+                String name = resultSet.getString("Name");
+                Region region = new Region(id, name);
+                regions.add(region);
+            }
+
+        } catch (SQLException error) {
+            error.printStackTrace();
+        }
+
+        return regions;
+    }
 }
