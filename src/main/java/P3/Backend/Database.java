@@ -1,4 +1,4 @@
-package P3.Backend.DB_Testing;
+package P3.Backend;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -107,4 +107,6 @@ public class Database {
             error.printStackTrace();
         }
     }
+
+
 }
