@@ -12,7 +12,7 @@ public class App {
 		// SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        // addDummyData(database);
+        addDummyData(database);
         ArrayList<Region> regions = database.getRegions();
         printDBData(regions);
 	}

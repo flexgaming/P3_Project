@@ -1,4 +1,4 @@
-package P3.Backend.Database;
+package P3.Backend;
 
 public class Constants {
     // Database Constants
