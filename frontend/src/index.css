@@ -23,7 +23,7 @@ a:hover {
 }
 
 body {
-    color: #213547;
+    background-color: #7ab5e9;
     margin: 0;
     display: flex;
     place-items: center;
@@ -66,4 +66,24 @@ button:focus-visible {
     button {
         background-color: #f9f9f9;
     }
+}
+
+.App {
+    min-width: 50vw;
+    max-width: 960px;
+    margin: 96px auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: #e05252;
+}
+
+.regions-accordion {
+    width: 80%;
+    text-align: left;
+}
+
+.regions {
+    padding: 1.5rem 0;
+    width: 80%;
 }

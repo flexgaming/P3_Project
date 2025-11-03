@@ -1,73 +1,65 @@
 import { useState } from "react";
 import "./App.css";
-import { Navbar, Nav, Container, Row, Col, Table, Badge } from "react-bootstrap";
+import { Navbar, Nav, Container, Row, Col, Table, Badge, Accordion } from "react-bootstrap";
 
 // The main application component
 const App = () => {
-  // Sample data for the table
-  const users = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Moderator', status: 'Active' },
-    { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'User', status: 'Active' },
-  ];
+    // Sample data for the table
+    const Regions = [
+        { name: 'North America', status: 'Active' },
+        { name: 'Europe', status: 'Inactive' },
+        { name: 'Asia', status: 'Active' },
+        { name: 'Australia', status: 'Active' },
+    ];
 
-  const getStatusBadge = (status) => {
-    const variant = status === 'Active' ? 'success' : 'secondary';
-    return <Badge bg={variant}>{status}</Badge>;
-  };
+    return (
+        <div className="App">
+        {/* Navbar */}
+        <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+            <Container>
+            <Navbar.Brand href="#home">Dashboard</Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+                <Nav className="me-auto">
+                <Nav.Link href="#home">Home</Nav.Link>
+                <Nav.Link href="#Regions">Regions</Nav.Link>
+                <Nav.Link href="#analytics">Analytics</Nav.Link>
+                </Nav>
+            </Navbar.Collapse>
+            </Container>
+        </Navbar>
 
-  return (
-    <div className="App">
-      {/* Navbar */}
-      <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-        <Container>
-          <Navbar.Brand href="#home">Dashboard</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link href="#home">Home</Nav.Link>
-              <Nav.Link href="#users">Users</Nav.Link>
-              <Nav.Link href="#analytics">Analytics</Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
+        {/* Main Content */}
+        <Container className="regions">
+            <Accordion className="regions-accordion">
+                <Accordion.Item eventKey="0">
+                    <Accordion.Header>Accordion Item #1</Accordion.Header>
+                    <Accordion.Body>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+                    minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                    culpa qui officia deserunt mollit anim id est laborum.
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="1">
+                    <Accordion.Header>Accordion Item #2</Accordion.Header>
+                    <Accordion.Body>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+                    minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                    culpa qui officia deserunt mollit anim id est laborum.
+                    </Accordion.Body>
+                </Accordion.Item>
+            </Accordion>
         </Container>
-      </Navbar>
-
-      {/* Main Content */}
-      <Container fluid className="py-4">
-        <Row>
-          <Col md={12}>
-            <h2 className="mb-4">User Management</h2>
-            <Table striped bordered hover responsive className="table-dark">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <Badge bg="info">{user.role}</Badge>
-                    </td>
-                    <td>{getStatusBadge(user.status)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-      </Container>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default App;
