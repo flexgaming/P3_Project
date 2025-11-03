@@ -1,93 +1,187 @@
 package P3.Backend.Database;
 
 import P3.Backend.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
+import java.lang.reflect.Array;
+import java.sql.*;
 import java.util.ArrayList;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 
 public class Database {
     String url = Constants.DATABASE_URL;
     String user = Constants.DATABASE_USER;
     String password = Constants.DATABASE_PASSWORD;
 
-    private void errorHandling(SQLException error) {
+    private void errorHandling(Error error) {
         error.printStackTrace();
     }
 
-    public void addRegion(String name) {
-        String sql = "INSERT INTO Region (Name) VALUES (?)";
+    private void sqlErrorHandling(SQLException sqlException) {
+        sqlException.printStackTrace();
+    }
+
+    public static boolean haveSameLength(Object... arrays) {
+        if (arrays.length == 0) return true;
+
+        int expectedLength = Array.getLength(arrays[0]);
+
+        for (Object arr : arrays) {
+            if (!arr.getClass().isArray() || Array.getLength(arr) != expectedLength) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void addRegions(String regionName) {
+        addRegions(new String[]{regionName});
+    }
+
+    public void addRegions(String[] regionNames) {
+        String sql = "INSERT INTO Region (Name) VALUES (?);";
 
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, name);
+            for (String regionName : regionNames) {
+                preparedStatement.setString(1, regionName);
+                preparedStatement.addBatch();
+            }
 
-            int rowsInserted = statement.executeUpdate();
-            System.out.println(rowsInserted + " row(s) inserted.");
+            int[] rowsInserted = preparedStatement.executeBatch();
+            System.out.println(rowsInserted.length + " row(s) inserted.");
 
-        } catch (SQLException error) {
-            errorHandling(error);
+        } catch (SQLException sqlException) {
+            sqlErrorHandling(sqlException);
         }
     }
 
-    public void addCompany(int regionID, String name) {
+    public void addCompanies(int regionID, String name) {
+        addCompanies(new int[]{regionID}, new String[]{name});
+    }
+
+    public void addCompanies(int[] regionIDs, String[] names) {
+        if (!haveSameLength(regionIDs, names)) {
+            errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
+            return;
+        }
+
         String sql = "INSERT INTO Company (Region_ID, Name) VALUES (?, ?)";
 
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            statement.setInt(1, regionID);
-            statement.setString(2, name);
+            for (int i = 0; i < regionIDs.length; i++) {
+                preparedStatement.setInt(1, regionIDs[i]);
+                preparedStatement.setString(2, names[i]);
+                preparedStatement.addBatch();
+            }
 
-            int rowsInserted = statement.executeUpdate();
-            System.out.println(rowsInserted + " row(s) inserted.");
+            int[] rowsInserted = preparedStatement.executeBatch();
+            System.out.println(rowsInserted.length + " row(s) inserted.");
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
     }
 
-    public void addServer(String serverID, int companyID, double ramTotal, double cpuTotal, double diskUsageTotal) {
+    public void addServers(String serverID, int companyID, double ramTotal, double cpuTotal, double diskUsageTotal) {
+        addServers(new String[]{serverID}, new int[]{companyID}, new double[]{ramTotal}, new double[]{cpuTotal},
+                new double[]{diskUsageTotal});
+    }
+
+    public void addServers(String[] serverIDs, int[] companyIDs, double[] ramTotals, double[] cpuTotals,
+                           double[] diskUsageTotals) {
+        if (!haveSameLength(serverIDs, companyIDs, ramTotals, cpuTotals, diskUsageTotals)) {
+            errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
+            return;
+        }
+
         String sql = "INSERT INTO Server (Server_ID, Company_ID, Ram_Total, CPU_Total, Disk_Usage_Total)" +
-                     "VALUES (?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, serverID);
-            statement.setInt(2, companyID);
-            statement.setDouble(3, ramTotal);
-            statement.setDouble(4, cpuTotal);
-            statement.setDouble(5, diskUsageTotal);
+            for (int i = 0; i < serverIDs.length; i++) {
+                preparedStatement.setString(1, serverIDs[i]);
+                preparedStatement.setInt(2, companyIDs[i]);
+                preparedStatement.setDouble(3, ramTotals[i]);
+                preparedStatement.setDouble(4, cpuTotals[i]);
+                preparedStatement.setDouble(5, diskUsageTotals[i]);
+                preparedStatement.addBatch();
+            }
 
-            int rowsInserted = statement.executeUpdate();
-            System.out.println(rowsInserted + " row(s) inserted.");
+            int[] rowsInserted = preparedStatement.executeBatch();
+            System.out.println(rowsInserted.length + " row(s) inserted.");
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
     }
 
-    public void addContainer(String containerID, String serverID) {
+    public void addContainers(String containerID, String serverID) {
+        addContainers(new String[]{containerID}, new String[]{serverID});
+    }
+
+    public void addContainers(String[] containerIDs, String[] serverIDs) {
+        if (!haveSameLength(containerIDs, serverIDs)) {
+            errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
+            return;
+        }
+
         String sql = "INSERT INTO Container (Container_ID, Server_ID) VALUES (?, ?)";
 
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, containerID);
-            statement.setString(2, serverID);
+            for (int i = 0; i < serverIDs.length; i++) {
+                preparedStatement.setString(1, containerIDs[i]);
+                preparedStatement.setString(2, serverIDs[i]);
+                preparedStatement.addBatch();
+            }
 
-            int rowsInserted = statement.executeUpdate();
-            System.out.println(rowsInserted + " row(s) inserted.");
+            int[] rowsInserted = preparedStatement.executeBatch();
+            System.out.println(rowsInserted.length + " row(s) inserted.");
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
+        }
+    }
+
+    public void addDiagnosticsBatch(String[] containerIDs, boolean[] runningList, double[] ramFrees, double[] cpuFrees,
+                                   double[] diskUsageFrees, int[] threadCounts, String[] processIDs, String[] statuses,
+                                   String[] errorLogsList) {
+        if (!haveSameLength(containerIDs, runningList, ramFrees, cpuFrees, diskUsageFrees, threadCounts, processIDs,
+                statuses, errorLogsList)) {
+            errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
+            return;
+        }
+
+        String sql = "INSERT INTO Diagnostics (Container_ID, Timestamp, Running, Ram_Free, CPU_Free, Disk_Usage_Free," +
+                "Thread_Count, Process_ID, Status, Error_Logs) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            for (int i = 0; i < containerIDs.length; i++) {
+                preparedStatement.setString(1, containerIDs[i]);
+                preparedStatement.setBoolean(2, runningList[i]);
+                preparedStatement.setDouble(3, ramFrees[i]);
+                preparedStatement.setDouble(4, cpuFrees[i]);
+                preparedStatement.setDouble(5, diskUsageFrees[i]);
+                preparedStatement.setInt(6, threadCounts[i]);
+                preparedStatement.setString(7, processIDs[i]);
+                preparedStatement.setString(8, statuses[i]);
+                preparedStatement.setString(9, errorLogsList[i]);
+                preparedStatement.addBatch();
+            }
+
+            int[] rowsInserted = preparedStatement.executeBatch();
+            System.out.println(rowsInserted.length + " row(s) inserted.");
+
+        } catch (SQLException error) {
+            sqlErrorHandling(error);
         }
     }
 
@@ -113,7 +207,7 @@ public class Database {
             System.out.println(rowsInserted + " row(s) inserted.");
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
     }
 
@@ -133,7 +227,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
 
         getCompanies(regions);
@@ -162,7 +256,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
 
         getServers(regions);
@@ -192,7 +286,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
 
         getContainers(regions);
@@ -221,7 +315,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
 
         getDiagnosticsData(regions);
@@ -261,7 +355,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            errorHandling(error);
+            sqlErrorHandling(error);
         }
     }
 }
