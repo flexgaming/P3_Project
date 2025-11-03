@@ -14,6 +14,10 @@ public class Database {
     String user = "postgres";
     String password = "SQLvmDBaccess";
 
+    private void errorHandling(SQLException error) {
+        error.printStackTrace();
+    }
+
     public void addRegion(String name) {
         String sql = "INSERT INTO Region (Name) VALUES (?)";
 
@@ -26,7 +30,7 @@ public class Database {
             System.out.println(rowsInserted + " row(s) inserted.");
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
     }
 
@@ -43,7 +47,7 @@ public class Database {
             System.out.println(rowsInserted + " row(s) inserted.");
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
     }
 
@@ -64,7 +68,7 @@ public class Database {
             System.out.println(rowsInserted + " row(s) inserted.");
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
     }
 
@@ -81,7 +85,7 @@ public class Database {
             System.out.println(rowsInserted + " row(s) inserted.");
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
     }
 
@@ -107,7 +111,7 @@ public class Database {
             System.out.println(rowsInserted + " row(s) inserted.");
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
     }
 
@@ -127,7 +131,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
 
         getCompanies(regions);
@@ -156,7 +160,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
 
         getServers(regions);
@@ -186,7 +190,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
 
         getContainers(regions);
@@ -215,7 +219,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
 
         getDiagnosticsData(regions);
@@ -255,7 +259,7 @@ public class Database {
             }
 
         } catch (SQLException error) {
-            error.printStackTrace();
+            errorHandling(error);
         }
     }
 }

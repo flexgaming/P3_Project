@@ -6,7 +6,7 @@ public class Region {
     private final int regionID;
     private final String name;
 
-    private ArrayList<Company> companies = new ArrayList<>();
+    private final ArrayList<Company> companies = new ArrayList<>();
 
     public Region(int regionID, String name) {
         this.regionID = regionID;

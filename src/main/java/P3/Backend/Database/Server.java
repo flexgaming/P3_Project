@@ -8,7 +8,7 @@ public class Server {
     private final double cpuTotal;
     private final double diskUsageTotal;
 
-    private ArrayList<Container> containers = new ArrayList<>();
+    private final ArrayList<Container> containers = new ArrayList<>();
 
     public Server(String serverID, double ramTotal, double cpuTotal, double diskUsageTotal) {
         this.serverID = serverID;

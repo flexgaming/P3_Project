@@ -3,9 +3,9 @@ package P3.Backend.Database;
 import java.util.ArrayList;
 
 public class Container {
-    private String containerID;
+    private final String containerID;
 
-    private ArrayList<Diagnostics> diagnosticsData = new ArrayList<>();
+    private final ArrayList<Diagnostics> diagnosticsData = new ArrayList<>();
 
     public Container(String containerID) {
         this.containerID = containerID;
