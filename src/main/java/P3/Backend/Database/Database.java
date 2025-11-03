@@ -1,7 +1,6 @@
 package P3.Backend.Database;
 
 import P3.Backend.Constants;
-import org.apache.tomcat.util.bcel.Const;
 
 import java.lang.reflect.Array;
 import java.sql.*;
@@ -20,17 +19,17 @@ public class Database {
         sqlException.printStackTrace();
     }
 
-    public static boolean haveSameLength(Object... arrays) {
-        if (arrays.length == 0) return true;
+    public static boolean notSameLength(Object... arrays) {
+        if (arrays.length == 0) return false;
 
         int expectedLength = Array.getLength(arrays[0]);
 
         for (Object arr : arrays) {
             if (!arr.getClass().isArray() || Array.getLength(arr) != expectedLength) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public void addRegions(String regionName) {
@@ -61,7 +60,7 @@ public class Database {
     }
 
     public void addCompanies(int[] regionIDs, String[] names) {
-        if (!haveSameLength(regionIDs, names)) {
+        if (notSameLength(regionIDs, names)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
@@ -92,7 +91,7 @@ public class Database {
 
     public void addServers(String[] serverIDs, int[] companyIDs, double[] ramTotals, double[] cpuTotals,
                            double[] diskUsageTotals) {
-        if (!haveSameLength(serverIDs, companyIDs, ramTotals, cpuTotals, diskUsageTotals)) {
+        if (notSameLength(serverIDs, companyIDs, ramTotals, cpuTotals, diskUsageTotals)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
@@ -125,7 +124,7 @@ public class Database {
     }
 
     public void addContainers(String[] containerIDs, String[] serverIDs) {
-        if (!haveSameLength(containerIDs, serverIDs)) {
+        if (notSameLength(containerIDs, serverIDs)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
@@ -152,7 +151,7 @@ public class Database {
     public void addDiagnosticsBatch(String[] containerIDs, boolean[] runningList, double[] ramFrees, double[] cpuFrees,
                                    double[] diskUsageFrees, int[] threadCounts, String[] processIDs, String[] statuses,
                                    String[] errorLogsList) {
-        if (!haveSameLength(containerIDs, runningList, ramFrees, cpuFrees, diskUsageFrees, threadCounts, processIDs,
+        if (notSameLength(containerIDs, runningList, ramFrees, cpuFrees, diskUsageFrees, threadCounts, processIDs,
                 statuses, errorLogsList)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
