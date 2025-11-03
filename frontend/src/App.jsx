@@ -4,6 +4,7 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
 
+// The main application component
 function App() {
     const [count, setCount] = useState(0);
     const [count2, setCount2] = useState(0);
