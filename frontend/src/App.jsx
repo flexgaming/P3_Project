@@ -13,7 +13,10 @@ function App() {
                 <a href="https://vite.dev" target="_blank">
                     <img src={viteLogo} className="logo" alt="Vite logo" />
                 </a>
-                <a href="http://localhost:8080/dockers" target="_blank">
+                <a
+                    href="http://localhost:8080/dashboard/redirect"
+                    target="_blank"
+                >
                     <img
                         src={reactLogo}
                         className="logo react"
