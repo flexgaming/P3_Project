@@ -1,85 +1,73 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import { Navbar, Container, Nav, Button } from "react-bootstrap";
+import { Navbar, Nav, Container, Row, Col, Table, Badge } from "react-bootstrap";
 
 // The main application component
-function App() {
-    const [count, setCount] = useState(0);
-    const [count2, setCount2] = useState(0);
+const App = () => {
+  // Sample data for the table
+  const users = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Inactive' },
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Moderator', status: 'Active' },
+    { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'User', status: 'Active' },
+  ];
 
-    return (
-        <>
-            <Navbar bg="dark" variant="dark">
-                {" "}
-                // Navbar with dark theme
-                <Container>
-                    <Navbar.Brand href="#">P3 Project</Navbar.Brand>
-                    <Nav className="me-auto">
-                        <Nav.Link href="http://localhost:8080/dashboard/redirect">
-                            Dashboard
-                        </Nav.Link>
-                    </Nav>
-                </Container>
-            </Navbar>
+  const getStatusBadge = (status) => {
+    const variant = status === 'Active' ? 'success' : 'secondary';
+    return <Badge bg={variant}>{status}</Badge>;
+  };
 
-            <Container className="mt-4">
-                <div className="d-flex align-items-center mb-3">
-                    <a href="https://vite.dev" target="_blank" rel="noreferrer">
-                        <img src={viteLogo} className="logo" alt="Vite logo" />
-                    </a>
-                    <a
-                        href="http://localhost:8080/dashboard/redirect"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <img
-                            src={reactLogo}
-                            className="logo react"
-                            alt="React logo"
-                        />
-                    </a>
-                </div>
+  return (
+    <div className="App">
+      {/* Navbar */}
+      <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+        <Container>
+          <Navbar.Brand href="#home">Dashboard</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link href="#home">Home</Nav.Link>
+              <Nav.Link href="#users">Users</Nav.Link>
+              <Nav.Link href="#analytics">Analytics</Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
 
-                <h1>Vite + localhost:8080/dockers</h1>
-
-                <div className="card p-3">
-                    <Button
-                        variant="primary"
-                        onClick={() => {
-                            setCount((count) => count + 1);
-                            setCount2((count2) => count2 + 1);
-                        }}
-                        className="mb-2"
-                    >
-                        count is {count}
-                    </Button>
-
-                    <p>
-                        Edit <code>src/App.jsx</code> and save to test HMR
-                    </p>
-
-                    <div>
-                        <p>
-                            Hello World! This is a sample React application
-                            using Vite as the build tool.
-                        </p>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setCount2((count2) => count2 + 1)}
-                        >
-                            Buttons clicked {count2} times!
-                        </Button>
-                    </div>
-                </div>
-
-                <p className="read-the-docs mt-3">
-                    Click on the Vite and React logos to learn more
-                </p>
-            </Container>
-        </>
-    );
-}
+      {/* Main Content */}
+      <Container fluid className="py-4">
+        <Row>
+          <Col md={12}>
+            <h2 className="mb-4">User Management</h2>
+            <Table striped bordered hover responsive className="table-dark">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <Badge bg="info">{user.role}</Badge>
+                    </td>
+                    <td>{getStatusBadge(user.status)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  );
+};
 
 export default App;
