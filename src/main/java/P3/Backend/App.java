@@ -12,7 +12,7 @@ public class App {
 		// SpringApplication.run(App.class, args);
 
         Database db = new Database();
-        addDummyData(db);
+        //addDummyData(db);
         printDBData(db);
 	}
 

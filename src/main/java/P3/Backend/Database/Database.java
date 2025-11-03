@@ -1,5 +1,7 @@
 package P3.Backend.Database;
 
+import P3.Backend.Constants;
+
 import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,9 +12,9 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 
 public class Database {
-    String url = "jdbc:postgresql://localhost:5432/P3DB";
-    String user = "postgres";
-    String password = "SQLvmDBaccess";
+    String url = Constants.DATABASE_URL;
+    String user = Constants.DATABASE_USER;
+    String password = Constants.DATABASE_PASSWORD;
 
     private void errorHandling(SQLException error) {
         error.printStackTrace();
