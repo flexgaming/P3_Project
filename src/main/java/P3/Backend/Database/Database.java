@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 public class Database {
     String url = "jdbc:postgresql://localhost:5432/P3DB";
@@ -229,7 +230,7 @@ public class Database {
 
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
-                String timestamp = resultSet.getString("Timestamp");
+                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 boolean running = resultSet.getBoolean("Running");
                 double ramFree = resultSet.getDouble("Ram_Free");
                 double cpuFree = resultSet.getDouble("CPU_Free");
