@@ -12,6 +12,8 @@ function App() {
     return (
         <>
             <Navbar bg="dark" variant="dark">
+                {" "}
+                // Navbar with dark theme
                 <Container>
                     <Navbar.Brand href="#">P3 Project</Navbar.Brand>
                     <Nav className="me-auto">
