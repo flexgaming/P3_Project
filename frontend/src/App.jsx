@@ -70,11 +70,12 @@ const App = () => {
                         </Accordion.Body>
                     </Accordion.Item>
                 </Accordion>
+                <div className="card p-3">
+                    <h3>Docker Data Viewer</h3>
+                    {/* <DockerButton /> */}
+                </div>
             </Container>
-            <div class="card p-3">
-                <h1>Docker Data Viewer</h1>
-                <DockerButton />
-            </div>
+            
         </div>
     );
 };
