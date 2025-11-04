@@ -13,10 +13,6 @@ public class Region {
         this.name = name;
     }
 
-    public void addCompany(Company company) {
-        companies.add(company);
-    }
-
     public int getRegionID() {
         return regionID;
     }
@@ -25,10 +21,19 @@ public class Region {
         return name;
     }
 
+    /**
+     * Get all companies in this region.
+     * @return All companies in the region.
+     */
     public ArrayList<Company> getCompanies() {
         return companies;
     }
 
+    /**
+     * Search for a company using the company ID.
+     * @param companyID The ID of the company being searched for.
+     * @return The Company object if it exists, otherwise null.
+     */
     public Company getCompany(int companyID) {
         for (Company company : companies) {
             if (company.getCompanyID() == companyID) {
@@ -37,5 +42,13 @@ public class Region {
         }
 
         return null;
+    }
+
+    /**
+     * Adds a Company object to this region.
+     * @param company The Company object being added to the region.
+     */
+    public void addCompany(Company company) {
+        companies.add(company);
     }
 }

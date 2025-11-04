@@ -17,10 +17,6 @@ public class Server {
         this.diskUsageTotal = diskUsageTotal;
     }
 
-    public void addContainer(Container container) {
-        containers.add(container);
-    }
-
     public String getServerID() {
         return serverID;
     }
@@ -37,10 +33,19 @@ public class Server {
         return diskUsageTotal;
     }
 
+    /**
+     * Get all containers in this server.
+     * @return All containers in the server.
+     */
     public ArrayList<Container> getContainers() {
         return containers;
     }
 
+    /**
+     * Search for a container using the container ID.
+     * @param containerID The ID of the container being searched for.
+     * @return The Container object if it exists, otherwise null.
+     */
     public Container getContainer(String containerID) {
         for (Container container : containers) {
             if (container.getContainerID().equals(containerID)) {
@@ -49,5 +54,13 @@ public class Server {
         }
 
         return null;
+    }
+
+    /**
+     * Adds a Container object to this server.
+     * @param container The Container object being added to the server.
+     */
+    public void addContainer(Container container) {
+        containers.add(container);
     }
 }

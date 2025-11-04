@@ -13,10 +13,6 @@ public class Company {
         this.name = name;
     }
 
-    public void addServer(Server server) {
-        servers.add(server);
-    }
-
     public int getCompanyID() {
         return companyID;
     }
@@ -25,10 +21,19 @@ public class Company {
         return name;
     }
 
+    /**
+     * Get all servers in this company.
+     * @return All servers in the company.
+     */
     public ArrayList<Server> getServers() {
         return servers;
     }
 
+    /**
+     * Search for a server using the server ID.
+     * @param serverID The ID of the server being searched for.
+     * @return The Server object if it exists, otherwise null.
+     */
     public Server getServer(String serverID) {
         for (Server server : servers) {
             if (server.getServerID().equals(serverID)) {
@@ -37,5 +42,13 @@ public class Company {
         }
 
         return null;
+    }
+
+    /**
+     * Adds a Server object to this company.
+     * @param server The Server object being added to the company.
+     */
+    public void addServer(Server server) {
+        servers.add(server);
     }
 }
