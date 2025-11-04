@@ -9,6 +9,10 @@ import {
     Table,
     Badge,
     Accordion,
+    Tab,
+    Tabs,
+    ListGroup,
+    Stack,
 } from "react-bootstrap";
 
 // The main application component
@@ -37,45 +41,122 @@ const App = () => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-
+            <Tabs
+                id="regions-tabs"
+                >
+                <Tab eventKey="Europe" title="Europe">
+                    <h3>Companies in Europe</h3>
+                    <Container className="Companies-container">
+                        <Accordion className="Companies-accordion">
+                            <Accordion.Item eventKey="0">
+                                <Accordion.Header>CEGO</Accordion.Header>
+                                <Accordion.Body>
+                                    <ListGroup defaultActiveKey="#link1">
+                                        <ListGroup.Item action href="#link1">
+                                            Server 1
+                                        </ListGroup.Item>
+                                        <ListGroup.Item action href="#link2">
+                                            Server 2
+                                        </ListGroup.Item>
+                                        <ListGroup.Item action href="#link3">
+                                            Server 3
+                                        </ListGroup.Item>
+                                    </ListGroup>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey="1">
+                                <Accordion.Header>NETIP</Accordion.Header>
+                                <Accordion.Body>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing.
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+                    </Container>
+                </Tab>
+                <Tab eventKey="North America" title="North America">
+                    <h3>Companies in North America</h3>
+                    <Container className="Companies-container">
+                        <Accordion className="Companies-accordion">
+                            <Accordion.Item eventKey="0">
+                                <Accordion.Header>Tesla</Accordion.Header>
+                                <Accordion.Body>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing.
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey="1">
+                                <Accordion.Header>Microsoft</Accordion.Header>
+                                <Accordion.Body>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing.
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey="2">
+                                <Accordion.Header>Amazon</Accordion.Header>
+                                <Accordion.Body>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing.
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+                    </Container>
+                </Tab>
+                <Tab eventKey="South America" title="South America">
+                    Tab content for South America
+                    <Stack direction="horizontal" gap={3}>
+                        <div className="p-2">
+                            <ListGroup defaultActiveKey="#link1">
+                                <ListGroup.Item action href="#link1">
+                                    Company 1
+                                </ListGroup.Item>
+                                <ListGroup.Item action href="#link2">
+                                    Company 2
+                                </ListGroup.Item>
+                                <ListGroup.Item action href="#link3">
+                                    Company 3
+                                </ListGroup.Item>
+                            </ListGroup>
+                        </div>
+                        <div className="vr" />
+                        <div className="p-2 ms-auto">
+                            <ListGroup defaultActiveKey="#link1">
+                                <ListGroup.Item action href="#link1">
+                                    Server 1
+                                </ListGroup.Item>
+                                <ListGroup.Item action href="#link2">
+                                    Server 2
+                                </ListGroup.Item>
+                                <ListGroup.Item action href="#link3">
+                                    Server 3
+                                </ListGroup.Item>
+                            </ListGroup>
+                        </div>
+                        <div className="vr" />
+                        <div className="p-2">
+                            <ListGroup defaultActiveKey="#link1">
+                                <ListGroup.Item action href="#link1">
+                                    Container 1
+                                </ListGroup.Item>
+                                <ListGroup.Item action href="#link2">
+                                    Container 2
+                                </ListGroup.Item>
+                                <ListGroup.Item action href="#link3">
+                                    Container 3
+                                </ListGroup.Item>
+                            </ListGroup>
+                        </div>
+                    </Stack>
+                </Tab>
+                <Tab eventKey="Australia" title="Australia">
+                    Tab content for Australia
+                </Tab>
+                <Tab eventKey="Asia" title="Asia">
+                    Tab content for Asia
+                </Tab>
+            </Tabs>
             {/* Main Content */}
-            <Container className="regions">
-                <Accordion className="regions-accordion">
-                    <Accordion.Item eventKey="0">
-                        <Accordion.Header>Accordion Item #1</Accordion.Header>
-                        <Accordion.Body>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit, sed do eiusmod tempor incididunt ut labore et
-                            dolore magna aliqua. Ut enim ad minim veniam, quis
-                            nostrud exercitation ullamco laboris nisi ut aliquip
-                            ex ea commodo consequat. Duis aute irure dolor in
-                            reprehenderit in voluptate velit esse cillum dolore
-                            eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia
-                            deserunt mollit anim id est laborum.
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey="1">
-                        <Accordion.Header>Accordion Item #2</Accordion.Header>
-                        <Accordion.Body>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit, sed do eiusmod tempor incididunt ut labore et
-                            dolore magna aliqua. Ut enim ad minim veniam, quis
-                            nostrud exercitation ullamco laboris nisi ut aliquip
-                            ex ea commodo consequat. Duis aute irure dolor in
-                            reprehenderit in voluptate velit esse cillum dolore
-                            eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia
-                            deserunt mollit anim id est laborum.
-                        </Accordion.Body>
-                    </Accordion.Item>
-                </Accordion>
-                <div className="card p-3">
-                    <h3>Docker Data Viewer</h3>
-                    {/* <DockerButton /> */}
-                </div>
-            </Container>
             
+            <div className="card p-3">
+                <h3>Docker Data Viewer (Placeholder)</h3>
+                {/* <DockerButton /> */}
+            </div>
         </div>
     );
 };
