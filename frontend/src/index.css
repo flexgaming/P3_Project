@@ -72,7 +72,7 @@ button:focus-visible {
     padding: 0 16px;
     box-sizing: border-box;
     text-align: center;
-    background-color: #e05252;
+    background-color: #c9c9c9;
 }
 
 .regions-accordion {
@@ -84,3 +84,13 @@ button:focus-visible {
     padding: 1.5rem 0;
     width: 80%;
 }
+
+.lg1 {
+    
+}
+
+.vr {
+    width: 2px;
+    color: #000;
+}
+
