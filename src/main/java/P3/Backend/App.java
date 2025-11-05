@@ -4,15 +4,16 @@ import java.util.ArrayList;
 
 import P3.Backend.Database.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication
 public class App {
 	public static void main(String[] args) {
-        // Run main using Spring Boot
-		// SpringApplication.run(App.class, args);
+        //Run main using Spring Boot
+		SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        addDummyData(database);
+        //addDummyData(database);
         ArrayList<Region> regions = database.getRegions();
         printDBData(regions);
 	}
