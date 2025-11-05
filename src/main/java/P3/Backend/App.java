@@ -16,6 +16,12 @@ public class App {
         //addDummyData(database);
         ArrayList<Region> regions = database.getRegions();
         printDBData(regions);
+
+        //Test getting diagnostics data for a specific container
+        /* Container dockerTst = new Container("ctr-001");
+        Container testData = database.getDiagnosticsData(dockerTst);
+        System.out.println("\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+        System.out.println(testData.getDiagnosticsData()); */
 	}
 
     private static void printDBData(ArrayList<Region> regions) {

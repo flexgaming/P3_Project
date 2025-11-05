@@ -490,4 +490,40 @@ public class Database {
             errorHandling(error);
         }
     }
+
+    public Container getDiagnosticsData(Container docker) {
+        String sql = "SELECT * FROM Diagnostics WHERE Container_ID = '" + docker.getContainerID() + "';";
+        Container dck = new Container(docker.getContainerID());
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use a normal Statement. No SQL injection protection is necessary when no user input.
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective
+            // container.
+            while (resultSet.next()) {
+                String containerID = resultSet.getString("Container_ID");
+                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
+                boolean running = resultSet.getBoolean("Running");
+                double ramFree = resultSet.getDouble("Ram_Free");
+                double cpuFree = resultSet.getDouble("CPU_Free");
+                double diskUsageFree = resultSet.getDouble("Disk_Usage_Free");
+                int threadCount = resultSet.getInt("Thread_Count");
+                String processID = resultSet.getString("Process_ID");
+                String status = resultSet.getString("Status");
+                String errorLogs = resultSet.getString("Error_Logs");
+                Diagnostics diagnostics = new Diagnostics(timestamp, running, ramFree, cpuFree, diskUsageFree,
+                                                          threadCount, processID, status, errorLogs);
+
+                dck.addDiagnostics(diagnostics);
+            }
+            return dck;
+            
+        } catch (SQLException error) {
+            errorHandling(error);
+            return null;
+        }
+    }
 }
