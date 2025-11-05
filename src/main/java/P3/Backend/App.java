@@ -8,15 +8,15 @@ import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication
 public class App {
-	public static void main(String[] args) {
+        public static void main(String[] args) {
         //Run main using Spring Boot
-		SpringApplication.run(App.class, args);
+                SpringApplication.run(App.class, args);
 
         Database database = new Database();
         //addDummyData(database);
         ArrayList<Region> regions = database.getRegions();
         printDBData(regions);
-	}
+        }
 
     private static void printDBData(ArrayList<Region> regions) {
         for (Region region : regions) {
