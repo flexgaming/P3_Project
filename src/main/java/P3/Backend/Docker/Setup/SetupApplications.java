@@ -191,7 +191,8 @@ public class SetupApplications {
                 String response = scanner.nextLine();
                 if (response.toLowerCase().equals("y")) { // If user wants to delete any inactive containers, then proceed.
                     while (true) {
-                        System.out.println("Do you want to delete all or individually?\n 1) Delete all.\n 2) Delete individually.");
+                        System.out.println("Do you want to delete all or individually?");
+                        System.out.println("\n 1) Delete all.\n 2) Delete individually.\n -1) Exit container deletion");
                         response = scanner.nextLine();
 
                         // If user wants to delete all of the inactive containers, then proceed.
@@ -207,6 +208,9 @@ public class SetupApplications {
                             // Select which of the inactive containers the user want to delete.
                             deleteIndividually(existingIdArr, oldContainersArr, JSONFileObj, scanner);
                             break outer;
+                            // If user does not want to delete any of the containers, then proceed.
+                        } else if (response.toLowerCase().equals("-1")) {
+                            return;
                         }
                     } // If the user does not want to delete any inactive containers, then proceed.
                 } else if (response.toLowerCase().equals("n")) {
@@ -343,11 +347,11 @@ public class SetupApplications {
     /** This function is used for configuring the interval of containers.
      * 
      * @param containersArr Is used to add every single one of the containers from the array to the JSON file.
-     * @param ExistingIdArr Is used for getting the intervals from the already existing containers in the JSON file.
+     * @param existingIdArr Is used for getting the intervals from the already existing containers in the JSON file.
      * @param JSONFileObj Is used for updating the JSON array and finding the intervals for the existing containers.
      * @param scanner Is used is used to scan all of the input from the user.
      */
-    private static void AppendJSONContainerList(JSONArray containersArr, JSONArray ExistingIdArr, 
+    private static void AppendJSONContainerList(JSONArray containersArr, JSONArray existingIdArr, 
                                                         JSONObject JSONFileObj, Scanner scanner) {
         // List all of the containers that is being configured.
         System.out.println("This is the setup for all of the containers.");
@@ -361,23 +365,23 @@ public class SetupApplications {
             
             // If there are any existing containers in the JSON file, then proceed. 
             Integer interval;
-            if (ExistingIdArr.length() > 0) {
+            if (existingIdArr.length() > 0) {
                 // Find the interval of the existing containers, if the container is newly discovered, 
                 // then the interval is set to the default interval
-                interval = findContainerInterval(containersArr, ExistingIdArr, JSONFileObj);
+                interval = findContainerInterval(containersArr, existingIdArr, id, JSONFileObj);
             } else {
                 interval = defaultIntervalTime;
             }
             
             // Gets the new interval for sending data from the user.
-            System.out.println((i + 1) + ": Name: " + name);
+            System.out.println("\n" + (i + 1) + ": Name: " + name);
             System.out.println("Id: " + id + "\n");
             System.out.println("The interval this container is going to send data (in seconds).");
             System.out.println("Latest interval for \"" + name + "\" is: " + interval + " seconds.");
             
             // Make sure that the user's interval input is an int and over 0.
             while (true) {
-                System.out.print("Input new interval: ");
+                System.out.print("Input new interval (over 0 sec): ");
                 String response = scanner.nextLine();    
                 try {
                     int value = Integer.parseInt(response);
@@ -405,19 +409,16 @@ public class SetupApplications {
      * 
      * @param containersArr Is used for checking if the container in the array already has an interval.
      * @param existingIdArr Is used for getting the intervals from the already existing containers in the JSON file.
+     * @param currentId Is used to compare each of the id's in the exisitingIdArr.
      * @param JSONFileObj Is used to get the interval that is inside of the JSON file.
      * @return The return is either the interval from an already existing container or the default interval (used for newly 
      * discovered containers that is not within the JSON file).
      */
-    private static int findContainerInterval(JSONArray containersArr, JSONArray existingIdArr, JSONObject JSONFileObj) {
+    private static int findContainerInterval(JSONArray containersArr, JSONArray existingIdArr, String currentId, JSONObject JSONFileObj) {
         int count = 0; 
         
         // This goes through the containerArr and gets the ID from each of the containers.
-        for (int i = 0; i < containersArr.length(); i++) {
-            String currentId = containersArr.
-                getJSONObject(i).
-                getString("id");
-
+        for (int i = 0; i < existingIdArr.length(); i++) {
             
             // If currentId exists in the existing array it returns the correct interval.
             if (existingIdArr.getString(i).equals(currentId)) {
