@@ -10,17 +10,19 @@ import org.springframework.boot.SpringApplication;
 public class App {
 	public static void main(String[] args) {
         //Run main using Spring Boot
-		SpringApplication.run(App.class, args);
+		//SpringApplication.run(App.class, args);
 
         Database database = new Database();
         //addDummyData(database);
         ArrayList<Region> regions = database.getRegions();
-        printDBData(regions);
+        //printDBData(regions);
 
         //Test getting diagnostics data for a specific container
         Container dockerTst = new Container("ctr-001");
         Container testData = database.getDiagnosticsData(dockerTst);
-        System.out.println(testData.getDiagnosticsData());
+        for (Diagnostics diagnostics : testData.getDiagnosticsData()) {
+            System.out.println(diagnostics);
+        }
 	}
 
     private static void printDBData(ArrayList<Region> regions) {
@@ -46,30 +48,44 @@ public class App {
         }
     }
 
-    private static void addDummyData(Database db) {
-        db.addRegions(
+    private static void addDummyData(Database database) {
+        database.addRegions(
                 new String[]{"North America", "Europe", "Asia", "South America", "Australia"}
         );
-        db.addCompanies(
-                new int[]{1, 1, 2, 2, 3, 3, 4, 5},
+        ArrayList<Region> regions = database.getRegions();
+        database.addCompanies(
+                new String[]{regions.get(0).getRegionID(), regions.get(0).getRegionID(), regions.get(1).getRegionID(),
+                        regions.get(1).getRegionID(), regions.get(2).getRegionID(), regions.get(2).getRegionID(),
+                        regions.get(3).getRegionID(), regions.get(4).getRegionID()},
                 new String[]{"TechNova Inc.", "CloudForge LLC", "EuroCloud GmbH", "Datastream Systems",
                         "AsiaNet Solutions", "PacificWare Co.", "Andes Data Corp.", "AussieCompute Ltd."}
         );
-        db.addServers(
+        regions = database.getRegions();
+        database.addServers(
                 new String[] { "srv-101", "srv-102", "srv-201", "srv-301", "srv-302", "srv-401", "srv-501", "srv-601",
                         "srv-701", "srv-801" },
-                new int[]    { 1, 1, 2, 3, 3, 4, 5, 6, 7, 8 },
+                new String[] { regions.get(0).getCompanies().get(0).getCompanyID(),
+                        regions.get(0).getCompanies().get(0).getCompanyID(),
+                        regions.get(0).getCompanies().get(1).getCompanyID(),
+                        regions.get(1).getCompanies().get(0).getCompanyID(),
+                        regions.get(1).getCompanies().get(0).getCompanyID(),
+                        regions.get(1).getCompanies().get(1).getCompanyID(),
+                        regions.get(2).getCompanies().get(0).getCompanyID(),
+                        regions.get(2).getCompanies().get(1).getCompanyID(),
+                        regions.get(3).getCompanies().get(0).getCompanyID(),
+                        regions.get(4).getCompanies().get(0).getCompanyID()
+                },
                 new double[] { 128.0, 64.0, 96.0, 128.0, 64.0, 96.0, 64.0, 128.0, 96.0, 64.0 },
                 new double[] { 64.0, 32.0, 48.0, 64.0, 32.0, 48.0, 32.0, 64.0, 48.0, 32.0 },
                 new double[] { 4000.0, 2000.0, 3500.0, 4200.0, 2500.0, 3000.0, 2000.0, 5000.0, 3500.0, 2500.0 }
         );
-        db.addContainers(
+        database.addContainers(
                 new String[] { "ctr-001", "ctr-002", "ctr-003", "ctr-004", "ctr-005", "ctr-006", "ctr-007",
                         "ctr-008", "ctr-009", "ctr-010", "ctr-011", "ctr-012", "ctr-013", "ctr-014", "ctr-015" },
                 new String[] { "srv-101", "srv-101", "srv-102", "srv-201", "srv-301", "srv-301", "srv-302",
                         "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" }
         );
-        db.addDiagnosticsBatch(
+        database.addDiagnosticsBatch(
                 new String[] {
                         "ctr-001","ctr-001","ctr-001",
                         "ctr-002","ctr-002","ctr-002",
