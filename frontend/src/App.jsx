@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import "./App.css";
 import {
     Navbar,
@@ -13,17 +13,52 @@ import {
     Tabs,
     ListGroup,
     Stack,
+    Spinner,
+    Alert
 } from "react-bootstrap";
+
 
 // The main application component
 const App = () => {
-    // Sample data for the table
-    const Regions = [
-        { name: "North America", status: "Active" },
-        { name: "Europe", status: "Inactive" },
-        { name: "Asia", status: "Active" },
-        { name: "Australia", status: "Active" },
-    ];
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchDockerData = async () => {
+    try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5173/api/dockers/ctr-011');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        setData(result);
+        } catch (err) {
+        setError(err.message);
+        } finally {
+        setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDockerData();
+    }, []); // Runs once on mount; add deps for refetching
+
+    if (loading) {
+        return (
+        <div className="d-flex justify-content-center mt-4">
+            <Spinner animation="border" variant="primary" />
+        </div>
+        );
+    }
+
+    if (error) {
+        return (
+        <Alert variant="danger" className="mt-4">
+            Error fetching data: {error}
+        </Alert>
+        );
+    }
 
     return (
         <div className="App">
@@ -41,9 +76,7 @@ const App = () => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Tabs
-                id="regions-tabs"
-                >
+            <Tabs id="regions-tabs">
                 <Tab eventKey="Europe" title="Europe">
                     <h3>Companies in Europe</h3>
                     <Container className="Companies-container">
@@ -521,8 +554,9 @@ const App = () => {
             </Tabs>
             {/* Main Content */}
             
-            <div className="card p-3">
-                <h3>Docker Data Viewer (Placeholder)</h3>
+            <div id="dataViewerTest">
+                <p id="dataTarget">Docker Data Viewer (Placeholder)</p>
+                <pre>{JSON.stringify(data, null, 2)}</pre>
                 {/* <DockerButton /> */}
             </div>
         </div>

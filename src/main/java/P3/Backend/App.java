@@ -8,15 +8,20 @@ import org.springframework.boot.SpringApplication;
 
 @SpringBootApplication
 public class App {
-        public static void main(String[] args) {
+	public static void main(String[] args) {
         //Run main using Spring Boot
-                SpringApplication.run(App.class, args);
+		SpringApplication.run(App.class, args);
 
         Database database = new Database();
         //addDummyData(database);
         ArrayList<Region> regions = database.getRegions();
         printDBData(regions);
-        }
+
+        //Test getting diagnostics data for a specific container
+        Container dockerTst = new Container("ctr-001");
+        Container testData = database.getDiagnosticsData(dockerTst);
+        System.out.println(testData.getDiagnosticsData());
+	}
 
     private static void printDBData(ArrayList<Region> regions) {
         for (Region region : regions) {
