@@ -359,10 +359,16 @@ public class SetupApplications {
             String name = container.getJSONArray("names").getString(0).substring(1);
             String id = container.getString("id");
             
-            // Find the interval of the existing containers, if the container is newly discovered, 
-            // then the interval is set to the default interval
-            Integer interval = findContainerInterval(containersArr, ExistingIdArr, JSONFileObj);
-
+            // If there are any existing containers in the JSON file, then proceed. 
+            Integer interval;
+            if (ExistingIdArr.length() > 0) {
+                // Find the interval of the existing containers, if the container is newly discovered, 
+                // then the interval is set to the default interval
+                interval = findContainerInterval(containersArr, ExistingIdArr, JSONFileObj);
+            } else {
+                interval = defaultIntervalTime;
+            }
+            
             // Gets the new interval for sending data from the user.
             System.out.println((i + 1) + ": Name: " + name);
             System.out.println("Id: " + id + "\n");
@@ -405,12 +411,14 @@ public class SetupApplications {
      */
     private static int findContainerInterval(JSONArray containersArr, JSONArray existingIdArr, JSONObject JSONFileObj) {
         int count = 0; 
+        
         // This goes through the containerArr and gets the ID from each of the containers.
         for (int i = 0; i < containersArr.length(); i++) {
             String currentId = containersArr.
                 getJSONObject(i).
                 getString("id");
 
+            
             // If currentId exists in the existing array it returns the correct interval.
             if (existingIdArr.getString(i).equals(currentId)) {
                 
