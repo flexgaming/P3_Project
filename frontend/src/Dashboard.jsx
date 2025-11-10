@@ -28,52 +28,50 @@ export default function Dashboard() {
 
   return (
     <main className="dashboard">
-        <h2>Dashboard</h2>
+        <h2><b>Dashboard</b></h2>
 
-        <Stack direction="horizontal" gap={3}>
-            <div className="p-2">
-                <h1>Europe</h1>
-                <ListGroup variant='block'>
+        <Stack direction="horizontal" id="region-overview-stack" gap={3}>
+            <div className="p-2 w-100">
+                
+                <ListGroup>
+                    <ListGroup.Item><h3><b>Europe</b></h3></ListGroup.Item>
                     <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
                     <ListGroup.Item>Companies: <Badge bg="primary">56</Badge></ListGroup.Item>
                     <ListGroup.Item>Total uptime: <Badge bg="primary">70%</Badge></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item>Errors last hour: <Badge bg="primary">123</Badge></ListGroup.Item>
                 </ListGroup>
             </div>
-            <div className="p-2 ms-auto">
-                <h1>North America</h1>
+            <div className="p-2 ms-auto w-100">
+                
                 <ListGroup>
-                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item><h3><b>North America</b></h3></ListGroup.Item>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">21912</Badge> / <Badge bg="primary">23547</Badge></ListGroup.Item>
+                    <ListGroup.Item>Companies: <Badge bg="primary">153</Badge></ListGroup.Item>
+                    <ListGroup.Item>Total uptime: <Badge bg="primary">85%</Badge></ListGroup.Item>
+                    <ListGroup.Item>Errors last hour: <Badge bg="primary">352</Badge></ListGroup.Item>
                 </ListGroup>
             </div>
-            <div className="p-2 ms-auto">
-                <h1>Australia</h1>
+            <div className="p-2 ms-auto w-100">
                 <ListGroup>
-                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item><h3><b>Australia</b></h3></ListGroup.Item>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">10543</Badge> / <Badge bg="primary">11672</Badge></ListGroup.Item>
+                    <ListGroup.Item>Companies: <Badge bg="primary">56</Badge></ListGroup.Item>
+                    <ListGroup.Item>Total uptime: <Badge bg="primary">42%</Badge></ListGroup.Item>
+                    <ListGroup.Item>Errors last hour: <Badge bg="primary">251</Badge></ListGroup.Item>
                 </ListGroup>
             </div>
-            <div className="p-2 ms-auto">
-                <h1>Asia</h1>
+            <div className="p-2 ms-auto w-100">
                 <ListGroup>
-                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
-                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item><h3><b>Asia</b></h3></ListGroup.Item>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">512</Badge> / <Badge bg="primary">754</Badge></ListGroup.Item>
+                    <ListGroup.Item>Companies: <Badge bg="primary">12</Badge></ListGroup.Item>
+                    <ListGroup.Item>Total uptime: <Badge bg="primary">89%</Badge></ListGroup.Item>
+                    <ListGroup.Item>Errors last hour: <Badge bg="primary">42</Badge></ListGroup.Item>
                 </ListGroup>
             </div>
         </Stack>
 
-        <h1>Critical Errors</h1>
+        <h1><b>Critical Errors</b></h1>
         <Table striped bordered hover id="errors-table">
             <thead>
                 <tr>
@@ -108,8 +106,8 @@ export default function Dashboard() {
                     <td>Europe/CEGO/Server2</td>
                     <td>TestCont6</td>
                     <td>5534</td>
-                    <td><button variant="warning">View</button></td>
-                    <td><button>Resolve</button></td>
+                    <td><Button variant="primary">View</Button></td>
+                    <td><Button variant='success'>Resolve</Button></td>
                 </tr>
                 <tr>
                     <td>10:54</td>
@@ -118,12 +116,11 @@ export default function Dashboard() {
                     <td>NorthAmerica/Tesla/Giga</td>      
                     <td>Gigapress4</td>
                     <td>512121</td>
-                    <td><button variant='info'>View</button></td>
-                    <td><button>Resolve</button></td>
+                    <td><Button variant='primary'>View</Button></td>
+                    <td><Button variant="success">Resolve</Button></td>
                 </tr>
             </tbody>
         </Table>
-
     </main>
   );
 }

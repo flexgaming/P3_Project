@@ -234,11 +234,30 @@ const App = () => {
                                                             <Row>
                                                                 <Col className="Server-Column">
                                                                     <ListGroup className="lg1">
+<<<<<<< Updated upstream
                                                                         <ListGroup.Item disabled className="Server-Header">
                                                                             <Stack direction="horizontal" gap={2}>
                                                                                 <div>Server 1</div>
                                                                                 <div className="ms-auto">Active containers:</div>
                                                                                 <div>3</div>
+=======
+                                                                        <ListGroup.Item
+                                                                            disabled
+                                                                            className="Server-Header"
+                                                                        >
+                                                                            <Stack direction="horizontal" gap={2}>
+                                                                                <div>
+                                                                                    Server
+                                                                                    1
+                                                                                </div>
+                                                                                <div className="ms-auto">
+                                                                                    Active
+                                                                                    containers:
+                                                                                </div>
+                                                                                <div>
+                                                                                    3
+                                                                                </div>
+>>>>>>> Stashed changes
                                                                             </Stack>
                                                                         </ListGroup.Item>
                                                                         <ListGroup.Item action href="#link1" variant="success">

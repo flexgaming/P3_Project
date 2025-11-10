@@ -18,12 +18,15 @@ public class Database {
 
     /**
      * Checks if all the given arrays are of the same length.
+     * 
      * @param arrays Input arrays.
-     * @return true if they at least one array is of different length than the others, false otherwise.
+     * @return true if they at least one array is of different length than the
+     *         others, false otherwise.
      */
     public static boolean notSameLength(Object... arrays) {
         // If there are no arrays, return false.
-        if (arrays.length == 0) return false;
+        if (arrays.length == 0)
+            return false;
 
         // The expected length is the length of the first array.
         int expectedLength = Array.getLength(arrays[0]);
@@ -39,15 +42,18 @@ public class Database {
 
     /**
      * Adds a region to the database.
+     * 
      * @param regionName The name of the region being added.
      */
     public void addRegions(String regionName) {
-        // Reformats the input parameters to fit the signature of the below addRegions method.
-        addRegions(new String[]{regionName});
+        // Reformats the input parameters to fit the signature of the below addRegions
+        // method.
+        addRegions(new String[] { regionName });
     }
 
     /**
      * Adds regions to the database.
+     * 
      * @param regionNames The names of all the regions being added.
      */
     public void addRegions(String[] regionNames) {
@@ -55,8 +61,8 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use Prepared Statement to help format the SQL string to prevent injections.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                // Use Prepared Statement to help format the SQL string to prevent injections.
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all regions to be added.
             for (String regionName : regionNames) {
@@ -76,18 +82,21 @@ public class Database {
 
     /**
      * Adds a company to the database.
+     * 
      * @param regionID The ID of the region in which the company resides.
-     * @param name The name of the company being added.
+     * @param name     The name of the company being added.
      */
     public void addCompanies(int regionID, String name) {
-        // Reformats the input parameters to fit the signature of the below addCompanies method.
-        addCompanies(new int[]{regionID}, new String[]{name});
+        // Reformats the input parameters to fit the signature of the below addCompanies
+        // method.
+        addCompanies(new int[] { regionID }, new String[] { name });
     }
 
     /**
      * Adds companies to the database.
+     * 
      * @param regionIDs The IDs of the regions in which these companies reside.
-     * @param names The names of the companies being added.
+     * @param names     The names of the companies being added.
      */
     public void addCompanies(int[] regionIDs, String[] names) {
         // Check that the input parameter arrays are of same length.
@@ -100,8 +109,8 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use Prepared Statement to help format the SQL string to prevent injections.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                // Use Prepared Statement to help format the SQL string to prevent injections.
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all companies to be added.
             for (int i = 0; i < regionIDs.length; i++) {
@@ -122,6 +131,7 @@ public class Database {
 
     /**
      * Adds a server to the database.
+     * 
      * @param serverID
      * @param companyID
      * @param ramTotal
@@ -129,21 +139,24 @@ public class Database {
      * @param diskUsageTotal
      */
     public void addServers(String serverID, int companyID, double ramTotal, double cpuTotal, double diskUsageTotal) {
-        // Reformats the input parameters to fit the signature of the below addServers method.
-        addServers(new String[]{serverID}, new int[]{companyID}, new double[]{ramTotal}, new double[]{cpuTotal},
-                new double[]{diskUsageTotal});
+        // Reformats the input parameters to fit the signature of the below addServers
+        // method.
+        addServers(new String[] { serverID }, new int[] { companyID }, new double[] { ramTotal },
+                new double[] { cpuTotal },
+                new double[] { diskUsageTotal });
     }
 
     /**
      * Adds servers to the database.
-     * @param serverIDs The IDs of the servers being added.
-     * @param companyIDs The IDs of the companies owning the servers.
-     * @param ramTotals The total amount of RAM on the server.
-     * @param cpuTotals The total amount of CPU on the server.
+     * 
+     * @param serverIDs       The IDs of the servers being added.
+     * @param companyIDs      The IDs of the companies owning the servers.
+     * @param ramTotals       The total amount of RAM on the server.
+     * @param cpuTotals       The total amount of CPU on the server.
      * @param diskUsageTotals The total amount of Disk Usage on the server.
      */
     public void addServers(String[] serverIDs, int[] companyIDs, double[] ramTotals, double[] cpuTotals,
-                           double[] diskUsageTotals) {
+            double[] diskUsageTotals) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(serverIDs, companyIDs, ramTotals, cpuTotals, diskUsageTotals)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
@@ -155,8 +168,8 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use Prepared Statement to help format the SQL string to prevent injections.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                // Use Prepared Statement to help format the SQL string to prevent injections.
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all companies to be added.
             for (int i = 0; i < serverIDs.length; i++) {
@@ -180,18 +193,21 @@ public class Database {
 
     /**
      * Adds a container to the database.
+     * 
      * @param containerID The ID of the container being added.
-     * @param serverID The ID of the server running the container.
+     * @param serverID    The ID of the server running the container.
      */
     public void addContainers(String containerID, String serverID) {
-        // Reformats the input parameters to fit the signature of the below addContainers method.
-        addContainers(new String[]{containerID}, new String[]{serverID});
+        // Reformats the input parameters to fit the signature of the below
+        // addContainers method.
+        addContainers(new String[] { containerID }, new String[] { serverID });
     }
 
     /**
      * Adds containers to the database.
+     * 
      * @param containerIDs The IDs of the containers being added.
-     * @param serverIDs The IDs of the servers running these containers.
+     * @param serverIDs    The IDs of the servers running these containers.
      */
     public void addContainers(String[] containerIDs, String[] serverIDs) {
         // Check that the input parameter arrays are of same length.
@@ -204,8 +220,8 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use Prepared Statement to help format the SQL string to prevent injections.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                // Use Prepared Statement to help format the SQL string to prevent injections.
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all companies to be added.
             for (int i = 0; i < serverIDs.length; i++) {
@@ -226,40 +242,44 @@ public class Database {
 
     /**
      * Adds diagnostics to the database.
-     * @param containerID The ID of the container being diagnosed.
-     * @param running If the container is running.
-     * @param ramFree How much RAM is free.
-     * @param cpuFree How much CPU is free.
+     * 
+     * @param containerID   The ID of the container being diagnosed.
+     * @param running       If the container is running.
+     * @param ramFree       How much RAM is free.
+     * @param cpuFree       How much CPU is free.
      * @param diskUsageFree How much Disk Usage is free.
-     * @param threadCount How many threads are active.
-     * @param processID The ID of the process.
-     * @param status The status of the container.
-     * @param errorLogs The Error Logs of the container.
+     * @param threadCount   How many threads are active.
+     * @param processID     The ID of the process.
+     * @param status        The status of the container.
+     * @param errorLogs     The Error Logs of the container.
      */
     public void addDiagnosticsBatch(String containerID, boolean running, double ramFree, double cpuFree,
-                                    double diskUsageFree, int threadCount, String processID, String status,
-                                    String errorLogs) {
-        // Reformats the input parameters to fit the signature of the below addDiagnosticsBatch method.
-        addDiagnosticsBatch(new String[]{containerID}, new boolean[]{running}, new double[]{ramFree},
-                new double[]{cpuFree}, new double[]{diskUsageFree}, new int[]{threadCount}, new String[]{processID},
-                new String[]{status}, new String[]{errorLogs});
+            double diskUsageFree, int threadCount, String processID, String status,
+            String errorLogs) {
+        // Reformats the input parameters to fit the signature of the below
+        // addDiagnosticsBatch method.
+        addDiagnosticsBatch(new String[] { containerID }, new boolean[] { running }, new double[] { ramFree },
+                new double[] { cpuFree }, new double[] { diskUsageFree }, new int[] { threadCount },
+                new String[] { processID },
+                new String[] { status }, new String[] { errorLogs });
     }
 
     /**
      * Adds a batch of diagnostics to the database.
-     * @param containerIDs The IDs of the containers that are diagnosed.
-     * @param runningList If the containers are running.
-     * @param ramFrees How much RAM is free.
-     * @param cpuFrees How much CPU is free.
+     * 
+     * @param containerIDs   The IDs of the containers that are diagnosed.
+     * @param runningList    If the containers are running.
+     * @param ramFrees       How much RAM is free.
+     * @param cpuFrees       How much CPU is free.
      * @param diskUsageFrees How much Disk Usage is free.
-     * @param threadCounts How many threads are active.
-     * @param processIDs The IDs of the processes.
-     * @param statuses The statuses of the containers.
-     * @param errorLogsList The Error Logs of the containers.
+     * @param threadCounts   How many threads are active.
+     * @param processIDs     The IDs of the processes.
+     * @param statuses       The statuses of the containers.
+     * @param errorLogsList  The Error Logs of the containers.
      */
     public void addDiagnosticsBatch(String[] containerIDs, boolean[] runningList, double[] ramFrees, double[] cpuFrees,
-                                   double[] diskUsageFrees, int[] threadCounts, String[] processIDs, String[] statuses,
-                                   String[] errorLogsList) {
+            double[] diskUsageFrees, int[] threadCounts, String[] processIDs, String[] statuses,
+            String[] errorLogsList) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(containerIDs, runningList, ramFrees, cpuFrees, diskUsageFrees, threadCounts, processIDs,
                 statuses, errorLogsList)) {
@@ -272,8 +292,8 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use Prepared Statement to help format the SQL string to prevent injections.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                // Use Prepared Statement to help format the SQL string to prevent injections.
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all companies to be added.
             for (int i = 0; i < containerIDs.length; i++) {
@@ -301,6 +321,7 @@ public class Database {
 
     /**
      * Fetches all the regions saved in the database.
+     * 
      * @return ArrayList of all regions.
      */
     public ArrayList<Region> getRegions() {
@@ -309,11 +330,13 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Region table and adds them as Region classes to the ArrayList.
+            // Reads all the rows in the Region table and adds them as Region classes to the
+            // ArrayList.
             while (resultSet.next()) {
                 int id = resultSet.getInt("Region_ID");
                 String name = resultSet.getString("Name");
@@ -333,6 +356,7 @@ public class Database {
 
     /**
      * Fetches all the companies saved in the database.
+     * 
      * @param regions The ArrayList of regions.
      */
     public void getCompanies(ArrayList<Region> regions) {
@@ -340,18 +364,21 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Company table and adds them as Company classes to their respective region.
+            // Reads all the rows in the Company table and adds them as Company classes to
+            // their respective region.
             while (resultSet.next()) {
                 int companyID = resultSet.getInt("Company_ID");
                 int regionId = resultSet.getInt("Region_ID");
                 String name = resultSet.getString("Name");
                 Company company = new Company(companyID, name);
 
-                // Finds the respective region of a company, and adds the company to that region.
+                // Finds the respective region of a company, and adds the company to that
+                // region.
                 for (Region region : regions) {
                     if (region.getRegionID() == regionId) {
                         region.addCompany(company);
@@ -369,6 +396,7 @@ public class Database {
 
     /**
      * Fetches all the servers saved in the database.
+     * 
      * @param regions The ArrayList of regions (that now also contain companies).
      */
     public void getServers(ArrayList<Region> regions) {
@@ -376,11 +404,13 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Server table and adds them as Server classes to their respective company.
+            // Reads all the rows in the Server table and adds them as Server classes to
+            // their respective company.
             while (resultSet.next()) {
                 String serverID = resultSet.getString("Server_ID");
                 int companyID = resultSet.getInt("Company_ID");
@@ -389,7 +419,8 @@ public class Database {
                 double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
                 Server server = new Server(serverID, ramTotal, cpuTotal, diskUsageTotal);
 
-                // Finds the respective company of a server, and adds the server to that company.
+                // Finds the respective company of a server, and adds the server to that
+                // company.
                 for (Region region : regions) {
                     Company company = region.getCompany(companyID);
                     if (company != null) {
@@ -408,24 +439,29 @@ public class Database {
 
     /**
      * Fetches all containers saved in the database.
-     * @param regions The ArrayList of regions (that now also contain companies and servers).
+     * 
+     * @param regions The ArrayList of regions (that now also contain companies and
+     *                servers).
      */
     public void getContainers(ArrayList<Region> regions) {
         String sql = "SELECT * FROM Container";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Container table and adds them as Container classes to their respective server.
+            // Reads all the rows in the Container table and adds them as Container classes
+            // to their respective server.
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
                 String serverID = resultSet.getString("Server_ID");
                 Container container = new Container(containerID);
 
-                // Finds the respective server of a container, and adds the container to that server.
+                // Finds the respective server of a container, and adds the container to that
+                // server.
                 for (Region region : regions) {
                     for (Company company : region.getCompanies()) {
                         Server server = company.getServer(serverID);
@@ -446,18 +482,22 @@ public class Database {
 
     /**
      * Fetches all diagnostics data saved in the database.
-     * @param regions The ArrayList of regions (that now also contain companies, servers and containers).
+     * 
+     * @param regions The ArrayList of regions (that now also contain companies,
+     *                servers and containers).
      */
     public void getDiagnosticsData(ArrayList<Region> regions) {
         String sql = "SELECT * FROM Diagnostics";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective
+            // Reads all the rows in the Diagnostics table and adds them as Diagnostics
+            // classes to their respective
             // container.
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
@@ -471,9 +511,10 @@ public class Database {
                 String status = resultSet.getString("Status");
                 String errorLogs = resultSet.getString("Error_Logs");
                 Diagnostics diagnostics = new Diagnostics(timestamp, running, ramFree, cpuFree, diskUsageFree,
-                                                          threadCount, processID, status, errorLogs);
+                        threadCount, processID, status, errorLogs);
 
-                // Finds the respective container of the diagnostics, and adds the diagnostics to that container.
+                // Finds the respective container of the diagnostics, and adds the diagnostics
+                // to that container.
                 for (Region region : regions) {
                     for (Company company : region.getCompanies()) {
                         for (Server server : company.getServers()) {
@@ -497,11 +538,13 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective
+            // Reads all the rows in the Diagnostics table and adds them as Diagnostics
+            // classes to their respective
             // container.
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
@@ -515,15 +558,42 @@ public class Database {
                 String status = resultSet.getString("Status");
                 String errorLogs = resultSet.getString("Error_Logs");
                 Diagnostics diagnostics = new Diagnostics(timestamp, running, ramFree, cpuFree, diskUsageFree,
-                                                          threadCount, processID, status, errorLogs);
+                        threadCount, processID, status, errorLogs);
 
                 dck.addDiagnostics(diagnostics);
             }
             return dck;
-            
+
         } catch (SQLException error) {
             errorHandling(error);
             return null;
         }
+    }
+
+    public ArrayList<Region> getRegionsTemp() {
+        ArrayList<Region> regions = new ArrayList<>();
+        String sql = "SELECT * FROM Region";
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+                // Use a normal Statement. No SQL injection protection is necessary when no user
+                // input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
+
+            // Reads all the rows in the Region table and adds them as Region classes to the
+            // ArrayList.
+            while (resultSet.next()) {
+                int id = resultSet.getInt("Region_ID");
+                String name = resultSet.getString("Name");
+                Region region = new Region(id, name);
+                regions.add(region);
+            }
+
+        } catch (SQLException error) {
+            errorHandling(error);
+        }
+
+        return regions;
     }
 }
