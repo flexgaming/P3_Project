@@ -5,28 +5,6 @@
     color: #213547;
 }
 
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-}
-
-.logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-.card {
-    padding: 2em;
-}
-
-.read-the-docs {
-    color: #888;
-}
 
 .fixed-status {
   min-width: 45px;      /* minimum width so content fits */
@@ -39,6 +17,14 @@
 .Container-Name-Container {
   width: 250px;
   text-align: left;
+}
+
+.Server-Header {
+    background-color: rgb(129, 179, 223);
+    font-weight: bold;
+    font-size: 1.2em;
+    padding-top: 10px;
+
 }
 
 .Server-Column {
