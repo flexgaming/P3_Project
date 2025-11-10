@@ -1,11 +1,14 @@
 package P3.Backend;
 
 import P3.Backend.Database.*;
+
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/data") //Router starting point
@@ -43,4 +46,12 @@ public class DataController {
         return database.getCompanies(id);
     }
 
+
+    @GetMapping("/regions")
+    public ArrayList getAllRegions(){
+        Database database = new Database();
+        System.out.println(database.getRegionsTemp());
+        return database.getRegionsTemp();
+    }
+    
 }

@@ -173,7 +173,7 @@ const App = () => {
                             <Nav.Link as={Link} to="/dashboard">
                                 Dashboard
                             </Nav.Link>
-                            <Nav.Link href="/navigate">Navigate</Nav.Link>
+                            <Nav.Link href="/nav">Navigate</Nav.Link>
                             <Nav.Link href="/manage">Manage</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>

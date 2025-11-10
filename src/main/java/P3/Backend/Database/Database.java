@@ -549,9 +549,9 @@ public class Database {
         }
     }
 
-    public ArrayList<Region> getRegionsTemp() {
-        ArrayList<Region> regions = new ArrayList<>();
-        String sql = "SELECT * FROM Region";
+    public ArrayList<String> getRegionsTemp() {
+        ArrayList<String> regions = new ArrayList<>();
+        String sql = "SELECT * FROM region";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -561,10 +561,7 @@ public class Database {
 
             // Reads all the rows in the Region table and adds them as Region classes to the ArrayList.
             while (resultSet.next()) {
-                int id = resultSet.getInt("Region_ID");
-                String name = resultSet.getString("Name");
-                Region region = new Region(id, name);
-                regions.add(region);
+                regions.add(resultSet.getString("Name"));
             }
 
         } catch (SQLException error) {
