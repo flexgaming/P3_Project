@@ -14,16 +14,33 @@ public class DataController {
     // Standard message endpoint
     @GetMapping
     public String getMessage() {
-        return "DataController is up and running!\nSpecific Docker data can be accessed via /data/{id}";
+        return "DataController is up and running!\nSpecific Docker data can be accessed via /data/container/{id}";
     }
 
     // GET Docker by ID
-    @GetMapping("/{id}") //Router continuation
+    @GetMapping("/container/{id}") //Router continuation
     public ArrayList getDockerById(@PathVariable String id) {
-        // In a real app, fetch from DB
+        // Get docker container diagnostics data from DB
         Database database = new Database();
         Container dockerTst = new Container(id);
         Container testData = database.getDiagnosticsData(dockerTst);
         return testData.getDiagnosticsData();
     }
+
+    // GET server by ID
+    @GetMapping("/server/{id}") //Router continuation
+    public ArrayList getServerById(@PathVariable String id) {
+        // Get server data from DB
+        Database database = new Database();
+        return null; // Placeholder for actual server data retrieval
+    }
+
+    // GET companies by RegionId
+    @GetMapping("/regions/{id}") //Router continuation
+    public ArrayList getCompaniesByRegion(@PathVariable Integer id) {
+        // Get companies by region from DB
+        Database database = new Database();
+        return database.getCompanies(id);
+    }
+
 }

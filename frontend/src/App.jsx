@@ -195,18 +195,12 @@ const App = () => {
                                     </Tab>
                                     <Tab eventKey="North America" title="North America">
                                         {/* This is the North America tab */}
-                                        <Tab.Container
-                                            id="left-tabs-example"
-                                            activeKey={selectedCompanyKey || "first"}
-                                            onSelect={(k) => setSelectedCompanyKey(k)}>
+                                        <Tab.Container id="left-tabs-example" activeKey={selectedCompanyKey || "first"} onSelect={(k) => setSelectedCompanyKey(k)}>
                                             <Row>
                                                 <Col sm={3} className="Company-List-Column">
                                                     <Nav variant="pills" className="flex-column">
                                                         <Nav.Item className="Company-List-Item">
-                                                            <Nav.Link
-                                                                eventKey="first"
-                                                                className="Company-List-Link"
-                                                                onClick={() => handleCompanySelect("CEGO", "first")}>
+                                                            <Nav.Link eventKey="first" className="Company-List-Link" onClick={() => handleCompanySelect("CEGO", "first")}>
                                                                 CEGO
                                                             </Nav.Link>
                                                         </Nav.Item>
@@ -234,30 +228,11 @@ const App = () => {
                                                             <Row>
                                                                 <Col className="Server-Column">
                                                                     <ListGroup className="lg1">
-<<<<<<< Updated upstream
                                                                         <ListGroup.Item disabled className="Server-Header">
                                                                             <Stack direction="horizontal" gap={2}>
                                                                                 <div>Server 1</div>
                                                                                 <div className="ms-auto">Active containers:</div>
                                                                                 <div>3</div>
-=======
-                                                                        <ListGroup.Item
-                                                                            disabled
-                                                                            className="Server-Header"
-                                                                        >
-                                                                            <Stack direction="horizontal" gap={2}>
-                                                                                <div>
-                                                                                    Server
-                                                                                    1
-                                                                                </div>
-                                                                                <div className="ms-auto">
-                                                                                    Active
-                                                                                    containers:
-                                                                                </div>
-                                                                                <div>
-                                                                                    3
-                                                                                </div>
->>>>>>> Stashed changes
                                                                             </Stack>
                                                                         </ListGroup.Item>
                                                                         <ListGroup.Item action href="#link1" variant="success">
