@@ -27,9 +27,9 @@ public class App {
     private static void printData(Database database) {
         JSONObject regions = database.getRegions();
         System.out.println(regions.toString(4));
-        JSONObject companies = database.getCompanies();
+        JSONObject companies = database.getCompanies(regions.getJSONObject("North America").getString("regionID"));
         System.out.println(companies.toString(4));
-        JSONObject servers = database.getServers();
+        JSONObject servers = database.getServers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
         System.out.println(servers.toString(4));
         JSONObject containers = database.getContainers();
         System.out.println(containers.toString(4));
@@ -57,21 +57,21 @@ public class App {
                 new String[]{"TechNova Inc.", "CloudForge LLC", "EuroCloud GmbH", "Datastream Systems",
                         "AsiaNet Solutions", "PacificWare Co.", "Anders Data Corp.", "AussieCompute Ltd."}
         );
-        JSONObject companies = database.getCompanies();
+        
         database.addServers(
                 new String[] { "srv-101", "srv-102", "srv-201", "srv-301", "srv-302", "srv-401", "srv-501", "srv-601",
                         "srv-701", "srv-801" },
                 new String[] {
-                        companies.getJSONObject("TechNova Inc.").getString("companyID"),
-                        companies.getJSONObject("TechNova Inc.").getString("companyID"),
-                        companies.getJSONObject("CloudForge LLC").getString("companyID"),
-                        companies.getJSONObject("EuroCloud GmbH").getString("companyID"),
-                        companies.getJSONObject("EuroCloud GmbH").getString("companyID"),
-                        companies.getJSONObject("Datastream Systems").getString("companyID"),
-                        companies.getJSONObject("AsiaNet Solutions").getString("companyID"),
-                        companies.getJSONObject("PacificWare Co.").getString("companyID"),
-                        companies.getJSONObject("Anders Data Corp.").getString("companyID"),
-                        companies.getJSONObject("AussieCompute Ltd.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("North America").getString("regionID")).getJSONObject("TechNova Inc.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("North America").getString("regionID")).getJSONObject("TechNova Inc.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("North America").getString("regionID")).getJSONObject("CloudForge LLC").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Europe").getString("regionID")).getJSONObject("EuroCloud GmbH").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Europe").getString("regionID")).getJSONObject("EuroCloud GmbH").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Europe").getString("regionID")).getJSONObject("Datastream Systems").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Asia").getString("regionID")).getJSONObject("AsiaNet Solutions").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Asia").getString("regionID")).getJSONObject("PacificWare Co.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("South America").getString("regionID")).getJSONObject("Anders Data Corp.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Australia").getString("regionID")).getJSONObject("AussieCompute Ltd.").getString("companyID"),
                 },
                 new String[] { "AetherCore", "NovaNode", "QuantumHub", "IronPeak", "EchoForge", "SolarisGate",
                         "ObsidianRealm", "CrystalPulse", "VortexNet", "TitanVale" },
