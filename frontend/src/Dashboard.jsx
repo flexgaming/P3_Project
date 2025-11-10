@@ -31,10 +31,46 @@ export default function Dashboard() {
         <h2>Dashboard</h2>
 
         <Stack direction="horizontal" gap={3}>
-            <div className="p-2">Europe</div>
-            <div className="p-2 ms-auto">North America</div>
-            <div className="p-2 ms-auto">Australia</div>
-            <div className="p-2 ms-auto">Asia</div>
+            <div className="p-2">
+                <h1>Europe</h1>
+                <ListGroup variant='block'>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
+                    <ListGroup.Item>Companies: <Badge bg="primary">56</Badge></ListGroup.Item>
+                    <ListGroup.Item>Total uptime: <Badge bg="primary">70%</Badge></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                </ListGroup>
+            </div>
+            <div className="p-2 ms-auto">
+                <h1>North America</h1>
+                <ListGroup>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                </ListGroup>
+            </div>
+            <div className="p-2 ms-auto">
+                <h1>Australia</h1>
+                <ListGroup>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                </ListGroup>
+            </div>
+            <div className="p-2 ms-auto">
+                <h1>Asia</h1>
+                <ListGroup>
+                    <ListGroup.Item>Active Containers: <Badge bg="primary">12873</Badge> / <Badge bg="primary">14154</Badge></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                    <ListGroup.Item></ListGroup.Item>
+                </ListGroup>
+            </div>
         </Stack>
 
         <h1>Critical Errors</h1>
@@ -48,7 +84,8 @@ export default function Dashboard() {
                     <th>Container Name</th>
                     <th>Error Code</th>
                     <th>Error Message</th>
-                    <th><Stack direction="horizontal"> 
+                    <th>
+                        <Stack direction="horizontal"> 
                             <div>Resolved?</div>
                             <div className='ms-auto'>
                                 <Form>
