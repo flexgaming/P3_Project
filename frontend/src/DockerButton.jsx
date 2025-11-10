@@ -2,10 +2,13 @@ import React, { useState } from "react";
 
 function DockerButton() {
     const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleClick = async () => {
         try {
-            const response = await fetch("/dockers"); // via proxy → http://localhost:8080/dockers
+            setLoading(true);
+            const response = await fetch("/api/dockers/ctr-011"); // via proxy → http://localhost:8080/API/dockers
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -13,14 +16,17 @@ function DockerButton() {
             console.log(jsonData); // print to console
             setData(jsonData); // store it in state for display (optional)
         } catch (error) {
-            console.error("Error fetching data:", error);
+            setError(`Error fetching data: ${error.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div style={{ textAlign: "center", marginTop: "2rem" }}>
-            <button onClick={handleClick}>Fetch Dockers</button>
-
+            <div>
+                <button onClick={handleClick}>Fetch Dockers</button>
+            </div>
             {data && (
                 <pre
                     style={{
