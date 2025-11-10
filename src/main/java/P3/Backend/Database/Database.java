@@ -345,7 +345,7 @@ public class Database {
      */
     public JSONObject getCompanies(String regionID) {
         JSONObject companies = new JSONObject();
-        String sql = "SELECT * FROM Company WHERE regionID = ?";
+        String sql = "SELECT * FROM Company WHERE Region_Reference = ?";
 
         System.out.println("Searching for within reagion ID" + " " + regionID);
 
@@ -354,8 +354,8 @@ public class Database {
              // Use a normal Statement. No SQL injection protection is necessary when no user input.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             
-            preparedStatement.setString(1, regionID);
-            ResultSet resultSet = preparedStatement.executeQuery(sql);
+            preparedStatement.setObject(1, UUID.fromString(regionID));
+            ResultSet resultSet = preparedStatement.executeQuery();
             // Reads all the rows in the Company table and adds them as Company classes to their respective region.
             while (resultSet.next()) {
                 JSONObject company = new JSONObject();
@@ -381,15 +381,15 @@ public class Database {
      */
     public JSONObject getServers(String companyID) {
         JSONObject servers = new JSONObject();
-        String sql = "SELECT * FROM Server WHERE Company_ID = ?";
+        String sql = "SELECT * FROM Server WHERE Company_Reference = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
              // Use a normal Statement. No SQL injection protection is necessary when no user input.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             
-            preparedStatement.setString(1, companyID);
-            ResultSet resultSet = preparedStatement.executeQuery(sql);
+            preparedStatement.setObject(1, UUID.fromString(companyID));
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Server table and adds them as Server classes to their respective company.
             while (resultSet.next()) {
