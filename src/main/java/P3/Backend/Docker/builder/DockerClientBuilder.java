@@ -38,5 +38,14 @@ public class DockerClientBuilder {
             
         return DockerClientImpl.getInstance(config, httpClient);
     }
+
+    @Bean
+    public static DockerClient dockerConnection() {
+
+        DockerClientBuilder builder = new DockerClientBuilder();
+		DockerClient dockerClient = builder.dockerClient();
+
+        return dockerClient;
+    }
 }
 

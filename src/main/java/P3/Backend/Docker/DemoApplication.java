@@ -9,6 +9,7 @@ import P3.Backend.Docker.builder.DockerClientBuilder;
 import P3.Backend.Docker.manager.DockerClientManager;
 import P3.Backend.Docker.manager.DockerStatsService;
 import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.DockerClient;
@@ -23,8 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 
+import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import P3.Backend.Docker.Setup.SetupApplications;
-
 
 
 @SpringBootApplication
@@ -32,8 +33,7 @@ public class DemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
-		DockerClientBuilder builder = new DockerClientBuilder();
-		DockerClient dockerClient = builder.dockerClient();
+		DockerClient dockerClient = DockerClientBuilder.dockerConnection();
 
 		dockerClient.pingCmd().exec();
 
@@ -47,6 +47,7 @@ public class DemoApplication {
 			System.out.println("Memory Usage: " + stats.getMemoryUsage());
 			System.out.println("Memory Limit: " + stats.getMemoryLimit());
 			System.out.println("PIDs: " + stats.getPids());
+            
 		} catch (InterruptedException e) {
 			System.err.println("Failed to get container stats: " + e.getMessage());
 			Thread.currentThread().interrupt();
@@ -54,237 +55,6 @@ public class DemoApplication {
 
         SetupApplications.Initiation(dockerClient);
 
-
-
-
-
-
-
-
-
-        // Gets all of the containers that is in the system.
-        List<Container> containersTemp = dockerClient.listContainersCmd().withShowAll(true).exec();
-        JSONArray containers = new JSONArray(containersTemp);
-        //System.out.println(containers.toString(2)); // Prints a manageable overview.
-        //System.out.println(containers.getJSONObject(0).getJSONArray("names").getString(0).substring(1));
-
-        /*if (containers.getJSONObject(0).getJSONArray("names").length() > 0) {
-            for (int i = 0; i < containers.getJSONObject(0).getJSONArray("names").length(); i++) {
-                String name = containers.getJSONObject(0).getJSONArray("names").getString(i).substring(1);
-
-                System.out.println(name);
-            }
-        } */
-
-
-
-        // Name for JSON file containing all of the containers:
-        final String containerFilename = "currentContainers.json";
-        // Check if the JSON file that contains all of the containers exists, if it does not exist then create one.
-        Path containerListPath = Path.of("" + containerFilename); // path
-
-        if (!Files.exists(containerListPath)) {
-            // If the file does not exist, then it has to be created.
-            try {
-                Files.writeString(containerListPath, "{}");
-            } catch (Exception e) {
-                // If anything goes wrong, it is printed.
-                e.printStackTrace();
-            }
-        } 
-
-
-
-        // If there are any old containers that is not within the currently pulled list of containers, ask user if it can be deleted.
-
-        try {
-             // Get all of the content within the file.
-            String content = Files.readString(containerListPath);
-         
-        
-            // Convert all of the content into a JSON format.
-            JSONObject currentJSONFile = new JSONObject(content);
-            
-            // This is the id's that is already within the JSON file.
-            JSONArray existingID = new JSONArray(currentJSONFile.length());
-            for (String key : currentJSONFile.keySet()) {
-                JSONObject tempContainer = currentJSONFile.getJSONObject(key);
-                existingID.put(tempContainer.getString("id"));
-            }
-
-            // Array over all of the old containers that is not within the fetch.
-            JSONArray oldContainersList = new JSONArray(existingID.length());
-            for (int i = 0; i < existingID.length(); i++) {
-
-                // Adds all of the containers from the JSON file, to figure out if it is active or not.
-                oldContainersList.put(i, existingID.getString(i));
-            }
-
-            // Array over all of the new containers that is not within the JSON file.
-            JSONArray newContainersList = new JSONArray(containers.length());
-            
-            // ############################################################################# Add comment here...
-            int matchedContainers = 0;
-            for (int i = 0; i < containers.length(); i++) {
-                // This is the name of the container that was just pulled.
-                String fetchedID = containers.getJSONObject(i).getString("id");
-                
-                int count = 0;
-                for (int j = 0; j < existingID.length(); j++) {
-                    
-                    // Removes fetchedID from the oldContainersList, proving that it already exists but is still actively used.
-                    if (existingID.getString(j).equals(fetchedID)) {
-                        
-                        oldContainersList.remove(j - matchedContainers);
-                        matchedContainers++; // This is used to match the correct index. 
-                        break;
-                    }
-                    count++;
-
-                    // Adds to the list of containers that is not within the JSON file.
-                    if (count == existingID.length()) {
-                        newContainersList.put(fetchedID);
-                    }
-                }
-            }
-            System.out.println("new containers: " + newContainersList + "\n");
-            System.out.println("old containers (not in use): " + oldContainersList + "\n");
-            
-            // Scans all of the input from the user
-            Scanner scanner = new Scanner(System.in); // Closed in the buttom
-
-            // do the user want to remove the containers that are not in the fetch?
-            if (oldContainersList.length() > 0) {
-                System.out.println("There are some unused containers within the JSON file: " + oldContainersList);
-                
-                outer: while (true) {
-                    System.out.println("Do you want to delete any of these containers? (y/n)");
-                    String response = scanner.nextLine();
-                    if (response.toLowerCase().equals("y")) {
-                        System.out.println("hello?");
-                        while (true) {
-                            System.out.println("Do you want to delete all or individually?\n 1) delete all\n 2) delete individually");
-                            response = scanner.nextLine();
-                            if (response.toLowerCase().equals("1")) {
-                                // Delete all function:
-                                // functionName(oldContainersList, ...)
-
-                                // ############################################################################# Add comment here...
-                                int removedContainers = 0;
-                                for (int i = 0; i < oldContainersList.length(); i++) {
-                                    for (int j = 0; j < existingID.length(); j++) {
-                                        
-                                        // Removes all of the inactive containers from the JSON file.
-                                        if (existingID.getString(j).equals(oldContainersList.getString(i))) {
-                                            
-                                            // Get the name of the container that has to be removed.
-                                            String temp = currentJSONFile.names().getString(j - removedContainers);
-                                            currentJSONFile.remove(temp); // Will be updated later
-                                            removedContainers++; // This is used to match the correct index. 
-                                            break;
-                                        }
-                                    }
-                                }
-                                break outer;
-                            } else if (response.toLowerCase().equals("2")) {
-                                // Delete individually function:
-                                // functionName(oldContainersList.getString(index))
-                                
-                                // ############################################################################# Add comment here...
-                                int removedContainers = 0;
-                                for (int i = 0; i < oldContainersList.length(); i++) {
-
-                                    System.out.println((i+1) + ") Do you want to remove this container (id): " + oldContainersList.getString(i) + "? (y/n)");
-                                    
-                                    inner: while (true) {
-                                        response = scanner.nextLine();
-                                        if (response.equals("y")) {
-                                            for (int j = 0; j < existingID.length(); j++) {
-                                                System.out.println(j + ": " + existingID.getString(j) + " = " + oldContainersList.getString(i));
-                                                // Removes all of the inayctive containers from the JSON file.
-                                                if (existingID.getString(j).equals(oldContainersList.getString(i))) {
-                                                    
-                                                    // Get the name of the container that has to be removed.
-                                                    String temp = currentJSONFile.names().getString(j - removedContainers);
-                                                    currentJSONFile.remove(temp); // Will be updated later
-                                                    removedContainers++; // This is used to match the correct index. 
-                                                    
-                                                    break inner;
-                                                }
-                                            }
-                                        } else if (response.equals("n")) {
-                                            break;
-                                        }
-                                    }
-                                }
-                                break outer;
-                            }
-                        }
-                    } else if (response.toLowerCase().equals("n")) {
-                        break;
-                    }
-                }
-                
-            }
-
-            // does the user want to go through all of the containers or just the newly discorvered?
-                // if the user want to go through all of the containers, they have the ability to look a the old intervals...
-                // If there are any new containers then add them to a list and then go through the process ↓.
-
-            
-
-
-            // Set up all of the containers using a loop.
-            System.out.println("This is the setup for all of the containers.");
-            System.out.println("Containers to set up: " + containers.length());
-
-            
-            for (int i = 0; i < containers.length(); i++) {
-                // Get the individual container from the list of containers (and extract the name and id).
-                JSONObject container = containers.getJSONObject(i);
-                String name = container.getJSONArray("names").getString(0).substring(1);
-                String id = container.getString("id");
-
-                // Gets the interval for sending data from the user
-                System.out.println((i + 1) + ": Name: " + name);
-                System.out.println("Id: " + id);
-                System.out.print("The interval this container is going to send data (in seconds): ");
-                Integer interval = scanner.nextInt();
-                
-                // Make a JSON object that contains all of the relevant information.
-                JSONObject newContainer = new JSONObject();
-                newContainer.put("name", name);
-                newContainer.put("id", id);
-                newContainer.put("interval", interval);
-
-                // Add the content to the JSON file. 
-                if (Files.exists(containerListPath)) {
-                    try {
-                        // Add the new container to the existing content.
-                        currentJSONFile.put(name, newContainer);
-
-                        // Updates the JSON file.
-                        Files.writeString(containerListPath, currentJSONFile.toString(4));
-                        System.out.println(currentJSONFile);
-                    } catch (IOException e) {
-                        // If anything goes wrong, it will be printed.
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            scanner.close(); // Closing the scanner.
-            
-            // Print all of the docker containers with the different parameters (makes sure that the information is correct).
-                // Name, id and intervals.
-                // Print all of the containers that is 
-            }
-        catch (IOException e) {
-            // If anything goes wrong, it will be printed (containerListPath).
-            e.printStackTrace();
-        }
-
-       
 
 /*
         ObjectMapper mapper = new ObjectMapper();
