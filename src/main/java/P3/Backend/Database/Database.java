@@ -339,7 +339,6 @@ public class Database {
         return regions;
     }
 
-    // Search for regionID
     /**
      * Fetches all the companies saved in the database.
      */
@@ -347,11 +346,9 @@ public class Database {
         JSONObject companies = new JSONObject();
         String sql = "SELECT * FROM Company WHERE Region_Reference = ?";
 
-        System.out.println("Searching for within reagion ID" + " " + regionID);
-
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
+             // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             
             preparedStatement.setObject(1, UUID.fromString(regionID));
@@ -375,7 +372,6 @@ public class Database {
         return companies;
     }
 
-    // Search for companyID
     /**
      * Fetches all the servers saved in the database.
      */
@@ -385,8 +381,8 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             
             preparedStatement.setObject(1, UUID.fromString(companyID));
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -416,19 +412,20 @@ public class Database {
         return servers;
     }
 
-    // Search for companyID & sort by serverID
     /**
      * Fetches all containers saved in the database.
      */
-    public JSONObject getContainers() {
+    public JSONObject getContainers(String companyID) {
         JSONObject containers = new JSONObject();
-        String sql = "SELECT * FROM Container";
+        String sql = "SELECT * FROM Company_Containers WHERE Company_ID = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {;
+
+            preparedStatement.setObject(1, UUID.fromString(companyID));
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Container table and adds them as Container classes to their respective server.
             while (resultSet.next()) {
@@ -449,25 +446,30 @@ public class Database {
         return containers;
     }
 
-    // Search for companyID & sort by containerID
-    // Maybe last 60 minutes of data?
     /**
      * Fetches all diagnostics data saved in the database.
      */
-    public JSONObject getDiagnosticsData() {
+    public JSONObject getDiagnosticsData(String companyID) {
         JSONObject diagnosticsData = new JSONObject();
-        String sql = "SELECT * FROM Diagnostics";
+        String sql = "SELECT * FROM Company_Diagnostics WHERE Company_ID = ? AND Company_Diagnostics.Timestamp >= " +
+                "NOW() - make_interval(mins => ?)";
+
+        System.out.println("Reading all diagnostics in Company: " + companyID);
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
              // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setObject(1, UUID.fromString(companyID));
+            preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIMER);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective
             // container.
             while (resultSet.next()) {
                 JSONObject diagnostics = new JSONObject();
+                String diagnosticsID = resultSet.getString("Diagnostics_ID");
                 String containerReference = resultSet.getString("Container_Reference");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 boolean running = resultSet.getBoolean("Running");
@@ -488,7 +490,7 @@ public class Database {
                 diagnostics.put("processID", processID);
                 diagnostics.put("status", status);
                 diagnostics.put("errorLogs", errorLogs);
-                diagnosticsData.put(timestamp.toString(), diagnostics);
+                diagnosticsData.put(diagnosticsID, diagnostics);
             }
 
         } catch (SQLException error) {
@@ -528,7 +530,7 @@ public class Database {
                 dck.addDiagnostics(diagnostics);
             }
             return dck;
-            
+
         } catch (SQLException error) {
             errorHandling(error);
             return null;

@@ -13,7 +13,7 @@ public class App {
 		//SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        addDummyData(database);
+        //addDummyData(database);
         printData(database);
 
         //Test getting diagnostics data for a specific container
@@ -31,9 +31,9 @@ public class App {
         System.out.println(companies.toString(4));
         JSONObject servers = database.getServers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
         System.out.println(servers.toString(4));
-        JSONObject containers = database.getContainers();
+        JSONObject containers = database.getContainers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
         System.out.println(containers.toString(4));
-        JSONObject diagnosticsData = database.getDiagnosticsData();
+        JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
         System.out.println(diagnosticsData.toString(4));
     }
 
