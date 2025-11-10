@@ -4,8 +4,8 @@ import P3.Backend.Constants;
 
 import java.lang.reflect.Array;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.UUID;
+import org.json.JSONObject;
 
 public class Database {
     // The information needed to connect to the Database.
@@ -125,35 +125,37 @@ public class Database {
      * Adds a server to the database.
      * @param serverID The ID of the server being added.
      * @param companyReference The ID of the company owning the server.
+     * @param serverName The name of the server being added.
      * @param ramTotal The total amount of RAM on the server.
      * @param cpuTotal The total amount of CPU on the server.
      * @param diskUsageTotal The total amount of Disk Usage on the server.
      */
-    public void addServers(String serverID, String companyReference, double ramTotal, double cpuTotal,
-                           double diskUsageTotal) {
+    public void addServers(String serverID, String companyReference, String serverName, double ramTotal,
+                           double cpuTotal, double diskUsageTotal) {
         // Reformats the input parameters to fit the signature of the below addServers method.
-        addServers(new String[]{serverID}, new String[]{companyReference}, new double[]{ramTotal}, new double[]{cpuTotal},
-                new double[]{diskUsageTotal});
+        addServers(new String[]{serverID}, new String[]{companyReference}, new String[]{serverName},
+                new double[]{ramTotal}, new double[]{cpuTotal}, new double[]{diskUsageTotal});
     }
 
     /**
      * Adds servers to the database.
      * @param serverIDs The IDs of the servers being added.
      * @param companyReferences The IDs of the companies owning the servers.
+     * @param serverNames The names of the servers being added.
      * @param ramTotals The total amount of RAM on the servers.
      * @param cpuTotals The total amount of CPU on the servers.
      * @param diskUsageTotals The total amount of Disk Usage on the servers.
      */
-    public void addServers(String[] serverIDs, String[] companyReferences, double[] ramTotals, double[] cpuTotals,
-                           double[] diskUsageTotals) {
+    public void addServers(String[] serverIDs, String[] companyReferences, String[] serverNames, double[] ramTotals,
+                           double[] cpuTotals, double[] diskUsageTotals) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(serverIDs, companyReferences, ramTotals, cpuTotals, diskUsageTotals)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Server (Server_ID, Company_Reference, Ram_Total, CPU_Total, Disk_Usage_Total)" +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Server (Server_ID, Company_Reference, Server_Name, Ram_Total, CPU_Total, Disk_Usage_Total)" +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -164,9 +166,10 @@ public class Database {
             for (int i = 0; i < serverIDs.length; i++) {
                 preparedStatement.setString(1, serverIDs[i]);
                 preparedStatement.setObject(2, UUID.fromString(companyReferences[i]));
-                preparedStatement.setDouble(3, ramTotals[i]);
-                preparedStatement.setDouble(4, cpuTotals[i]);
-                preparedStatement.setDouble(5, diskUsageTotals[i]);
+                preparedStatement.setString(3, serverNames[i]);
+                preparedStatement.setDouble(4, ramTotals[i]);
+                preparedStatement.setDouble(5, cpuTotals[i]);
+                preparedStatement.setDouble(6, diskUsageTotals[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -184,25 +187,27 @@ public class Database {
      * Adds a container to the database.
      * @param containerID The ID of the container being added.
      * @param serverReference The ID of the server running the container.
+     * @param containerName The name of the container being added.
      */
-    public void addContainers(String containerID, String serverReference) {
+    public void addContainers(String containerID, String serverReference, String containerName) {
         // Reformats the input parameters to fit the signature of the below addContainers method.
-        addContainers(new String[]{containerID}, new String[]{serverReference});
+        addContainers(new String[]{containerID}, new String[]{serverReference}, new String[]{containerName});
     }
 
     /**
      * Adds containers to the database.
      * @param containerIDs The IDs of the containers being added.
      * @param serverReferences The IDs of the servers running these containers.
+     * @param containerNames the names of the containers being added.
      */
-    public void addContainers(String[] containerIDs, String[] serverReferences) {
+    public void addContainers(String[] containerIDs, String[] serverReferences, String[] containerNames) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(containerIDs, serverReferences)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Container (Container_ID, Server_Reference) VALUES (?, ?)";
+        String sql = "INSERT INTO Container (Container_ID, Server_Reference, Container_Name) VALUES (?, ?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -213,6 +218,7 @@ public class Database {
             for (int i = 0; i < serverReferences.length; i++) {
                 preparedStatement.setString(1, containerIDs[i]);
                 preparedStatement.setString(2, serverReferences[i]);
+                preparedStatement.setString(3, containerNames[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -306,8 +312,8 @@ public class Database {
      * Fetches all the regions saved in the database.
      * @return ArrayList of all regions.
      */
-    public ArrayList<Region> getRegions() {
-        ArrayList<Region> regions = new ArrayList<>();
+    public JSONObject getRegions() {
+        JSONObject regions = new JSONObject();
         String sql = "SELECT * FROM Region";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -316,65 +322,62 @@ public class Database {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Region table and adds them as Region classes to the ArrayList.
+            // Reads all the rows in the Region table and adds them to the JSON object.
             while (resultSet.next()) {
+                JSONObject region = new JSONObject();
                 String regionID = resultSet.getString("Region_ID");
                 String regionName = resultSet.getString("Region_Name");
-                Region region = new Region(regionID, regionName);
-                regions.add(region);
+                region.put("regionID", regionID);
+                region.put("regionName", regionName);
+                regions.put(regionName, region);
             }
 
         } catch (SQLException error) {
             errorHandling(error);
         }
-
-        // Adds all companies to the regions before returning.
-        getCompanies(regions);
 
         return regions;
     }
 
+    // Search for regionID
     /**
      * Fetches all the companies saved in the database.
-     * @param regions The ArrayList of regions.
      */
-    public void getCompanies(ArrayList<Region> regions) {
-        String sql = "SELECT * FROM Company";
+    public JSONObject getCompanies(String regionID) {
+        JSONObject companies = new JSONObject();
+        String sql = "SELECT * FROM Company WHERE regionID = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
              // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
+             PreparedStatement statement = connection.prepareStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
 
             // Reads all the rows in the Company table and adds them as Company classes to their respective region.
             while (resultSet.next()) {
+                JSONObject company = new JSONObject();
                 String companyID = resultSet.getString("Company_ID");
                 String regionReference = resultSet.getString("Region_Reference");
                 String companyName = resultSet.getString("Company_Name");
-                Company company = new Company(companyID, companyName);
-
-                // Finds the respective region of a company, and adds the company to that region.
-                for (Region region : regions) {
-                    if (region.getRegionID().equals(regionReference)) {
-                        region.addCompany(company);
-                    }
-                }
+                company.put("companyID", companyID);
+                company.put("regionReference", regionReference);
+                company.put("companyName", companyName);
+                companies.put(companyName, company);
             }
 
         } catch (SQLException error) {
             errorHandling(error);
         }
 
-        // Adds all servers to the companies before returning.
-        getServers(regions);
+        return companies;
     }
 
+    // Search for companyID
     /**
      * Fetches all the servers saved in the database.
-     * @param regions The ArrayList of regions (that now also contain companies).
      */
-    public void getServers(ArrayList<Region> regions) {
+    public JSONObject getServers() {
+        JSONObject servers = new JSONObject();
         String sql = "SELECT * FROM Server";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -385,35 +388,35 @@ public class Database {
 
             // Reads all the rows in the Server table and adds them as Server classes to their respective company.
             while (resultSet.next()) {
+                JSONObject server = new JSONObject();
                 String serverID = resultSet.getString("Server_ID");
                 String companyReference = resultSet.getString("Company_Reference");
+                String serverName = resultSet.getString("Server_Name");
                 double ramTotal = resultSet.getDouble("Ram_Total");
                 double cpuTotal = resultSet.getDouble("CPU_Total");
                 double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
-                Server server = new Server(serverID, ramTotal, cpuTotal, diskUsageTotal);
-
-                // Finds the respective company of a server, and adds the server to that company.
-                for (Region region : regions) {
-                    Company company = region.getCompany(companyReference);
-                    if (company != null) {
-                        company.addServer(server);
-                    }
-                }
+                server.put("serverID", serverID);
+                server.put("companyReference", companyReference);
+                server.put("serverName", serverName);
+                server.put("ramTotal", ramTotal);
+                server.put("cpuTotal", cpuTotal);
+                server.put("diskUsageTotal", diskUsageTotal);
+                servers.put(serverName, server);
             }
 
         } catch (SQLException error) {
             errorHandling(error);
         }
 
-        // Adds all containers to the servers before returning.
-        getContainers(regions);
+        return servers;
     }
 
+    // Search for companyID & sort by serverID
     /**
      * Fetches all containers saved in the database.
-     * @param regions The ArrayList of regions (that now also contain companies and servers).
      */
-    public void getContainers(ArrayList<Region> regions) {
+    public JSONObject getContainers() {
+        JSONObject containers = new JSONObject();
         String sql = "SELECT * FROM Container";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -424,34 +427,30 @@ public class Database {
 
             // Reads all the rows in the Container table and adds them as Container classes to their respective server.
             while (resultSet.next()) {
+                JSONObject container = new JSONObject();
                 String containerID = resultSet.getString("Container_ID");
                 String serverReference = resultSet.getString("Server_Reference");
-                Container container = new Container(containerID);
-
-                // Finds the respective server of a container, and adds the container to that server.
-                for (Region region : regions) {
-                    for (Company company : region.getCompanies()) {
-                        Server server = company.getServer(serverReference);
-                        if (server != null) {
-                            server.addContainer(container);
-                        }
-                    }
-                }
+                String containerName = resultSet.getString("Container_Name");
+                container.put("containerID", containerID);
+                container.put("serverReference", serverReference);
+                container.put("containerName", containerName);
+                containers.put(containerName, container);
             }
 
         } catch (SQLException error) {
             errorHandling(error);
         }
 
-        // Adds all diagnostics data to the containers before returning.
-        getDiagnosticsData(regions);
+        return containers;
     }
 
+    // Search for companyID & sort by containerID
+    // Maybe last 60 minutes of data?
     /**
      * Fetches all diagnostics data saved in the database.
-     * @param regions The ArrayList of regions (that now also contain companies, servers and containers).
      */
-    public void getDiagnosticsData(ArrayList<Region> regions) {
+    public JSONObject getDiagnosticsData() {
+        JSONObject diagnosticsData = new JSONObject();
         String sql = "SELECT * FROM Diagnostics";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -463,6 +462,7 @@ public class Database {
             // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective
             // container.
             while (resultSet.next()) {
+                JSONObject diagnostics = new JSONObject();
                 String containerReference = resultSet.getString("Container_Reference");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 boolean running = resultSet.getBoolean("Running");
@@ -473,26 +473,27 @@ public class Database {
                 String processID = resultSet.getString("Process_ID");
                 String status = resultSet.getString("Status");
                 String errorLogs = resultSet.getString("Error_Logs");
-                Diagnostics diagnostics = new Diagnostics(timestamp, running, ramFree, cpuFree, diskUsageFree,
-                                                          threadCount, processID, status, errorLogs);
-
-                // Finds the respective container of the diagnostics, and adds the diagnostics to that container.
-                for (Region region : regions) {
-                    for (Company company : region.getCompanies()) {
-                        for (Server server : company.getServers()) {
-                            Container container = server.getContainer(containerReference);
-                            if (container != null) {
-                                container.addDiagnostics(diagnostics);
-                            }
-                        }
-                    }
-                }
+                diagnostics.put("containerReference", containerReference);
+                diagnostics.put("timestamp", timestamp);
+                diagnostics.put("running", running);
+                diagnostics.put("ramFree", ramFree);
+                diagnostics.put("cpuFree", cpuFree);
+                diagnostics.put("diskUsageFree", diskUsageFree);
+                diagnostics.put("threadCount", threadCount);
+                diagnostics.put("processID", processID);
+                diagnostics.put("status", status);
+                diagnostics.put("errorLogs", errorLogs);
+                diagnosticsData.put(timestamp.toString(), diagnostics);
             }
 
         } catch (SQLException error) {
             errorHandling(error);
         }
+
+        return diagnosticsData;
     }
+
+    // View that shows all errors?
 
     public Container getDiagnosticsData(Container docker) {
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = '" + docker.getContainerID() + "';";

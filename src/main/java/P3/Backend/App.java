@@ -1,8 +1,8 @@
 package P3.Backend;
 
-import java.util.ArrayList;
-
 import P3.Backend.Database.*;
+
+import org.json.JSONObject;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.SpringApplication;
 
@@ -13,68 +13,68 @@ public class App {
 		//SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        //addDummyData(database);
-        ArrayList<Region> regions = database.getRegions();
-        //printDBData(regions);
+        addDummyData(database);
+        printData(database);
 
         //Test getting diagnostics data for a specific container
-        Container dockerTst = new Container("ctr-001");
-        Container testData = database.getDiagnosticsData(dockerTst);
-        for (Diagnostics diagnostics : testData.getDiagnosticsData()) {
-            System.out.println(diagnostics);
-        }
+//        Container dockerTst = new Container("ctr-001");
+//        Container testData = database.getDiagnosticsData(dockerTst);
+//        for (Diagnostics diagnostics : testData.getDiagnosticsData()) {
+//            System.out.println(diagnostics);
+//        }
 	}
 
-    private static void printDBData(ArrayList<Region> regions) {
-        for (Region region : regions) {
-            System.out.print("Region: " + region.getRegionID() + " ");
-            System.out.println(region.getRegionName());
-            for (Company company : region.getCompanies()) {
-                System.out.print("Company: " + company.getCompanyID() + " ");
-                System.out.println(company.getCompanyName());
-                for (Server server : company.getServers()) {
-                    System.out.print("Server: " + server.getServerID() + " ");
-                    System.out.print(server.getRamTotal() + " ");
-                    System.out.print(server.getCpuTotal() + " ");
-                    System.out.println(server.getDiskUsageTotal());
-                    for (Container container : server.getContainers()) {
-                        System.out.println("Container: " + container.getContainerID());
-                        for (Diagnostics diagnostics : container.getDiagnosticsData()) {
-                            System.out.println("Diagnostics: " + diagnostics);
-                        }
-                    }
-                }
-            }
-        }
+    private static void printData(Database database) {
+        JSONObject regions = database.getRegions();
+        System.out.println(regions.toString(4));
+        JSONObject companies = database.getCompanies();
+        System.out.println(companies.toString(4));
+        JSONObject servers = database.getServers();
+        System.out.println(servers.toString(4));
+        JSONObject containers = database.getContainers();
+        System.out.println(containers.toString(4));
+        JSONObject diagnosticsData = database.getDiagnosticsData();
+        System.out.println(diagnosticsData.toString(4));
     }
 
     private static void addDummyData(Database database) {
         database.addRegions(
                 new String[]{"North America", "Europe", "Asia", "South America", "Australia"}
         );
-        ArrayList<Region> regions = database.getRegions();
+        JSONObject regions = database.getRegions();
+
         database.addCompanies(
-                new String[]{regions.get(0).getRegionID(), regions.get(0).getRegionID(), regions.get(1).getRegionID(),
-                        regions.get(1).getRegionID(), regions.get(2).getRegionID(), regions.get(2).getRegionID(),
-                        regions.get(3).getRegionID(), regions.get(4).getRegionID()},
+                new String[]{
+                        regions.getJSONObject("North America").getString("regionID"),
+                        regions.getJSONObject("North America").getString("regionID"),
+                        regions.getJSONObject("Europe").getString("regionID"),
+                        regions.getJSONObject("Europe").getString("regionID"),
+                        regions.getJSONObject("Asia").getString("regionID"),
+                        regions.getJSONObject("Asia").getString("regionID"),
+                        regions.getJSONObject("South America").getString("regionID"),
+                        regions.getJSONObject("Australia").getString("regionID")
+                },
                 new String[]{"TechNova Inc.", "CloudForge LLC", "EuroCloud GmbH", "Datastream Systems",
-                        "AsiaNet Solutions", "PacificWare Co.", "Andes Data Corp.", "AussieCompute Ltd."}
+                        "AsiaNet Solutions", "PacificWare Co.", "Anders Data Corp.", "AussieCompute Ltd."}
         );
-        regions = database.getRegions();
+        JSONObject companies = database.getCompanies();
         database.addServers(
                 new String[] { "srv-101", "srv-102", "srv-201", "srv-301", "srv-302", "srv-401", "srv-501", "srv-601",
                         "srv-701", "srv-801" },
-                new String[] { regions.get(0).getCompanies().get(0).getCompanyID(),
-                        regions.get(0).getCompanies().get(0).getCompanyID(),
-                        regions.get(0).getCompanies().get(1).getCompanyID(),
-                        regions.get(1).getCompanies().get(0).getCompanyID(),
-                        regions.get(1).getCompanies().get(0).getCompanyID(),
-                        regions.get(1).getCompanies().get(1).getCompanyID(),
-                        regions.get(2).getCompanies().get(0).getCompanyID(),
-                        regions.get(2).getCompanies().get(1).getCompanyID(),
-                        regions.get(3).getCompanies().get(0).getCompanyID(),
-                        regions.get(4).getCompanies().get(0).getCompanyID()
+                new String[] {
+                        companies.getJSONObject("TechNova Inc.").getString("companyID"),
+                        companies.getJSONObject("TechNova Inc.").getString("companyID"),
+                        companies.getJSONObject("CloudForge LLC").getString("companyID"),
+                        companies.getJSONObject("EuroCloud GmbH").getString("companyID"),
+                        companies.getJSONObject("EuroCloud GmbH").getString("companyID"),
+                        companies.getJSONObject("Datastream Systems").getString("companyID"),
+                        companies.getJSONObject("AsiaNet Solutions").getString("companyID"),
+                        companies.getJSONObject("PacificWare Co.").getString("companyID"),
+                        companies.getJSONObject("Anders Data Corp.").getString("companyID"),
+                        companies.getJSONObject("AussieCompute Ltd.").getString("companyID"),
                 },
+                new String[] { "AetherCore", "NovaNode", "QuantumHub", "IronPeak", "EchoForge", "SolarisGate",
+                        "ObsidianRealm", "CrystalPulse", "VortexNet", "TitanVale" },
                 new double[] { 128.0, 64.0, 96.0, 128.0, 64.0, 96.0, 64.0, 128.0, 96.0, 64.0 },
                 new double[] { 64.0, 32.0, 48.0, 64.0, 32.0, 48.0, 32.0, 64.0, 48.0, 32.0 },
                 new double[] { 4000.0, 2000.0, 3500.0, 4200.0, 2500.0, 3000.0, 2000.0, 5000.0, 3500.0, 2500.0 }
@@ -83,7 +83,10 @@ public class App {
                 new String[] { "ctr-001", "ctr-002", "ctr-003", "ctr-004", "ctr-005", "ctr-006", "ctr-007",
                         "ctr-008", "ctr-009", "ctr-010", "ctr-011", "ctr-012", "ctr-013", "ctr-014", "ctr-015" },
                 new String[] { "srv-101", "srv-101", "srv-102", "srv-201", "srv-301", "srv-301", "srv-302",
-                        "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" }
+                        "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" },
+                new String[] { "blue_whale", "iron_squid", "frosty_mongoose", "crimson_fox", "silent_panda",
+                        "cosmic_turtle", "rapid_lynx", "shadow_otter", "amber_crow", "lunar_badger", "mystic_serpent",
+                        "glacial_hawk", "rusty_wombat", "silver_iguana", "electric_ferret" }
         );
         database.addDiagnosticsBatch(
                 new String[] {
