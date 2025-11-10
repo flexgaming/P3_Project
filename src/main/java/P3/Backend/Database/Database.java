@@ -46,8 +46,7 @@ public class Database {
      * @param regionName The name of the region being added.
      */
     public void addRegions(String regionName) {
-        // Reformats the input parameters to fit the signature of the below addRegions
-        // method.
+        // Reformats the input parameters to fit the signature of the below addRegions method.
         addRegions(new String[] { regionName });
     }
 
@@ -87,8 +86,7 @@ public class Database {
      * @param name     The name of the company being added.
      */
     public void addCompanies(int regionID, String name) {
-        // Reformats the input parameters to fit the signature of the below addCompanies
-        // method.
+        // Reformats the input parameters to fit the signature of the below addCompanies method.
         addCompanies(new int[] { regionID }, new String[] { name });
     }
 
@@ -139,8 +137,7 @@ public class Database {
      * @param diskUsageTotal
      */
     public void addServers(String serverID, int companyID, double ramTotal, double cpuTotal, double diskUsageTotal) {
-        // Reformats the input parameters to fit the signature of the below addServers
-        // method.
+        // Reformats the input parameters to fit the signature of the below addServers method.
         addServers(new String[] { serverID }, new int[] { companyID }, new double[] { ramTotal },
                 new double[] { cpuTotal },
                 new double[] { diskUsageTotal });
@@ -198,8 +195,7 @@ public class Database {
      * @param serverID    The ID of the server running the container.
      */
     public void addContainers(String containerID, String serverID) {
-        // Reformats the input parameters to fit the signature of the below
-        // addContainers method.
+        // Reformats the input parameters to fit the signature of the below addContainers method.
         addContainers(new String[] { containerID }, new String[] { serverID });
     }
 
@@ -256,8 +252,7 @@ public class Database {
     public void addDiagnosticsBatch(String containerID, boolean running, double ramFree, double cpuFree,
             double diskUsageFree, int threadCount, String processID, String status,
             String errorLogs) {
-        // Reformats the input parameters to fit the signature of the below
-        // addDiagnosticsBatch method.
+        // Reformats the input parameters to fit the signature of the below addDiagnosticsBatch method.
         addDiagnosticsBatch(new String[] { containerID }, new boolean[] { running }, new double[] { ramFree },
                 new double[] { cpuFree }, new double[] { diskUsageFree }, new int[] { threadCount },
                 new String[] { processID },
@@ -330,13 +325,11 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Region table and adds them as Region classes to the
-            // ArrayList.
+            // Reads all the rows in the Region table and adds them as Region classes to the ArrayList.
             while (resultSet.next()) {
                 int id = resultSet.getInt("Region_ID");
                 String name = resultSet.getString("Name");
@@ -364,21 +357,18 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Company table and adds them as Company classes to
-            // their respective region.
+            // Reads all the rows in the Company table and adds them as Company classes to their respective region.
             while (resultSet.next()) {
                 int companyID = resultSet.getInt("Company_ID");
                 int regionId = resultSet.getInt("Region_ID");
                 String name = resultSet.getString("Name");
                 Company company = new Company(companyID, name);
 
-                // Finds the respective region of a company, and adds the company to that
-                // region.
+                // Finds the respective region of a company, and adds the company to that region.
                 for (Region region : regions) {
                     if (region.getRegionID() == regionId) {
                         region.addCompany(company);
@@ -404,13 +394,11 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Server table and adds them as Server classes to
-            // their respective company.
+            // Reads all the rows in the Server table and adds them as Server classes to their respective company.
             while (resultSet.next()) {
                 String serverID = resultSet.getString("Server_ID");
                 int companyID = resultSet.getInt("Company_ID");
@@ -419,8 +407,7 @@ public class Database {
                 double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
                 Server server = new Server(serverID, ramTotal, cpuTotal, diskUsageTotal);
 
-                // Finds the respective company of a server, and adds the server to that
-                // company.
+                // Finds the respective company of a server, and adds the server to that company.
                 for (Region region : regions) {
                     Company company = region.getCompany(companyID);
                     if (company != null) {
@@ -448,20 +435,17 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Container table and adds them as Container classes
-            // to their respective server.
+            // Reads all the rows in the Container table and adds them as Container classes to their respective server.
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
                 String serverID = resultSet.getString("Server_ID");
                 Container container = new Container(containerID);
 
-                // Finds the respective server of a container, and adds the container to that
-                // server.
+                // Finds the respective server of a container, and adds the container to that server.
                 for (Region region : regions) {
                     for (Company company : region.getCompanies()) {
                         Server server = company.getServer(serverID);
@@ -491,14 +475,11 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Diagnostics table and adds them as Diagnostics
-            // classes to their respective
-            // container.
+            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
@@ -513,8 +494,7 @@ public class Database {
                 Diagnostics diagnostics = new Diagnostics(timestamp, running, ramFree, cpuFree, diskUsageFree,
                         threadCount, processID, status, errorLogs);
 
-                // Finds the respective container of the diagnostics, and adds the diagnostics
-                // to that container.
+                // Finds the respective container of the diagnostics, and adds the diagnostics to that container.
                 for (Region region : regions) {
                     for (Company company : region.getCompanies()) {
                         for (Server server : company.getServers()) {
@@ -538,14 +518,11 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Diagnostics table and adds them as Diagnostics
-            // classes to their respective
-            // container.
+            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
             while (resultSet.next()) {
                 String containerID = resultSet.getString("Container_ID");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
@@ -576,13 +553,11 @@ public class Database {
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user
-                // input.
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 
-            // Reads all the rows in the Region table and adds them as Region classes to the
-            // ArrayList.
+            // Reads all the rows in the Region table and adds them as Region classes to the ArrayList.
             while (resultSet.next()) {
                 int id = resultSet.getInt("Region_ID");
                 String name = resultSet.getString("Name");
