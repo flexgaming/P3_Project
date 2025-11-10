@@ -1,5 +1,6 @@
 {
     "printWidth": 160,
+    "proseWrap": "never",
     "tabWidth": 4,
     "useTabs": false,
     "quoteProps": "as-needed",

@@ -8,7 +8,7 @@ function DockerButton() {
     const handleClick = async () => {
         try {
             setLoading(true);
-            const response = await fetch("/api/dockers/ctr-011"); // via proxy → http://localhost:8080/API/dockers
+            const response = await fetch("/api/data/ctr-011"); // via proxy → http://localhost:8080/API/dockers
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -36,8 +36,7 @@ function DockerButton() {
                         textAlign: "left",
                         display: "inline-block",
                         marginTop: "1rem",
-                    }}
-                >
+                    }}>
                     {JSON.stringify(data, null, 2)}
                 </pre>
             )}
