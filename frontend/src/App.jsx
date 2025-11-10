@@ -1,23 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import warningSmall from "./assets/warning128.png";
-import {
-    Navbar,
-    Nav,
-    Container,
-    Row,
-    Col,
-    Table,
-    Badge,
-    Accordion,
-    Tab,
-    Tabs,
-    ListGroup,
-    Stack,
-    Spinner,
-    Alert,
-    Image,
-} from "react-bootstrap";
+import { Navbar, Nav, Container, Row, Col, Table, Badge, Accordion, Tab, Tabs, ListGroup, Stack, Spinner, Alert, Image } from "react-bootstrap";
 import { Routes, Route, Link } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import DockerButton from "./DockerButton.jsx";
@@ -41,9 +25,7 @@ const App = () => {
         const p = window.location.pathname.replace(/^\//, "");
         if (!p) return "Europe";
         const cleaned = p.replace(/[^a-zA-Z]/g, "");
-        return cleaned
-            ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
-            : "Europe";
+        return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : "Europe";
     });
 
     // Fetch region data for a region slug (e.g. 'europe', 'northamerica')
@@ -101,9 +83,7 @@ const App = () => {
                 const regionSlug = parts[1] || "";
                 // derive tab title from slug (match known tabs)
                 const tabs = ["Europe", "North America", "Australia", "Asia"];
-                const found = tabs.find(
-                    (t) => t.toLowerCase().replace(/\s+/g, "") === regionSlug
-                );
+                const found = tabs.find((t) => t.toLowerCase().replace(/\s+/g, "") === regionSlug);
                 const tab = found || "Europe";
                 setActiveTab(tab);
                 if (regionSlug) fetchRegionData(regionSlug);
@@ -120,9 +100,7 @@ const App = () => {
                         ],
                     };
                     const list = companies[regionSlug] || [];
-                    const foundCompany = list.find(
-                        (c) => slugify(c.name) === companySlug.toLowerCase()
-                    );
+                    const foundCompany = list.find((c) => slugify(c.name) === companySlug.toLowerCase());
                     if (foundCompany) {
                         setSelectedCompanyKey(foundCompany.key);
                     } else {
@@ -135,9 +113,7 @@ const App = () => {
                 // default behaviour if path doesn't start with /nav/
                 const p = window.location.pathname.replace(/^\//, "");
                 const cleaned = p.replace(/[^a-zA-Z]/g, "");
-                const tab = cleaned
-                    ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
-                    : "Europe";
+                const tab = cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : "Europe";
                 setActiveTab(tab);
                 const slug = cleaned.toLowerCase();
                 if (slug) fetchRegionData(slug);
@@ -152,9 +128,7 @@ const App = () => {
     const fetchDockerData = async () => {
         try {
             setLoading(true);
-            const response = await fetch(
-                "http://localhost:5173/api/dockers/ctr-011"
-            );
+            const response = await fetch("http://localhost:5173/api/dockers/ctr-011");
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -192,9 +166,7 @@ const App = () => {
             {/* Navbar */}
             <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
                 <Container style={{ maxWidth: "100%" }}>
-                    <Navbar.Brand href="#home">
-                        Container Diagnostics Platform
-                    </Navbar.Brand>
+                    <Navbar.Brand href="#home">Container Diagnostics Platform</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
@@ -216,50 +188,25 @@ const App = () => {
                         element={
                             <>
                                 {/* Main Content */}
-                                <Tabs
-                                    id="nav-region-tabs"
-                                    activeKey={activeTab}
-                                    onSelect={handleTabSelect}
-                                    justify
-                                >
+                                <Tabs id="nav-region-tabs" activeKey={activeTab} onSelect={handleTabSelect} justify>
                                     <Tab eventKey="Europe" title="Europe">
                                         {/* This is the Europe tab */}
                                         <h3>Companies in Europe</h3>
                                     </Tab>
-                                    <Tab
-                                        eventKey="North America"
-                                        title="North America"
-                                    >
+                                    <Tab eventKey="North America" title="North America">
                                         {/* This is the North America tab */}
                                         <Tab.Container
                                             id="left-tabs-example"
-                                            activeKey={
-                                                selectedCompanyKey || "first"
-                                            }
-                                            onSelect={(k) =>
-                                                setSelectedCompanyKey(k)
-                                            }
-                                        >
+                                            activeKey={selectedCompanyKey || "first"}
+                                            onSelect={(k) => setSelectedCompanyKey(k)}>
                                             <Row>
-                                                <Col
-                                                    sm={3}
-                                                    className="Company-List-Column"
-                                                >
-                                                    <Nav
-                                                        variant="pills"
-                                                        className="flex-column"
-                                                    >
+                                                <Col sm={3} className="Company-List-Column">
+                                                    <Nav variant="pills" className="flex-column">
                                                         <Nav.Item className="Company-List-Item">
                                                             <Nav.Link
                                                                 eventKey="first"
                                                                 className="Company-List-Link"
-                                                                onClick={() =>
-                                                                    handleCompanySelect(
-                                                                        "CEGO",
-                                                                        "first"
-                                                                    )
-                                                                }
-                                                            >
+                                                                onClick={() => handleCompanySelect("CEGO", "first")}>
                                                                 CEGO
                                                             </Nav.Link>
                                                         </Nav.Item>
@@ -267,13 +214,7 @@ const App = () => {
                                                             <Nav.Link
                                                                 eventKey="second"
                                                                 className="Company-List-Link"
-                                                                onClick={() =>
-                                                                    handleCompanySelect(
-                                                                        "MAERSK",
-                                                                        "second"
-                                                                    )
-                                                                }
-                                                            >
+                                                                onClick={() => handleCompanySelect("MAERSK", "second")}>
                                                                 MAERSK
                                                             </Nav.Link>
                                                         </Nav.Item>
@@ -281,13 +222,7 @@ const App = () => {
                                                             <Nav.Link
                                                                 eventKey="third"
                                                                 className="Company-List-Link"
-                                                                onClick={() =>
-                                                                    handleCompanySelect(
-                                                                        "Danish Crown",
-                                                                        "third"
-                                                                    )
-                                                                }
-                                                            >
+                                                                onClick={() => handleCompanySelect("Danish Crown", "third")}>
                                                                 Danish Crown
                                                             </Nav.Link>
                                                         </Nav.Item>
@@ -299,49 +234,19 @@ const App = () => {
                                                             <Row>
                                                                 <Col className="Server-Column">
                                                                     <ListGroup className="lg1">
-                                                                        <ListGroup.Item
-                                                                            disabled
-                                                                            className="Server-Header"
-                                                                        >
-                                                                            <Stack
-                                                                                direction="horizontal"
-                                                                                gap={
-                                                                                    2
-                                                                                }
-                                                                            >
-                                                                                <div>
-                                                                                    Server
-                                                                                    1
-                                                                                </div>
-                                                                                <div className="ms-auto">
-                                                                                    Active
-                                                                                    containers:
-                                                                                </div>
-                                                                                <div>
-                                                                                    3
-                                                                                </div>
+                                                                        <ListGroup.Item disabled className="Server-Header">
+                                                                            <Stack direction="horizontal" gap={2}>
+                                                                                <div>Server 1</div>
+                                                                                <div className="ms-auto">Active containers:</div>
+                                                                                <div>3</div>
                                                                             </Stack>
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link1"
-                                                                            variant="success"
-                                                                        >
-                                                                            <Stack
-                                                                                direction="horizontal"
-                                                                                gap={
-                                                                                    0
-                                                                                }
-                                                                            >
-                                                                                <div className="Container-Name-Container">
-                                                                                    Container
-                                                                                    1
-                                                                                </div>
+                                                                        <ListGroup.Item action href="#link1" variant="success">
+                                                                            <Stack direction="horizontal" gap={0}>
+                                                                                <div className="Container-Name-Container">Container 1</div>
                                                                                 <div className="ms-auto">
                                                                                     <Image
-                                                                                        src={
-                                                                                            warningSmall
-                                                                                        }
+                                                                                        src={warningSmall}
                                                                                         id="ctr-001-Warning"
                                                                                         alt="warning"
                                                                                         width="30px"
@@ -349,134 +254,64 @@ const App = () => {
                                                                                         hidden
                                                                                     />
                                                                                 </div>
-                                                                                <div className="ms-auto">
-                                                                                    Uptime:
-                                                                                </div>
-                                                                                <div className="fixed-status">
-                                                                                    100%
-                                                                                </div>
+                                                                                <div className="ms-auto">Uptime:</div>
+                                                                                <div className="fixed-status">100%</div>
                                                                             </Stack>
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link2"
-                                                                            variant="danger"
-                                                                        >
-                                                                            <Stack
-                                                                                direction="horizontal"
-                                                                                gap={
-                                                                                    0
-                                                                                }
-                                                                            >
-                                                                                <div className="Container-Name-Container">
-                                                                                    Bandit
-                                                                                </div>
+                                                                        <ListGroup.Item action href="#link2" variant="danger">
+                                                                            <Stack direction="horizontal" gap={0}>
+                                                                                <div className="Container-Name-Container">Bandit</div>
                                                                                 <div className="ms-auto">
                                                                                     <Image
-                                                                                        src={
-                                                                                            warningSmall
-                                                                                        }
+                                                                                        src={warningSmall}
                                                                                         id="ctr-002-Warning"
                                                                                         alt="warning"
                                                                                         width="30px"
                                                                                         height="30px"
                                                                                     />
                                                                                 </div>
-                                                                                <div className="ms-auto">
-                                                                                    Uptime:
-                                                                                </div>
-                                                                                <div className="fixed-status">
-                                                                                    40%
-                                                                                </div>
+                                                                                <div className="ms-auto">Uptime:</div>
+                                                                                <div className="fixed-status">40%</div>
                                                                             </Stack>
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                            variant="warning"
-                                                                        >
-                                                                            <Stack
-                                                                                direction="horizontal"
-                                                                                gap={
-                                                                                    0
-                                                                                }
-                                                                            >
-                                                                                <div className="Container-Name-Container">
-                                                                                    Container
-                                                                                    3
-                                                                                </div>
+                                                                        <ListGroup.Item action href="#link3" variant="warning">
+                                                                            <Stack direction="horizontal" gap={0}>
+                                                                                <div className="Container-Name-Container">Container 3</div>
                                                                                 <div className="ms-auto">
                                                                                     <Image
-                                                                                        src={
-                                                                                            warningSmall
-                                                                                        }
+                                                                                        src={warningSmall}
                                                                                         id="ctr-003-Warning"
                                                                                         alt="warning"
                                                                                         width="30px"
                                                                                         height="30px"
                                                                                     />
                                                                                 </div>
-                                                                                <div className="ms-auto">
-                                                                                    Uptime:
-                                                                                </div>
-                                                                                <div className="fixed-status">
-                                                                                    76%
-                                                                                </div>
+                                                                                <div className="ms-auto">Uptime:</div>
+                                                                                <div className="fixed-status">76%</div>
                                                                             </Stack>
                                                                         </ListGroup.Item>
                                                                     </ListGroup>
                                                                 </Col>
                                                                 <Col className="Server-Column">
                                                                     <ListGroup className="lg1">
-                                                                        <ListGroup.Item
-                                                                            disabled
-                                                                        >
-                                                                            Server
-                                                                            2
+                                                                        <ListGroup.Item disabled>Server 2</ListGroup.Item>
+                                                                        <ListGroup.Item action href="#link1" variant="warning">
+                                                                            Container 1
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link1"
-                                                                            variant="warning"
-                                                                        >
-                                                                            Container
-                                                                            1
+                                                                        <ListGroup.Item action href="#link2" variant="danger">
+                                                                            Container 2
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link2"
-                                                                            variant="danger"
-                                                                        >
-                                                                            Container
-                                                                            2
+                                                                        <ListGroup.Item action href="#link3">
+                                                                            Container 3
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                        >
-                                                                            Container
-                                                                            3
+                                                                        <ListGroup.Item action href="#link3">
+                                                                            Container 3
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                        >
-                                                                            Container
-                                                                            3
+                                                                        <ListGroup.Item action href="#link3">
+                                                                            Container 3
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                        >
-                                                                            Container
-                                                                            3
-                                                                        </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                        >
-                                                                            Container
-                                                                            3
+                                                                        <ListGroup.Item action href="#link3">
+                                                                            Container 3
                                                                         </ListGroup.Item>
                                                                     </ListGroup>
                                                                 </Col>
@@ -486,32 +321,15 @@ const App = () => {
                                                             <Row>
                                                                 <Col className="Server-Column">
                                                                     <ListGroup className="lg1">
-                                                                        <ListGroup.Item
-                                                                            disabled
-                                                                        >
-                                                                            Server
-                                                                            1
+                                                                        <ListGroup.Item disabled>Server 1</ListGroup.Item>
+                                                                        <ListGroup.Item action href="#link1">
+                                                                            Container 1
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link1"
-                                                                        >
-                                                                            Container
-                                                                            1
+                                                                        <ListGroup.Item action href="#link2">
+                                                                            Container 2
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link2"
-                                                                        >
-                                                                            Container
-                                                                            2
-                                                                        </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                        >
-                                                                            Container
-                                                                            3
+                                                                        <ListGroup.Item action href="#link3">
+                                                                            Container 3
                                                                         </ListGroup.Item>
                                                                     </ListGroup>
                                                                 </Col>
@@ -523,39 +341,18 @@ const App = () => {
                                                             <Row>
                                                                 <Col className="Server-Column">
                                                                     <ListGroup className="lg1">
-                                                                        <ListGroup.Item
-                                                                            disabled
-                                                                        >
-                                                                            Server
-                                                                            1
+                                                                        <ListGroup.Item disabled>Server 1</ListGroup.Item>
+                                                                        <ListGroup.Item action href="#link1">
+                                                                            Container 1
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link1"
-                                                                        >
-                                                                            Container
-                                                                            1
+                                                                        <ListGroup.Item action href="#link2">
+                                                                            Container 2
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link2"
-                                                                        >
-                                                                            Container
-                                                                            2
+                                                                        <ListGroup.Item action href="#link3">
+                                                                            Container 3
                                                                         </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link3"
-                                                                        >
-                                                                            Container
-                                                                            3
-                                                                        </ListGroup.Item>
-                                                                        <ListGroup.Item
-                                                                            action
-                                                                            href="#link4"
-                                                                        >
-                                                                            Container
-                                                                            4
+                                                                        <ListGroup.Item action href="#link4">
+                                                                            Container 4
                                                                         </ListGroup.Item>
                                                                     </ListGroup>
                                                                 </Col>
@@ -577,9 +374,7 @@ const App = () => {
                                 </Tabs>
 
                                 <div id="dataViewerTest">
-                                    <p id="dataTarget">
-                                        Docker Data Viewer (Placeholder)
-                                    </p>
+                                    <p id="dataTarget">Docker Data Viewer (Placeholder)</p>
                                     {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
                                     <DockerButton />
                                 </div>
