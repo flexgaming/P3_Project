@@ -20,11 +20,11 @@ public final class Persistent {
     // -------------------------------
     // Application Settings
     // -------------------------------
-
+    public static final Integer DEFAULT_INTERVAL_TIME = 60;
     // -------------------------------
     // Example URLs or endpoints
     // -------------------------------
-    // public static final String API_BASE_URL = "https://api.example.com/";
-    // public static final String HEALTH_ENDPOINT = API_BASE_URL + "health";
-
+    public static final String WINDOWS_DOCKER_SOCKET = "npipe:////./pipe/docker_engine";
+    public static final String LINUX_MAC_DOCKER_SOCKET = "unix:///var/run/docker.sock";
+            
 }

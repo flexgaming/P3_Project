@@ -6,11 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 // import P3.Backend.Docker.manager.DockerClientManager;
+
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
+
+import static P3.Backend.Docker.Persistent.WINDOWS_DOCKER_SOCKET;
+import static P3.Backend.Docker.Persistent.LINUX_MAC_DOCKER_SOCKET;
 
 import P3.Backend.Docker.manager.DockerClientManager;
 
@@ -21,9 +25,9 @@ public class DockerClientBuilder {
         // Detect platform and select appropriate socket/pipe
         String dockerHost;
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            dockerHost = "npipe:////./pipe/docker_engine";  // Windows named pipe
+            dockerHost = WINDOWS_DOCKER_SOCKET;     // Windows named pipe
         } else {
-            dockerHost = "unix:///var/run/docker.sock";     // Linux/macOS socket
+            dockerHost = LINUX_MAC_DOCKER_SOCKET;   // Linux/macOS socket
         }
 
         DockerClientConfig config = DockerClientManager.initializeDockerClient(dockerHost);

@@ -1,5 +1,7 @@
 package P3.Backend.Docker.Setup;
 
+import static P3.Backend.Docker.Persistent.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,10 +20,10 @@ import com.github.dockerjava.api.DockerClient;
 public class SetupApplications {
 
     // The default interval (in seconds) for the new containers.
-    private static final Integer defaultIntervalTime = 60;
+    private static final Integer defaultIntervalTime = DEFAULT_INTERVAL_TIME;
 
     // Name for JSON file containing all of the containers:
-    private static final String containerFilename = "currentContainers.json";
+    private static final String containerFilename = CURRENT_CONTAINER_PATH;
 
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of("" + containerFilename); // Replace "" with desired path.
