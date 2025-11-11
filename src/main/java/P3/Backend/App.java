@@ -13,7 +13,7 @@ public class App {
 		//SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        //addDummyData(database);
+        addDummyData(database);
         printData(database);
 
         //Test getting diagnostics data for a specific container
@@ -226,21 +226,21 @@ public class App {
                         "Crashed","Recovered","Healthy"
                 },
                 new String[] {
-                        "","","High memory usage",
-                        "NullPointerException at line 42","","",
-                        "","","CPU spike detected",
-                        "","","Disk IO error",
-                        "High CPU usage","","",
-                        "OOMKilled","","",
-                        "","","CPU spike detected",
-                        "","","",
-                        "Disk full","","",
-                        "","","",
-                        "Timeout error","","",
-                        "","","Disk read latency",
-                        "","","Network instability",
-                        "","","CPU usage exceeded 90%",
-                        "","",""
+                        null,null,"High memory usage",
+                        "NullPointerException at line 42",null,null,
+                        null,null,"CPU spike detected",
+                        null,null,"Disk IO error",
+                        "High CPU usage",null,null,
+                        "OOMKilled",null,null,
+                        null,null,"CPU spike detected",
+                        null,null,null,
+                        "Disk full",null,null,
+                        null,null,null,
+                        "Timeout error",null,null,
+                        null,null,"Disk read latency",
+                        null,null,"Network instability",
+                        null,null,"CPU usage exceeded 90%",
+                        null,null,null
                 }
         );
     }
