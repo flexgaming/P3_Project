@@ -52,8 +52,8 @@ public class Region {
         companies.add(company);
     }
 
-    @Override
+    /* @Override
     public String toString() {
         return this.name;
-    }
+    } */
 }
