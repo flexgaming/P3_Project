@@ -3,22 +3,22 @@ package P3.Backend.Database;
 import java.util.ArrayList;
 
 public class Company {
-    private final int companyID;
-    private final String name;
+    private final String companyID;
+    private final String companyName;
 
-    private ArrayList<Server> servers = new ArrayList<>();
+    private final ArrayList<Server> servers = new ArrayList<>();
 
-    public Company(int companyID, String name) {
+    public Company(String companyID, String companyName) {
         this.companyID = companyID;
-        this.name = name;
+        this.companyName = companyName;
     }
 
-    public int getCompanyID() {
+    public String getCompanyID() {
         return companyID;
     }
 
     public String getCompanyName() {
-        return name;
+        return companyName;
     }
 
     /**
