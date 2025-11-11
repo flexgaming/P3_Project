@@ -62,8 +62,10 @@ function CriticalError() {
                 <tr key={error.id}>
                     <td>{error.timestamp}</td>
                     <td>--DATE--</td>
-                    <td>--DIAGNOSTICS ID--</td>
-                    <td>--CONTAINER PATH--</td>
+                    {/* <td>--DIAGNOSTICS ID--</td> */}
+                    <td>
+                        {error.regionName} → {error.companyName} → {error.serverID} → {error.containerID}
+                    </td>
                     <td>{error.containerName}</td>
                     <td>{error.errorLogs}</td>
                     <td>
