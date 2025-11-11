@@ -38,14 +38,14 @@ function AddRegions() {
 
     return (
         <>
-            {regions.map((name, idx) => (
-                <div className="p-2 w-100" id={`region-${String(name).replace(/\s+/g, '-').toLowerCase()}`} key={idx}>
+            {regions.map((name) => (
+                <div className="p-2 w-100" id={`region-${String(name).replace(/\s+/g, '-').toLowerCase()}`}>
                     <ListGroup>
                         <ListGroup.Item><h3><b>{name}</b></h3></ListGroup.Item>
                         <ListGroup.Item>Active Containers: <Badge bg="primary">bitch</Badge> / <Badge bg="primary">—</Badge></ListGroup.Item>
                         <ListGroup.Item>Companies: <Badge bg="primary">—</Badge></ListGroup.Item>
                         <ListGroup.Item>Total uptime: <Badge bg="primary">—</Badge></ListGroup.Item>
-                        <ListGroup.Item>Errors last hour: <Badge bg="primary">—</Badge></ListGroup.Item>
+                        <ListGroup.Item>Errors last hour: <Badge bg="primary">yes</Badge></ListGroup.Item>
                     </ListGroup>
                 </div>
             ))}
