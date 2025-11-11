@@ -362,7 +362,7 @@ public class Database {
             
             preparedStatement.setObject(1, UUID.fromString(regionID));
             ResultSet resultSet = preparedStatement.executeQuery();
-            // Reads all the rows in the Company table and adds them as Company classes to their respective region.
+            // Reads all the rows in the Company table and adds them to the JSON object.
             while (resultSet.next()) {
                 JSONObject company = new JSONObject();
                 String companyID = resultSet.getString("Company_ID");
@@ -396,7 +396,7 @@ public class Database {
             preparedStatement.setObject(1, UUID.fromString(companyID));
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            // Reads all the rows in the Server table and adds them as Server classes to their respective company.
+            // Reads all the rows in the Server table and adds them to the JSON object.
             while (resultSet.next()) {
                 JSONObject server = new JSONObject();
                 String serverID = resultSet.getString("Server_ID");
@@ -426,6 +426,7 @@ public class Database {
      */
     public JSONObject getContainers(String companyID) {
         JSONObject containers = new JSONObject();
+        // Read all data from View Company_Containers.
         String sql = "SELECT * FROM Company_Containers WHERE Company_ID = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -436,7 +437,7 @@ public class Database {
             preparedStatement.setObject(1, UUID.fromString(companyID));
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            // Reads all the rows in the Container table and adds them as Container classes to their respective server.
+            // Reads all the rows in the Company_Containers View and adds them to the JSON object.
             while (resultSet.next()) {
                 JSONObject container = new JSONObject();
                 String containerID = resultSet.getString("Container_ID");
@@ -460,21 +461,20 @@ public class Database {
      */
     public JSONObject getDiagnosticsData(String companyID) {
         JSONObject diagnosticsData = new JSONObject();
+        // Read all data from View Company_Diagnostics that are within time scope.
         String sql = "SELECT * FROM Company_Diagnostics WHERE Company_ID = ? AND Company_Diagnostics.Timestamp >= " +
                 "NOW() - make_interval(mins => ?)";
 
-        System.out.println("Reading all diagnostics in Company: " + companyID);
-
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use a normal Statement. No SQL injection protection is necessary when no user input.
+             // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setObject(1, UUID.fromString(companyID));
-            preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIMER);
+            preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIME_SCOPE);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
+            // Reads all the rows in the Company_Diagnostics View and adds them to the JSON object.
             while (resultSet.next()) {
                 JSONObject diagnostics = new JSONObject();
                 String diagnosticsID = resultSet.getString("Diagnostics_ID");
@@ -506,6 +506,51 @@ public class Database {
         }
 
         return diagnosticsData;
+    }
+
+    public JSONObject getDiagnosticsErrors() {
+        JSONObject diagnosticsErrors = new JSONObject();
+        // Read all data from View Diagnostics_Errors.
+        String sql = "SELECT * FROM Diagnostics_Errors";
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use a normal Statement. No SQL injection protection is necessary when no user input.
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            // Reads all the rows in the Diagnostics Errors View and adds them to the JSON object.
+            while (resultSet.next()) {
+                JSONObject diagnosticsError = new JSONObject();
+                String regionID = resultSet.getString("Region_ID");
+                String regionName = resultSet.getString("Region_Name");
+                String companyID = resultSet.getString("Company_ID");
+                String companyName = resultSet.getString("Company_Name");
+                String serverID = resultSet.getString("Server_ID");
+                String serverName = resultSet.getString("Server_Name");
+                String containerID = resultSet.getString("Container_ID");
+                String containerName = resultSet.getString("Container_Name");
+                String diagnosticsID = resultSet.getString("Diagnostics_ID");
+                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
+                String errorLogs = resultSet.getString("Error_Logs");
+                diagnosticsError.put("regionID", regionID);
+                diagnosticsError.put("regionName", regionName);
+                diagnosticsError.put("companyID", companyID);
+                diagnosticsError.put("companyName", companyName);
+                diagnosticsError.put("serverID", serverID);
+                diagnosticsError.put("serverName", serverName);
+                diagnosticsError.put("containerID", containerID);
+                diagnosticsError.put("containerName", containerName);
+                diagnosticsError.put("timestamp", timestamp);
+                diagnosticsError.put("errorLogs", errorLogs);
+                diagnosticsErrors.put(diagnosticsID, diagnosticsError);
+            }
+
+        } catch (SQLException error) {
+            errorHandling(error);
+        }
+
+        return diagnosticsErrors;
     }
 
 // ===============================================================================================
