@@ -573,8 +573,9 @@ public class Database {
 
 
 
-    public ArrayList<Company> getCompanies(int regionId) {
-        String sql = "SELECT * FROM Company WHERE Region_ID = " + regionId;
+    public ArrayList<Company> getCompanies(String regionName) {
+        regionName = regionName.replaceAll("-", " ");
+        String sql = "SELECT * FROM company WHERE region_id = (SELECT region.region_id FROM region WHERE region.Name ~* '" + regionName + "')";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -591,6 +592,31 @@ public class Database {
                 companies.add(company);
             }
             return companies;
+
+        } catch (SQLException error) {
+            errorHandling(error);
+            return null;
+        }
+    }
+
+    public ArrayList<String> getCompanyContents(String regionName, String companyName) {
+        companyName = companyName.replaceAll("-", " ");
+        // Select from View
+        String sql = " ";// TO BE FILLED
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+                // Use a normal Statement. No SQL injection protection is necessary when no user input.
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
+
+            ArrayList<String> servers = new ArrayList<>();
+            // Reads all the rows in the Server table and adds them as Server classes to the ArrayList.
+            while (resultSet.next()) {
+                String serverID = resultSet.getString("Server_ID");
+                servers.add(serverID);
+            }
+            return servers;
 
         } catch (SQLException error) {
             errorHandling(error);
