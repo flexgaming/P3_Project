@@ -4,7 +4,7 @@ import warningSmall from "./assets/warning128.png";
 import { Navbar, Nav, Container, Row, Col, Table, Badge, Accordion, Tab, Tabs, ListGroup, Stack, Spinner, Alert, Image } from "react-bootstrap";
 import { Routes, Route, Link } from "react-router-dom";
 import Dashboard from "./Dashboard";
-import DockerButton from "./DockerButton.jsx";
+import DockerButton from "./modules/DockerButton.jsx";
 import NavRegions from "./modules/NavRegions.jsx";
 import NavCompanies from "./modules/NavCompanies.jsx";
 
