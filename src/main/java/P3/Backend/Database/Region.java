@@ -3,22 +3,22 @@ package P3.Backend.Database;
 import java.util.ArrayList;
 
 public class Region {
-    private final int regionID;
-    private final String name;
+    private final String regionID;
+    private final String regionName;
 
     private final ArrayList<Company> companies = new ArrayList<>();
 
-    public Region(int regionID, String name) {
+    public Region(String regionID, String regionName) {
         this.regionID = regionID;
-        this.name = name;
+        this.regionName = regionName;
     }
 
-    public int getRegionID() {
+    public String getRegionID() {
         return regionID;
     }
 
     public String getRegionName() {
-        return name;
+        return regionName;
     }
 
     /**
@@ -34,9 +34,9 @@ public class Region {
      * @param companyID The ID of the company being searched for.
      * @return The Company object if it exists, otherwise null.
      */
-    public Company getCompany(int companyID) {
+    public Company getCompany(String companyID) {
         for (Company company : companies) {
-            if (company.getCompanyID() == companyID) {
+            if (company.getCompanyID().equals(companyID)) {
                 return company;
             }
         }

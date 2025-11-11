@@ -1,8 +1,8 @@
 package P3.Backend;
 
-import java.util.ArrayList;
-
 import P3.Backend.Database.*;
+
+import org.json.JSONObject;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.SpringApplication;
 
@@ -13,9 +13,8 @@ public class App {
         SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        // addDummyData(database);
-        ArrayList<Region> regions = database.getRegions();
-        //printDBData(regions);
+        addDummyData(database);
+        printData(database);
 
         // Test getting diagnostics data for a specific container
         /* Container dockerTst = new Container("ctr-001");
@@ -23,49 +22,71 @@ public class App {
         System.out.println(testData.getDiagnosticsData()); */
     }
 
-    private static void printDBData(ArrayList<Region> regions) {
-        for (Region region : regions) {
-            System.out.print("Region: " + region.getRegionID() + " ");
-            System.out.println(region.getRegionName());
-            for (Company company : region.getCompanies()) {
-                System.out.print("Company: " + company.getCompanyID() + " ");
-                System.out.println(company.getCompanyName());
-                for (Server server : company.getServers()) {
-                    System.out.print("Server: " + server.getServerID() + " ");
-                    System.out.print(server.getRamTotal() + " ");
-                    System.out.print(server.getCpuTotal() + " ");
-                    System.out.println(server.getDiskUsageTotal());
-                    for (Container container : server.getContainers()) {
-                        System.out.println("Container: " + container.getContainerID());
-                        for (Diagnostics diagnostics : container.getDiagnosticsData()) {
-                            System.out.println("Diagnostics: " + diagnostics);
-                        }
-                    }
-                }
-            }
-        }
+    private static void printData(Database database) {
+        JSONObject regions = database.getRegions();
+        System.out.println(regions.toString(4));
+        JSONObject companies = database.getCompanies(regions.getJSONObject("North America").getString("regionID"));
+        System.out.println(companies.toString(4));
+        JSONObject servers = database.getServers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
+        System.out.println(servers.toString(4));
+        JSONObject containers = database.getContainers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
+        System.out.println(containers.toString(4));
+        JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
+        System.out.println(diagnosticsData.toString(4));
     }
 
-    private static void addDummyData(Database db) {
-        db.addRegions(
-                new String[] { "North America", "Europe", "Asia", "South America", "Australia" });
-        db.addCompanies(
-                new int[] { 1, 1, 2, 2, 3, 3, 4, 5 },
-                new String[] { "TechNova Inc.", "CloudForge LLC", "EuroCloud GmbH", "Datastream Systems",
-                        "AsiaNet Solutions", "PacificWare Co.", "Andes Data Corp.", "AussieCompute Ltd." });
-        db.addServers(
+    private static void addDummyData(Database database) {
+        database.addRegions(
+                new String[]{"North America", "Europe", "Asia", "South America", "Australia"}
+        );
+        JSONObject regions = database.getRegions();
+
+        database.addCompanies(
+                new String[]{
+                        regions.getJSONObject("North America").getString("regionID"),
+                        regions.getJSONObject("North America").getString("regionID"),
+                        regions.getJSONObject("Europe").getString("regionID"),
+                        regions.getJSONObject("Europe").getString("regionID"),
+                        regions.getJSONObject("Asia").getString("regionID"),
+                        regions.getJSONObject("Asia").getString("regionID"),
+                        regions.getJSONObject("South America").getString("regionID"),
+                        regions.getJSONObject("Australia").getString("regionID")
+                },
+                new String[]{"TechNova Inc.", "CloudForge LLC", "EuroCloud GmbH", "Datastream Systems",
+                        "AsiaNet Solutions", "PacificWare Co.", "Anders Data Corp.", "AussieCompute Ltd."}
+        );
+        
+        database.addServers(
                 new String[] { "srv-101", "srv-102", "srv-201", "srv-301", "srv-302", "srv-401", "srv-501", "srv-601",
                         "srv-701", "srv-801" },
-                new int[] { 1, 1, 2, 3, 3, 4, 5, 6, 7, 8 },
+                new String[] {
+                        database.getCompanies(regions.getJSONObject("North America").getString("regionID")).getJSONObject("TechNova Inc.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("North America").getString("regionID")).getJSONObject("TechNova Inc.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("North America").getString("regionID")).getJSONObject("CloudForge LLC").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Europe").getString("regionID")).getJSONObject("EuroCloud GmbH").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Europe").getString("regionID")).getJSONObject("EuroCloud GmbH").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Europe").getString("regionID")).getJSONObject("Datastream Systems").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Asia").getString("regionID")).getJSONObject("AsiaNet Solutions").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Asia").getString("regionID")).getJSONObject("PacificWare Co.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("South America").getString("regionID")).getJSONObject("Anders Data Corp.").getString("companyID"),
+                        database.getCompanies(regions.getJSONObject("Australia").getString("regionID")).getJSONObject("AussieCompute Ltd.").getString("companyID"),
+                },
+                new String[] { "AetherCore", "NovaNode", "QuantumHub", "IronPeak", "EchoForge", "SolarisGate",
+                        "ObsidianRealm", "CrystalPulse", "VortexNet", "TitanVale" },
                 new double[] { 128.0, 64.0, 96.0, 128.0, 64.0, 96.0, 64.0, 128.0, 96.0, 64.0 },
                 new double[] { 64.0, 32.0, 48.0, 64.0, 32.0, 48.0, 32.0, 64.0, 48.0, 32.0 },
-                new double[] { 4000.0, 2000.0, 3500.0, 4200.0, 2500.0, 3000.0, 2000.0, 5000.0, 3500.0, 2500.0 });
-        db.addContainers(
+                new double[] { 4000.0, 2000.0, 3500.0, 4200.0, 2500.0, 3000.0, 2000.0, 5000.0, 3500.0, 2500.0 }
+        );
+        database.addContainers(
                 new String[] { "ctr-001", "ctr-002", "ctr-003", "ctr-004", "ctr-005", "ctr-006", "ctr-007",
                         "ctr-008", "ctr-009", "ctr-010", "ctr-011", "ctr-012", "ctr-013", "ctr-014", "ctr-015" },
                 new String[] { "srv-101", "srv-101", "srv-102", "srv-201", "srv-301", "srv-301", "srv-302",
-                        "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" });
-        db.addDiagnosticsBatch(
+                        "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" },
+                new String[] { "blue_whale", "iron_squid", "frosty_mongoose", "crimson_fox", "silent_panda",
+                        "cosmic_turtle", "rapid_lynx", "shadow_otter", "amber_crow", "lunar_badger", "mystic_serpent",
+                        "glacial_hawk", "rusty_wombat", "silver_iguana", "electric_ferret" }
+        );
+        database.addDiagnosticsBatch(
                 new String[] {
                         "ctr-001", "ctr-001", "ctr-001",
                         "ctr-002", "ctr-002", "ctr-002",
@@ -203,21 +224,22 @@ public class App {
                         "Crashed", "Recovered", "Healthy"
                 },
                 new String[] {
-                        "", "", "High memory usage",
-                        "NullPointerException at line 42", "", "",
-                        "", "", "CPU spike detected",
-                        "", "", "Disk IO error",
-                        "High CPU usage", "", "",
-                        "OOMKilled", "", "",
-                        "", "", "CPU spike detected",
-                        "", "", "",
-                        "Disk full", "", "",
-                        "", "", "",
-                        "Timeout error", "", "",
-                        "", "", "Disk read latency",
-                        "", "", "Network instability",
-                        "", "", "CPU usage exceeded 90%",
-                        "", "", ""
-                });
+                        null,null,"High memory usage",
+                        "NullPointerException at line 42",null,null,
+                        null,null,"CPU spike detected",
+                        null,null,"Disk IO error",
+                        "High CPU usage",null,null,
+                        "OOMKilled",null,null,
+                        null,null,"CPU spike detected",
+                        null,null,null,
+                        "Disk full",null,null,
+                        null,null,null,
+                        "Timeout error",null,null,
+                        null,null,"Disk read latency",
+                        null,null,"Network instability",
+                        null,null,"CPU usage exceeded 90%",
+                        null,null,null
+                }
+        );
     }
 }
