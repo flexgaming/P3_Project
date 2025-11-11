@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.json.JSONObject;
 
 
 @RestController
@@ -30,7 +31,7 @@ public class DataController {
 
     // GET companies by region name
     @GetMapping("/{region}/companies") //Router continuation
-    public ArrayList getCompaniesByRegion(@PathVariable String region) {
+    public JSONObject getCompaniesByRegion(@PathVariable String region) {
         // Get companies by region from DB
         Database database = new Database();
         return database.getCompanies(region);
