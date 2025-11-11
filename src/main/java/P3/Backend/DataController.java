@@ -6,8 +6,7 @@ import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 import org.json.JSONObject;
 
 
@@ -23,18 +22,19 @@ public class DataController {
 
     // GET all regions
     @GetMapping("/regions") //Router continuation
-    public ArrayList getAllRegions(){
+    public Map<String, Object> getAllRegions(){
         Database database = new Database();
-        System.out.println(database.getRegionsTemp()); // Debug print
-        return database.getRegionsTemp();
+        JSONObject regions = database.getRegions();
+        System.out.println(regions); // Debug print
+        return regions.toMap();
     }
 
     // GET companies by region name
     @GetMapping("/{region}/companies") //Router continuation
-    public JSONObject getCompaniesByRegion(@PathVariable String region) {
+    public Map<String, Object> getCompaniesByRegion(@PathVariable String region) {
         // Get companies by region from DB
         Database database = new Database();
-        return database.getCompanies(region);
+        return database.getCompanies(region).toMap();
     }
 
     // GET company Servers, Dockers and latest Diagnostics by company name
