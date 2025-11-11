@@ -36,7 +36,7 @@ public class DataController {
         return database.getCompanies(region);
     }
 
-    // GET company contents by company name
+    // GET company Servers, Dockers and latest Diagnostics by company name
     @GetMapping("/{region}/{companyName}/contents") //Router continuation
     public ArrayList getCompanyContentsByName(@PathVariable String region, @PathVariable String companyName) {
         // Get company contents from DB
@@ -51,5 +51,13 @@ public class DataController {
         Database database = new Database();
         Container container = database.getDiagnosticsData(new Container(id));
         return container.getDiagnosticsData();
+    }
+
+    // GET Dashboard data
+    @GetMapping("/dashboard") //Router continuation
+    public ArrayList getDashboardData() {
+        // Get dashboard data from DB
+        Database database = new Database();
+        return null; //database.getDashboardData();
     }
 }

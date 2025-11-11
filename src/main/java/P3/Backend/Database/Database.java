@@ -512,7 +512,9 @@ public class Database {
         }
     }
 
-// ========= MAKESHIFT ADDITIONS - NOT FINAL ===============
+// ===============================================================================================
+// =============================== MAKESHIFT ADDITIONS - NOT FINAL ===============================
+// ===============================================================================================
 
     public Container getDiagnosticsData(Container docker) {
         String sql = "SELECT * FROM Diagnostics WHERE Container_ID = '" + docker.getContainerID() + "';";
