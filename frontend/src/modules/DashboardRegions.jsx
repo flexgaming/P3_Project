@@ -47,10 +47,8 @@ function AddRegions() {
                 <div className="p-2 w-100" id={`region-${region.regionID}`} key={region.regionID}>
                     <ListGroup>
                         <ListGroup.Item>
-                            <h3>
-                                <b>{region.regionName}</b>
-                            </h3>
-                            <small className="text-muted">ID: {region.regionID}</small>
+                            <h3><b>{region.regionName}</b></h3>
+                            {/* <small className="text-muted">ID: {region.regionID}</small> */}
                         </ListGroup.Item>
                         <ListGroup.Item>
                             Active Containers: <Badge bg="primary">—</Badge> / <Badge bg="primary">—</Badge>

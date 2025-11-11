@@ -1,7 +1,7 @@
 import React from 'react';
 import './Dashboard.css';
 import { Stack, Table, Form, Button } from "react-bootstrap";
-import AddRegions from './modules/DashboardRegions.jsx';
+import AddRegionsDashboard from './modules/DashboardRegions.jsx';
 
 export default function Dashboard() {
 
@@ -11,7 +11,7 @@ export default function Dashboard() {
         <main className="dashboard">
             <h2><b>Dashboard</b></h2>
             <Stack direction="horizontal" gap={3} id="test-Regions">
-                <AddRegions />
+                <AddRegionsDashboard />
             </Stack>
 
             <h1><b>Critical Errors</b></h1>
