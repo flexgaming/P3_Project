@@ -25,16 +25,18 @@ public class DataController {
     public Map<String, Object> getAllRegions(){
         Database database = new Database();
         JSONObject regions = database.getRegions();
-        System.out.println(regions); // Debug print
         return regions.toMap();
     }
 
-    // GET companies by region name
-    @GetMapping("/{region}/companies") //Router continuation
-    public Map<String, Object> getCompaniesByRegion(@PathVariable String region) {
+    // GET companies by region ID
+    @GetMapping("/{regionID}/companies") //Router continuation
+    public Map<String, Object> getCompaniesByRegion(@PathVariable String regionID) {
         // Get companies by region from DB
         Database database = new Database();
-        return database.getCompanies(region).toMap();
+        JSONObject companies = database.getCompanies(regionID);
+        System.out.println(companies); // Debug print
+        System.out.println(companies.toMap());
+        return companies.toMap();
     }
 
     // GET company Servers, Dockers and latest Diagnostics by company ID
@@ -60,5 +62,14 @@ public class DataController {
         // Get dashboard data from DB
         Database database = new Database();
         return null; //database.getDashboardData();
+    }
+
+    // GET Critical Errors data
+    @GetMapping("/errors") //Router continuation
+    public Map<String, Object> getCriticalErrorsData() {
+        // Get critical errors data from DB
+        Database database = new Database();
+        JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
+        return diagnosticsErrors.toMap();
     }
 }

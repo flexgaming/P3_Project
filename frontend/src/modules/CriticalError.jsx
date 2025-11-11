@@ -1,0 +1,81 @@
+import { useState, useEffect } from "react";
+import { Button } from "react-bootstrap";
+
+function CriticalError() {
+    const [errorDetails, setErrorDetails] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchErrorDetails();
+    }, []);
+
+    async function fetchErrorDetails() {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await fetch(`/api/data/errors`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const json = await response.json();
+
+            // Extract region objects with both regionID and regionName
+            // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
+            setErrorDetails(Object.values(json));
+        } catch (error) {
+            console.error("Error fetching error details:", error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if (loading) {
+        return (
+            <tr>
+                <td colSpan="8">Loading errors...</td>
+            </tr>
+        );
+    }
+
+    if (error) {
+        return (
+            <tr>
+                <td colSpan="8">Error: {error}</td>
+            </tr>
+        );
+    }
+
+    if (errorDetails.length === 0) {
+        return (
+            <tr>
+                <td colSpan="8">No critical errors found</td>
+            </tr>
+        );
+    }
+
+    return (
+        <>
+            {errorDetails.map((error) => (
+                <tr key={error.id}>
+                    <td>{error.timestamp}</td>
+                    <td>--DATE--</td>
+                    <td>--DIAGNOSTICS ID--</td>
+                    <td>--CONTAINER PATH--</td>
+                    <td>{error.containerName}</td>
+                    <td>{error.errorLogs}</td>
+                    <td>
+                        <Button variant="primary">View</Button>
+                    </td>
+                    <td>
+                        <Button variant="success">Resolve</Button>
+                    </td>
+                </tr>
+            ))}
+        </>
+    );
+}
+
+export default CriticalError;

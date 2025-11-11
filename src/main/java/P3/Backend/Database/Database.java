@@ -508,6 +508,9 @@ public class Database {
         return diagnosticsData;
     }
 
+    /**
+     * Fetches all diagnostics errors saved in the database.
+     */
     public JSONObject getDiagnosticsErrors() {
         JSONObject diagnosticsErrors = new JSONObject();
         // Read all data from View Diagnostics_Errors.
