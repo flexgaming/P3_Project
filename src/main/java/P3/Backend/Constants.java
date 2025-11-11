@@ -6,5 +6,5 @@ public class Constants {
     public static final String DATABASE_USER = "postgres";
     public static final String DATABASE_PASSWORD = "SQLvmDBaccess";
     public static final String ARRAY_LENGTH_ERROR = "The arrays do not have the same length.";
-    public static final int DIAGNOSTICS_TIMER = 60;
+    public static final int DIAGNOSTICS_TIMER = 60; // Scope of diagnostics data in minutes
 }

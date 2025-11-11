@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.UUID;
 import org.json.JSONObject;
+import java.util.ArrayList;
 
 public class Database {
     // The information needed to connect to the Database.
@@ -569,7 +570,7 @@ public class Database {
 
 
 
-    public ArrayList<Company> getCompanies(String regionName) {
+    /* public ArrayList<Company> getCompanies(String regionName) {
         regionName = regionName.replaceAll("-", " ");
         String sql = "SELECT * FROM company WHERE region_id = (SELECT region.region_id FROM region WHERE region.Name ~* '" + regionName + "')";
 
@@ -593,7 +594,7 @@ public class Database {
             errorHandling(error);
             return null;
         }
-    }
+    } */
 
     public ArrayList<String> getCompanyContents(String regionName, String companyName) {
         companyName = companyName.replaceAll("-", " ");
