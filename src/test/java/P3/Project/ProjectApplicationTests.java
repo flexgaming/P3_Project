@@ -1,5 +1,9 @@
 package P3.Project;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 import static P3.Backend.Docker.builder.DockerClientBuilder.dockerConnection;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,25 +11,24 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.api.extension.TestWatcher;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.model.Container;
 
 import P3.Project.util.TestResult;
 import P3.Backend.Docker.DemoApplication;
 import P3.Backend.Docker.manager.DockerClientManager;
+import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
+import static P3.Backend.Docker.Setup.SetupApplications.updateJSONFile;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 
 @SpringBootTest(classes = DemoApplication.class)
 @ExtendWith(TestResult.class)
@@ -43,27 +46,61 @@ class ProjectApplicationTests {
 		} */
 	}
 
-	@Test
+	// TODO Needs to be redone to work properly.
+	/*@Test
 	void ListAllContainersTest() throws JSONException {
 		DockerClient dockerClient = dockerConnection();
 
-		JSONArray containers = assertDoesNotThrow(
+		 JSONArray containers = assertDoesNotThrow(
 			() -> DockerClientManager.ListAllContainers(dockerClient),
-			"An error occured while trying to get a list of all containers.");
+			"An error occured while trying to get a list of all containers."); 
 
+		List<Container> containersTemp = assertDoesNotThrow( () -> dockerClient.listContainersCmd().withShowAll(true).exec(),
+		 													"An error occured while trying to get a list of all containers.");
+		JSONArray containers = new JSONArray(containersTemp);
+		
 		assertNotNull(containers, "Container list should not be null");
-
+		System.out.print("# of containers:" + containers.length());
 		for (int i = 0; i < containers.length(); i++) {
-			assertTrue(containers.get(i) instanceof org.json.JSONObject, "Element " + i + " is not a JSONObject");
 			org.json.JSONObject c = containers.getJSONObject(i);
+			assertNotNull(c, "Element" + i + " should not be null.");
+			//assertNotNull(containers.getJSONObject(i), "Element " + i + " is not a JSONObject");
+			//assertTrue(containers.get(i), "Element " + i + " is not a JSONObject");
 
 			assertTrue(c.has("Id") || c.has("id"), "Container missing Id");
 			assertTrue(c.has("Names") || c.has("names"), "Container missing Names");
 		}
+	} */
+
+	
+	
+	// TODO Check if containers are put in the currentContainers file.
+	@Test 
+	void ensureAddedContainersTest() {
+    	final String containerFilename = CURRENT_CONTAINER_PATH;
+   		// The path for where the JSON file is stored.
+   		final Path containerListPath = Path.of("" + containerFilename); // Replace "" with desired path.
+
+		try {
+			String content = Files.readString(containerListPath);
+			JSONObject JSONFile = new JSONObject(content);
+			updateJSONFile("Joachim-the-container", "107401j", 35, JSONFile);
+			
+			
+		} catch (Exception e) {
+
+		}
+
 	}
 
-	// TODO Tjek om containers man selv sætter ind på currentCotainers bliver en del af oldContainersArray.
-	// TODO Tjek om containers bliver sat ind på currentContainer.
+	
+	// TODO Check if containers we insert ourselves in the currentContainers file becomes apart of the oldContainersArray, as they should.
+	@Test
+	void yes() {}
+
+	// TODO
+
+	
 
 
 

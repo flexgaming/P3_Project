@@ -63,7 +63,7 @@ public class SetupApplications {
             JSONArray newContainersArr = new JSONArray(fetchedContainersArr.length());
 
             // Filter the containers into inactive and new container, as well as asking if the inactive containers should be deleted.
-            detectInactiveConstainers(fetchedContainersArr, existingIdArr, JSONFileObj, newContainersArr, scanner);
+            detectInactiveContainers(fetchedContainersArr, existingIdArr, JSONFileObj, newContainersArr, scanner);
 
             // Configure the containers, either all of the containers or just the newly discovered ones.
             showContainers(fetchedContainersArr, newContainersArr, existingIdArr, JSONFileObj, scanner);
@@ -105,7 +105,7 @@ public class SetupApplications {
      * @param newContainersArr Is used to store all of the newly discovered containers on the system.
      * @param scanner Is used is used to scan all of the input from the user.
      */
-    private static void detectInactiveConstainers(JSONArray fetchedContainersArr, JSONArray existingIdArr, 
+    private static void detectInactiveContainers (JSONArray fetchedContainersArr, JSONArray existingIdArr, 
                                                         JSONObject JSONFileObj, JSONArray newContainersArr, Scanner scanner) {
         // Get all of the id's from each "key" in the JSON file and add them to the existingIdArr.
         for (String key : JSONFileObj.keySet()) {
@@ -451,7 +451,7 @@ public class SetupApplications {
      * @param interval Is used for setting the container's interval in the JSON file.
      * @param JSONFileObj Is used to set the parameters that is inside of the JSON file.
      */
-    private static void updateJSONFile(String name, String id, Integer interval, JSONObject JSONFileObj) {
+    public static void updateJSONFile(String name, String id, Integer interval, JSONObject JSONFileObj) {
         // Make a JSON object that contains all of the relevant information.
         JSONObject newContainer = new JSONObject();
         newContainer.put("name", name);
