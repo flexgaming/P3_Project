@@ -6,7 +6,7 @@ import { ListGroup, Badge, Spinner, Alert } from "react-bootstrap";
  * - Fetches region names from /api/data/regions on mount
  * - Renders one ListGroup block per region name
  */
-function AddRegions() {
+function AddRegionsDashboard() {
     const [regions, setRegions] = useState([]);
     const [error, setError] = useState(null);
 
@@ -44,7 +44,7 @@ function AddRegions() {
     return (
         <>
             {regions.map((region) => (
-                <div className="p-2 w-100" id={`region-${region.regionID}`} key={region.regionID}>
+                <div className="p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
                     <ListGroup>
                         <ListGroup.Item>
                             <h3><b>{region.regionName}</b></h3>
@@ -69,4 +69,4 @@ function AddRegions() {
     );
 }
 
-export default AddRegions;
+export default AddRegionsDashboard;

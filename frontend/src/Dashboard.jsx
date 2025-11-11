@@ -5,7 +5,7 @@ import AddRegionsDashboard from './modules/DashboardRegions.jsx';
 
 export default function Dashboard() {
 
-    // Regions are handled by the AddRegions component which fetches on mount
+    // Regions are handled by the AddRegionsDashboard component which fetches on mount
 
     return (
         <main className="dashboard">

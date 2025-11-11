@@ -37,12 +37,12 @@ public class DataController {
         return database.getCompanies(region).toMap();
     }
 
-    // GET company Servers, Dockers and latest Diagnostics by company name
-    @GetMapping("/{region}/{companyName}/contents") //Router continuation
-    public ArrayList getCompanyContentsByName(@PathVariable String region, @PathVariable String companyName) {
+    // GET company Servers, Dockers and latest Diagnostics by company ID
+    @GetMapping("/{region}/{companyID}/contents") //Router continuation
+    public ArrayList getCompanyContentsByID(@PathVariable String region, @PathVariable String companyID) {
         // Get company contents from DB
         Database database = new Database();
-        return database.getCompanyContents(region, companyName);
+        return database.getCompanyContents(region, companyID);
     }
 
     // GET Container by ID
