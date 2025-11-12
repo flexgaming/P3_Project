@@ -4,7 +4,11 @@ import P3.Backend.Constants;
 
 import java.lang.reflect.Array;
 import java.sql.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Database {
@@ -543,6 +547,70 @@ public class Database {
 
         return diagnosticsErrors;
     }
+
+
+    public JSONObject getCompanyServersAndContainers(String companyID) {
+    JSONObject companyData = new JSONObject();
+
+    // SQL to get all servers belonging to the company
+    String sqlServers = "SELECT * FROM Server WHERE Company_Reference = ?";
+    // SQL to get all containers belonging to the company’s servers
+    String sqlContainers = "SELECT * FROM Container WHERE Server_Reference IN (SELECT Server_ID FROM Server WHERE Company_Reference = ?)";
+
+    try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password)) {
+
+        // Step 1: Fetch all servers
+        Map<String, JSONObject> serverMap = new LinkedHashMap<>(); // Keep insertion order
+        try (PreparedStatement serverStatement = connection.prepareStatement(sqlServers)) {
+            serverStatement.setObject(1, UUID.fromString(companyID));
+            ResultSet rsServers = serverStatement.executeQuery();
+
+            while (rsServers.next()) {
+                JSONObject server = new JSONObject();
+                String serverID = rsServers.getString("Server_ID");
+                server.put("serverID", serverID);
+                server.put("companyReference", rsServers.getString("Company_Reference"));
+                server.put("serverName", rsServers.getString("Server_Name"));
+                server.put("ramTotal", rsServers.getDouble("Ram_Total"));
+                server.put("cpuTotal", rsServers.getDouble("CPU_Total"));
+                server.put("diskUsageTotal", rsServers.getDouble("Disk_Usage_Total"));
+                server.put("containers", new JSONArray()); // Empty array for containers
+                serverMap.put(serverID, server);
+            }
+        }
+
+        // Step 2: Fetch all containers belonging to these servers
+        try (PreparedStatement containerStatement = connection.prepareStatement(sqlContainers)) {
+            containerStatement.setObject(1, UUID.fromString(companyID));
+            ResultSet rsContainers = containerStatement.executeQuery();
+
+            while (rsContainers.next()) {
+                JSONObject container = new JSONObject();
+                String containerID = rsContainers.getString("Container_ID");
+                String serverReference = rsContainers.getString("Server_Reference");
+                container.put("containerID", containerID);
+                container.put("serverReference", serverReference);
+                container.put("containerName", rsContainers.getString("Container_Name"));
+
+                // Match container to its server
+                if (serverMap.containsKey(serverReference)) {
+                    serverMap.get(serverReference).getJSONArray("containers").put(container);
+                }
+            }
+        }
+
+        // Step 3: Add everything into one JSON
+        for (JSONObject server : serverMap.values()) {
+            companyData.put(server.getString("serverName"), server);
+        }
+
+    } catch (SQLException error) {
+        errorHandling(error);
+    }
+
+    return companyData;
+}
+
 
     public Container getDiagnosticsData(Container docker) {
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = '" + docker.getContainerID() + "';";

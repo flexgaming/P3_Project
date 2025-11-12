@@ -13,7 +13,7 @@ public class App {
 		//SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        //addDummyData(database);
+        addDummyData(database);
         printData(database);
 
         //Test getting diagnostics data for a specific container
@@ -37,6 +37,8 @@ public class App {
         System.out.println(diagnosticsData.toString(4));
         JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
         System.out.println(diagnosticsErrors.toString(4));
+        JSONObject serverAndContainer = database.getCompanyServersAndContainers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
+        System.out.println(serverAndContainer.toString(4));
     }
 
     private static void addDummyData(Database database) {
