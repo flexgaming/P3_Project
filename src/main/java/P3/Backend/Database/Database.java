@@ -1,6 +1,7 @@
 package P3.Backend.Database;
 
 import P3.Backend.Constants;
+import P3.Backend.TimeUtils;
 
 import java.lang.reflect.Array;
 import java.sql.*;
@@ -560,9 +561,9 @@ public class Database {
     // =============================== MAKESHIFT ADDITIONS - NOT FINAL ===============================
     // ===============================================================================================
 
-    public Container getDiagnosticsData(Container docker) {
+    public JSONObject getDiagnosticsData(Container docker) {
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = '" + docker.getContainerID() + "';";
-        Container dck = new Container(docker.getContainerID());
+        JSONObject diagnosticsData = new JSONObject();
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -572,6 +573,9 @@ public class Database {
 
             // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
             while (resultSet.next()) {
+                JSONObject diagnostics = new JSONObject();
+                String diagnosticsID = resultSet.getString("Diagnostics_ID");
+                String containerReference = resultSet.getString("Container_Reference");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 boolean running = resultSet.getBoolean("Running");
                 double ramFree = resultSet.getDouble("Ram_Free");
@@ -581,17 +585,24 @@ public class Database {
                 String processID = resultSet.getString("Process_ID");
                 String status = resultSet.getString("Status");
                 String errorLogs = resultSet.getString("Error_Logs");
-                Diagnostics diagnostics = new Diagnostics(timestamp, running, ramFree, cpuFree, diskUsageFree,
-                        threadCount, processID, status, errorLogs);
-
-                dck.addDiagnostics(diagnostics);
+                diagnostics.put("containerReference", containerReference);
+                diagnostics.put("timestamp", timestamp);
+                diagnostics.put("running", running);
+                diagnostics.put("ramFree", ramFree);
+                diagnostics.put("cpuFree", cpuFree);
+                diagnostics.put("diskUsageFree", diskUsageFree);
+                diagnostics.put("threadCount", threadCount);
+                diagnostics.put("processID", processID);
+                diagnostics.put("status", status);
+                diagnostics.put("errorLogs", errorLogs);
+                diagnosticsData.put(diagnosticsID, diagnostics);
             }
-            return dck;
 
         } catch (SQLException error) {
             errorHandling(error);
             return null;
         }
+        return diagnosticsData;
     }
 
     public ArrayList<String> getRegionsTemp() {

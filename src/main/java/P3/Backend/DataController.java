@@ -49,11 +49,14 @@ public class DataController {
 
     // GET Container by ID
     @GetMapping("/container/{id}") //Router continuation
-    public ArrayList getContainerById(@PathVariable String id) {
+    public Map<String, Object> getContainerDiagnosticsById(@PathVariable String id) {
         // Get container diagnostics data from DB
         Database database = new Database();
-        Container container = database.getDiagnosticsData(new Container(id));
-        return container.getDiagnosticsData();
+        JSONObject diagnostics = database.getDiagnosticsData(new Container(id));
+        /* String[] timesStamp = TimeUtils.splitIsoToLocalDateAndTime(diagnostics.get("timestamp").toString());
+        diagnostics.put("date", timesStamp[0]);
+        diagnostics.put("timestamp", timesStamp[1]); */
+        return diagnostics.toMap();
     }
 
     // GET Dashboard data

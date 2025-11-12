@@ -1,6 +1,8 @@
 package P3.Backend;
 
 import P3.Backend.Database.*;
+
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,12 +25,11 @@ public class DockerController {
 
     // GET Docker by ID
     @GetMapping("/{id}") //Router continuation
-    public ArrayList getDockerById(@PathVariable String id) {
+    public JSONObject getDockerById(@PathVariable String id) {
         // In a real app, fetch from DB
         Database database = new Database();
-        Container dockerTst = new Container(id);
-        Container testData = database.getDiagnosticsData(dockerTst);
-        return testData.getDiagnosticsData();
+        JSONObject testData = database.getDiagnosticsData(new Container(id));
+        return testData;
     }
 
     // POST new Docker
