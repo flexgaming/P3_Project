@@ -5,7 +5,11 @@ import P3.Backend.TimeUtils;
 
 import java.lang.reflect.Array;
 import java.sql.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
@@ -425,17 +429,17 @@ public class Database {
     /**
      * Fetches all containers saved in the database.
      */
-    public JSONObject getContainers(String companyID) {
+    public JSONObject getContainers(String serverID) {
         JSONObject containers = new JSONObject();
         // Read all data from View Company_Containers.
-        String sql = "SELECT * FROM Company_Containers WHERE Company_ID = ?";
+        String sql = "SELECT * FROM Container WHERE Server_Reference = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
              // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {;
 
-            preparedStatement.setObject(1, UUID.fromString(companyID));
+            preparedStatement.setString(1, serverID);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Company_Containers View and adds them to the JSON object.
@@ -460,10 +464,10 @@ public class Database {
     /**
      * Fetches all diagnostics data saved in the database.
      */
-    public JSONObject getDiagnosticsData(String companyID) {
+    public JSONObject getDiagnosticsData(String containerID) {
         JSONObject diagnosticsData = new JSONObject();
         // Read all data from View Company_Diagnostics that are within time scope.
-        String sql = "SELECT * FROM Company_Diagnostics WHERE Company_ID = ? AND Company_Diagnostics.Timestamp >= " +
+        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.Timestamp >= " +
                 "NOW() - make_interval(mins => ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -471,7 +475,7 @@ public class Database {
              // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setObject(1, UUID.fromString(companyID));
+            preparedStatement.setString(1, containerID);
             preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIME_SCOPE);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -555,6 +559,44 @@ public class Database {
         }
 
         return diagnosticsErrors;
+    }
+
+    public JSONObject getRecentCompanyData(String companyID) {
+        JSONObject allCompanyData = new JSONObject();
+
+        JSONObject servers = getServers(companyID);
+        translateServerData(allCompanyData, servers);
+
+        return allCompanyData;
+    }
+
+    private void translateServerData(JSONObject allCompanyData, JSONObject servers) {
+        for (String serverKey : servers.keySet()) {
+            JSONObject tempServer = servers.getJSONObject(serverKey);
+            JSONObject tempServerContainers = new JSONObject();
+            JSONObject containers = getContainers(servers.getJSONObject(serverKey).getString("serverID"));
+            translateContainerData(tempServerContainers, containers);
+            tempServer.put("containers", tempServerContainers);
+            allCompanyData.put(tempServer.getString("serverID"), tempServer);
+        }
+    }
+
+    private void translateContainerData(JSONObject tempServerContainers, JSONObject containers) {
+        for (String containerKey : containers.keySet()) {
+            JSONObject tempContainer = containers.getJSONObject(containerKey);
+            JSONArray tempContainerDiagnosticsData = new JSONArray();
+            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID"));
+            translateDiagnosticsData(tempContainerDiagnosticsData, diagnosticsData);
+            tempContainer.put("diagnosticsData", tempContainerDiagnosticsData);
+            tempServerContainers.put(tempContainer.getString("containerID"), tempContainer);
+        }
+    }
+
+    private void translateDiagnosticsData(JSONArray tempContainerDiagnosticsData, JSONObject diagnosticsData) {
+        for (String diagnosticsKey : diagnosticsData.keySet()) {
+            JSONObject tempDiagnosticsData = diagnosticsData.getJSONObject(diagnosticsKey);
+            tempContainerDiagnosticsData.put(tempDiagnosticsData);
+        }
     }
 
     // ===============================================================================================

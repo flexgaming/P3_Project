@@ -13,7 +13,7 @@ public class App {
         SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        //addDummyData(database);
+        // addDummyData(database);
         printData(database);
 
         // Test getting diagnostics data for a specific container
@@ -24,17 +24,19 @@ public class App {
 
     private static void printData(Database database) {
         JSONObject regions = database.getRegions();
-        System.out.println(regions.toString(4));
+//        System.out.println(regions.toString(4));
         JSONObject companies = database.getCompanies(regions.getJSONObject("North America").getString("regionID"));
-        System.out.println(companies.toString(4));
+//        System.out.println(companies.toString(4));
         JSONObject servers = database.getServers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
-        System.out.println(servers.toString(4));
+//        System.out.println(servers.toString(4));
         JSONObject containers = database.getContainers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
-        System.out.println(containers.toString(4));
+//        System.out.println(containers.toString(4));
         JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
-        System.out.println(diagnosticsData.toString(4));
+//        System.out.println(diagnosticsData.toString(4));
         JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
-        System.out.println(diagnosticsErrors.toString(4));
+//        System.out.println(diagnosticsErrors.toString(4));
+        JSONObject allCompanyData = database.getRecentCompanyData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
+        System.out.println(allCompanyData.toString(4));
     }
 
     private static void addDummyData(Database database) {
