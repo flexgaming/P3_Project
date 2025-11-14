@@ -186,7 +186,7 @@ const App = () => {
             <div className="Body">
                 <Routes>
                     <Route path="/*" element={<Dashboard />} />
-                    <Route path="/diagnosticsview" element={<DiagnosticsView />} />
+                    <Route path="/diagnosticsview" element={<DiagnosticsView containerID={"ctr-001"}/>} />
                     <Route path="/manage" element={<div><h2>Manage Page (Placeholder)</h2></div>} />
                     <Route path="/nav/*" element={<NavRegions />} />
                 </Routes>
