@@ -1,13 +1,19 @@
 package P3.Project;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import P3.Backend.Docker.Setup.SetupApplications;
+import P3.Project.util.TestResult;
+
+@SpringBootTest(classes = SetupApplications.class)
+@ExtendWith(TestResult.class)
 public class SetupApplicationsTests {
+
     @Test
-	void contextLoads() {
-	}
+    void contextLoads() {
+    }
 }
 
 // TODO Send POST/PUT request with JSONArray of containers, Parameters: CompanyID, ContainerIDs, ContainerName, ContainerRunning.
