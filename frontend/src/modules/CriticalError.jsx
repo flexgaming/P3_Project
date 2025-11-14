@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
+import ErrorModal from "./ErrorModal";
 
 function CriticalError() {
     const [errorDetails, setErrorDetails] = useState([]);
@@ -69,7 +70,7 @@ function CriticalError() {
                     <td>{error.containerName}</td>
                     <td>{error.errorLogs}</td>
                     <td>
-                        <Button variant="primary">View</Button>
+                        <ErrorModal error={error /* Alternatively error.errorLogs */} buttonText="View" buttonVariant="primary" />
                     </td>
                     <td>
                         <Button variant="success">Resolve</Button>

@@ -176,7 +176,9 @@ const App = () => {
                                 Dashboard
                             </Nav.Link>
                             <Nav.Link href="/nav">Navigate</Nav.Link>
-                            <Nav.Link as={Link} to="/DiagnosticsView">DiagnosticsView</Nav.Link>
+                            <Nav.Link as={Link} to="/DiagnosticsView">
+                                DiagnosticsView
+                            </Nav.Link>
                             <Nav.Link href="/manage">Manage</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
@@ -187,7 +189,14 @@ const App = () => {
                 <Routes>
                     <Route path="/*" element={<Dashboard />} />
                     <Route path="/diagnosticsview" element={<DiagnosticsView />} />
-                    <Route path="/manage" element={<div><h2>Manage Page (Placeholder)</h2></div>} />
+                    <Route
+                        path="/manage"
+                        element={
+                            <div>
+                                <h2>Manage Page (Placeholder)</h2>
+                            </div>
+                        }
+                    />
                     <Route path="/nav/*" element={<NavRegions />} />
                 </Routes>
             </div>
