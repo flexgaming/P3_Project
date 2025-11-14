@@ -185,25 +185,10 @@ const App = () => {
 
             <div className="Body">
                 <Routes>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/DiagnosticsView" element={<DiagnosticsView />} />
-                    <Route
-                        path="/*"
-                        element={
-                            <>
-                                {/* Main Content */}
-                                <NavRegions />
-                                {/* <NavCompanies regionID="fb4c6b1f-cc12-4d6b-a083-261bf21234a3" /> {/* Testing */}
-                                
-
-                                <div id="dataViewerTest">
-                                    <p id="dataTarget">Docker Data Viewer (Placeholder)</p>
-                                    {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-                                    <DockerButton />
-                                </div>
-                            </>
-                        }
-                    />
+                    <Route path="/*" element={<Dashboard />} />
+                    <Route path="/diagnosticsview" element={<DiagnosticsView />} />
+                    <Route path="/manage" element={<div><h2>Manage Page (Placeholder)</h2></div>} />
+                    <Route path="/nav/*" element={<NavRegions />} />
                 </Routes>
             </div>
         </div>

@@ -6,7 +6,7 @@ import CriticalError from "./modules/CriticalError.jsx";
 
 export default function Dashboard() {
     // Regions are handled by the AddRegionsDashboard component which fetches on mount
-
+    window.history.replaceState({}, "", `/dashboard/`); // set URL to /dashboard/
     return (
         <main className="dashboard">
             <h2>
@@ -19,7 +19,7 @@ export default function Dashboard() {
             <h1>
                 <b>Critical Errors</b>
             </h1>
-            <Table striped bordered hover id="errors-table">
+            <Table striped bordered hover id="errors-table" responsive>
                 <thead>
                     <tr>
                         <th>Time</th>
