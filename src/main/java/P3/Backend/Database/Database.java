@@ -541,6 +541,8 @@ public class Database {
                 String diagnosticsID = resultSet.getString("Diagnostics_ID");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 String errorLogs = resultSet.getString("Error_Logs");
+                String date = resultSet.getString("diagnosticDate");
+                String time = resultSet.getString("diagnosticTime");
                 diagnosticsError.put("regionID", regionID);
                 diagnosticsError.put("regionName", regionName);
                 diagnosticsError.put("companyID", companyID);
@@ -551,6 +553,8 @@ public class Database {
                 diagnosticsError.put("containerName", containerName);
                 diagnosticsError.put("timestamp", timestamp);
                 diagnosticsError.put("errorLogs", errorLogs);
+                diagnosticsError.put("date", date);
+                diagnosticsError.put("time", time);
                 diagnosticsErrors.put(diagnosticsID, diagnosticsError);
             }
 

@@ -52,9 +52,6 @@ Database database = new Database();
     public Map<String, Object> getContainerDiagnosticsById(@PathVariable String id) {
         // Get container diagnostics data from DB
         JSONObject diagnostics = database.getDiagnosticsData(new Container(id));
-        /* String[] timesStamp = TimeUtils.splitIsoToLocalDateAndTime(diagnostics.get("timestamp").toString());
-        diagnostics.put("date", timesStamp[0]);
-        diagnostics.put("timestamp", timesStamp[1]); */
         return diagnostics.toMap();
     }
 
@@ -70,7 +67,22 @@ Database database = new Database();
     public Map<String, Object> getCriticalErrorsData() {
         // Get critical errors data from DB
         Database database = new Database();
-        JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
-        return diagnosticsErrors.toMap();
+        Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
+        
+        // Check if timestamp exists before processing
+        /* Object timestampObj = diagnosticsErrors.get("timestamp");
+        if (timestampObj != null) {
+            String tmstmp = timestampObj.toString();
+            diagnosticsErrors.put("timestamp", tmstmp);
+            String[] timesStamp = TimeUtils.splitIsoToLocalDateAndTime(tmstmp);
+            diagnosticsErrors.put("date", timesStamp[0]);
+            diagnosticsErrors.put("time", timesStamp[1]);
+        } else {
+            System.out.println("Timestamp: " + diagnosticsErrors.get("timestamp"));
+            System.out.println("date: " + null);
+            System.out.println("time: " + null);
+        } */
+        
+        return diagnosticsErrors;
     }
 }

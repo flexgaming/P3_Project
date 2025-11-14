@@ -5,18 +5,24 @@
     color: #213547;
 }
 
+/* Make an element span the full viewport width even when inside a centered container */
+.full-bleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
 
 .fixed-status {
-  min-width: 45px;      /* minimum width so content fits */
-  width: 45px;          /* optional: make it fixed exactly 45px */
-  text-align: right;
-  flex-shrink: 0;       /* prevents it from shrinking in a flex row */
-  white-space: nowrap;  /* avoid wrapping if the text is long */
+    min-width: 45px; /* minimum width so content fits */
+    width: 45px; /* optional: make it fixed exactly 45px */
+    text-align: right;
+    flex-shrink: 0; /* prevents it from shrinking in a flex row */
+    white-space: nowrap; /* avoid wrapping if the text is long */
 }
 
 .Container-Name-Container {
-  width: 100%;
-  text-align: left;
+    width: 100%;
+    text-align: left;
 }
 
 .Server-Header {
@@ -24,7 +30,6 @@
     font-weight: bold;
     font-size: 1.2em;
     padding-top: 10px;
-
 }
 
 .Server-Column {

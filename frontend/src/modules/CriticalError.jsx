@@ -34,7 +34,7 @@ function CriticalError() {
 
     if (loading) {
         return (
-            <tr>
+            <tr key="loading">
                 <td colSpan="8">Loading errors...</td>
             </tr>
         );
@@ -42,7 +42,7 @@ function CriticalError() {
 
     if (error) {
         return (
-            <tr>
+            <tr key="error">
                 <td colSpan="8">Error: {error}</td>
             </tr>
         );
@@ -50,7 +50,7 @@ function CriticalError() {
 
     if (errorDetails.length === 0) {
         return (
-            <tr>
+            <tr key="no-errors">
                 <td colSpan="8">No critical errors found</td>
             </tr>
         );
@@ -60,8 +60,8 @@ function CriticalError() {
         <>
             {errorDetails.map((error) => (
                 <tr key={error.id}>
-                    <td>{error.timestamp}</td>
-                    <td>--DATE--</td>
+                    <td>{error.time}</td>
+                    <td>{error.date}</td>
                     {/* <td>--DIAGNOSTICS ID--</td> */}
                     <td>
                         {error.regionName} → {error.companyName} → {error.serverID} → {error.containerID}

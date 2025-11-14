@@ -166,8 +166,8 @@ const App = () => {
     return (
         <div className="App">
             {/* Navbar */}
-            <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-                <Container style={{ maxWidth: "100%" }}>
+            <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="full-bleed">
+                <Container fluid>
                     <Navbar.Brand href="#home">Container Diagnostics Platform</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
