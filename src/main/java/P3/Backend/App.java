@@ -14,7 +14,7 @@ public class App {
 
         Database database = new Database();
         // addDummyData(database);
-        printData(database);
+        // printData(database);
 
         // Test getting diagnostics data for a specific container
         /* Container dockerTst = new Container("ctr-001");

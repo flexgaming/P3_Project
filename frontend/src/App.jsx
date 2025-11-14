@@ -3,10 +3,10 @@ import "./App.css";
 import warningSmall from "./assets/warning128.png";
 import { Navbar, Nav, Container, Row, Col, Table, Badge, Accordion, Tab, Tabs, ListGroup, Stack, Spinner, Alert, Image } from "react-bootstrap";
 import { Routes, Route, Link } from "react-router-dom";
-import Dashboard from "./Dashboard";
+import Dashboard from "./Dashboard.jsx";
+import DiagnosticsView from "./pages/DiagnosticsView.jsx";
 import DockerButton from "./modules/DockerButton.jsx";
 import NavRegions from "./modules/NavRegions.jsx";
-import NavCompanies from "./modules/NavCompanies.jsx";
 
 // The main application component
 const App = () => {
@@ -176,6 +176,7 @@ const App = () => {
                                 Dashboard
                             </Nav.Link>
                             <Nav.Link href="/nav">Navigate</Nav.Link>
+                            <Nav.Link as={Link} to="/DiagnosticsView">DiagnosticsView</Nav.Link>
                             <Nav.Link href="/manage">Manage</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
@@ -185,6 +186,7 @@ const App = () => {
             <div className="Body">
                 <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/DiagnosticsView" element={<DiagnosticsView />} />
                     <Route
                         path="/*"
                         element={
@@ -192,6 +194,7 @@ const App = () => {
                                 {/* Main Content */}
                                 <NavRegions />
                                 {/* <NavCompanies regionID="fb4c6b1f-cc12-4d6b-a083-261bf21234a3" /> {/* Testing */}
+                                
 
                                 <div id="dataViewerTest">
                                     <p id="dataTarget">Docker Data Viewer (Placeholder)</p>

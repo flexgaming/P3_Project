@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
+import NavServers from "./NavServers";
 
 /**
  * NavCompanies component
@@ -73,6 +74,7 @@ function NavCompanies({ regionID }) {
                     {companies.map(company => (
                         <Tab.Pane eventKey={`${company.companyName}`} key={company.companyID}>
                             <h4>{`Company: ${company.companyName}`}</h4>
+                            <NavServers companyID={company.companyID} />
                         </Tab.Pane>
                     ))}
                 </Tab.Content>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
+import { Alert, Row, Col, Badge, ListGroup, Stack, Image } from "react-bootstrap";
+import warningSmall from "../assets/warning128.png";
 
 /**
  * NavServers component
@@ -8,7 +9,6 @@ import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
  */
 function NavServers({ regionID, companyID }) {
     const [servers, setServers] = useState([]);
-    const [activeKey, setActiveKey] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -18,21 +18,36 @@ function NavServers({ regionID, companyID }) {
                 const res = await fetch(`/api/data/${regionID}/${companyID}/contents`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
-                console.log(json);
+                // The API returns a map keyed by server id. Convert to an array with normalized fields.
+                // Input shape (example):
+                // { "srv-101": { serverID: "srv-101", serverName: "AetherCore", containers: { "ctr-001": { ... } } }, ... }
+                const serverList = [];
+                if (json && typeof json === "object" && !Array.isArray(json)) {
+                    for (const [sKey, sVal] of Object.entries(json)) {
+                        if (!sVal || typeof sVal !== "object") continue;
+                        const containersObj = sVal.containers && typeof sVal.containers === "object" ? sVal.containers : {};
+                        const containers = Object.entries(containersObj).map(([cKey, cVal]) => {
+                            return {
+                                containerID: cVal?.containerID ?? cKey,
+                                containerName: cVal?.containerName ?? cVal?.name ?? cKey,
+                                diagnosticsData: Array.isArray(cVal?.diagnosticsData) ? cVal.diagnosticsData : [],
+                                raw: cVal,
+                            };
+                        });
 
-                // Extract region objects with both regionID and companyName
-                // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
-                // Support multiple shapes: object map or array
-                const companyList = json && !Array.isArray(json)
-                    ? Object.values(json)
-                    : Array.isArray(json)
-                        ? json
-                        : (json.companies || []);
-                if (mounted) {
-                    setServers(companyList);
-                    // set first tab active by companyName (matches Nav.Link/Tab.Pane eventKey)
-                    setActiveKey(companyList.length ? String(companyList[0].companyName) : null);
+                        serverList.push({
+                            serverID: sVal.serverID ?? sKey,
+                            serverName: sVal.serverName ?? sVal.serverName ?? sVal.serverName ?? sKey,
+                            ramTotal: sVal.ramTotal,
+                            cpuTotal: sVal.cpuTotal,
+                            diskUsageTotal: sVal.diskUsageTotal,
+                            containers,
+                            raw: sVal,
+                        });
+                    }
                 }
+
+                if (mounted) setServers(serverList);
             } catch (err) {
                 if (mounted) setError(err.message || String(err));
             }
@@ -42,7 +57,7 @@ function NavServers({ regionID, companyID }) {
         return () => {
             mounted = false;
         };
-    }, []);
+    }, [regionID, companyID]);
 
     if (error)
         return (
@@ -50,35 +65,70 @@ function NavServers({ regionID, companyID }) {
                 <Alert variant="danger">{error}</Alert>
             </div>
         );
+    
+    function chunkArray(arr, size = 3) {
+        const out = [];
+        for (let i = 0; i < arr.length; i += size) {
+            out.push(arr.slice(i, i + size));
+        }
+        return out;
+    }
+
+    const rows = chunkArray(servers, 3);
 
     return (
-        <Tab.Container
-            id={`${regionID}`}
-            activeKey={activeKey}
-            onSelect={(k) => setActiveKey(k)}
-            defaultActiveKey={companies.length ? `${companies[0].companyName}` : null}
-        >
-            <Row>
-            <Col sm={3}>
-                <Nav variant="pills" className="flex-column">
-                    {companies.map(company => (
-                        <Nav.Item key={company.companyID}>
-                            <Nav.Link eventKey={`${company.companyName}`}>{`${company.companyName}`}</Nav.Link>
-                        </Nav.Item>
+        <>
+            {rows.map((chunk, rowIndex) => (
+                <Row key={`row-${rowIndex}`} className="mb-3">
+                    {chunk.map((server) => (
+                        <Col className="Server-Column" key={`col-${server.serverID}`}>
+                            <ListGroup className="lg1">
+                                <ListGroup.Item as="div" disabled className="Server-Header" key={`header-${server.serverID}`}>
+                                    <Stack direction="horizontal" gap={2}>
+                                        <div>{server.serverName}</div>
+                                        <div className="ms-auto">Active containers:</div>
+                                        <Badge variant="primary">{server.containers?.length ?? 0}</Badge>
+                                    </Stack>
+                                </ListGroup.Item>
+
+                                {server.containers && server.containers.length > 0 ? (
+                                    server.containers.map((container) => {
+                                        const latest = (container.diagnosticsData && container.diagnosticsData.length > 0)
+                                            ? container.diagnosticsData[container.diagnosticsData.length - 1]
+                                            : null;
+                                        const showWarning = !!(latest && (latest.status && latest.status !== "Healthy" || latest.running === false));
+
+                                        return (
+                                            <ListGroup.Item key={`ctr-${container.containerID}`}>
+                                                <Stack direction="horizontal" gap={2}>
+                                                    <div className="Container-Name-Container">{container.containerName}</div>
+                                                    <div className="ms-auto">
+                                                        <Image
+                                                            src={warningSmall}
+                                                            id={`${container.containerID}-Warning`}
+                                                            alt="warning"
+                                                            width="28px"
+                                                            height="28px"
+                                                            hidden={!showWarning}
+                                                        />
+                                                    </div>
+                                                    <div className="ms-auto">Uptime:</div>
+                                                    <div className="fixed-status">100%</div>
+                                                </Stack>
+                                            </ListGroup.Item>
+                                        );
+                                    })
+                                ) : (
+                                    <ListGroup.Item key={`no-ctr-${server.serverID}`}>
+                                        <div>No containers</div>
+                                    </ListGroup.Item>
+                                )}
+                            </ListGroup>
+                        </Col>
                     ))}
-                </Nav>
-            </Col>
-            <Col sm={9}>
-                <Tab.Content>
-                    {companies.map(company => (
-                        <Tab.Pane eventKey={`${company.companyName}`} key={company.companyID}>
-                            <h4>{`Company: ${company.companyName}`}</h4>
-                        </Tab.Pane>
-                    ))}
-                </Tab.Content>
-            </Col>
-            </Row>
-        </Tab.Container>
+                </Row>
+            ))}
+        </>
     );
 }
 
