@@ -43,10 +43,10 @@ public class DemoApplication {
 			ContainerStats stats = dockerStatsService.getContainerStats(containerId);
 
 			// Print stats only when successfully retrieved (stats is in-scope here)
-			System.out.println("CPU Total Usage: " + stats.getCpuTotalUsage());
-			System.out.println("Memory Usage: " + stats.getMemoryUsage());
-			System.out.println("Memory Limit: " + stats.getMemoryLimit());
-			System.out.println("PIDs: " + stats.getPids());
+			System.out.println("CPU Total Usage: " + stats.getCpuTotalUsage()); // Total accumulated CPU time (in nanosec) used by the container since startup.
+			System.out.println("Memory Usage: " + stats.getMemoryUsage()); // Current RAM usage of the container
+			System.out.println("Memory Limit: " + stats.getMemoryLimit()); // Maximum amount of RAM the container can use.
+			System.out.println("PIDs: " + stats.getPids()); // The number of active processes currently running (processes and threads)
             
 		} catch (InterruptedException e) {
 			System.err.println("Failed to get container stats: " + e.getMessage());
