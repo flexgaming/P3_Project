@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ListGroup, Badge, Spinner, Alert } from "react-bootstrap";
+import { ListGroup, Badge, Alert } from "react-bootstrap";
 
 /**
  * AddRegions component

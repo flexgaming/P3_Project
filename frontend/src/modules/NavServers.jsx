@@ -86,20 +86,28 @@ function NavServers({ regionID, companyID }) {
                                 <ListGroup.Item as="div" disabled className="Server-Header" key={`header-${server.serverID}`}>
                                     <Stack direction="horizontal" gap={2}>
                                         <div>{server.serverName}</div>
-                                        <div className="ms-auto">Active containers:</div>
+                                        <div className="ms-auto">Containers:</div>
                                         <Badge variant="primary">{server.containers?.length ?? 0}</Badge>
                                     </Stack>
                                 </ListGroup.Item>
 
                                 {server.containers && server.containers.length > 0 ? (
                                     server.containers.map((container) => {
-                                        const latest = (container.diagnosticsData && container.diagnosticsData.length > 0)
-                                            ? container.diagnosticsData[container.diagnosticsData.length - 1]
-                                            : null;
-                                        const showWarning = !!(latest && (latest.status && latest.status !== "Healthy" || latest.running === false));
+                                        const latest = (container.diagnosticsData && container.diagnosticsData.length > 0) // The amount of diagnostics data entries
+                                                        ? container.diagnosticsData[container.diagnosticsData.length - 1]
+                                                        : null;
+                                        const showWarning = latest?.running; // if it is not currently running show warning
+                                        const uptime = container.diagnosticsData.length > 0
+                                                        ? ((container.diagnosticsData.filter(d => d.running).length / container.diagnosticsData.length) * 100).toFixed(0)
+                                                        : "N/A";
+                                        const healthVariant = // if uptime is above 75% green, 50-75% yellow, below 50% red
+                                            uptime === "N/A" ? "secondary" :
+                                            uptime >= 75 ? "success" :
+                                            uptime >= 50 ? "warning" :
+                                            "danger";
 
                                         return (
-                                            <ListGroup.Item key={`ctr-${container.containerID}`}>
+                                            <ListGroup.Item key={`${container.containerID}-Item`} action href={`/${container.containerID}`} variant={healthVariant}>
                                                 <Stack direction="horizontal" gap={2}>
                                                     <div className="Container-Name-Container">{container.containerName}</div>
                                                     <div className="ms-auto">
@@ -113,7 +121,7 @@ function NavServers({ regionID, companyID }) {
                                                         />
                                                     </div>
                                                     <div className="ms-auto">Uptime:</div>
-                                                    <div className="fixed-status">100%</div>
+                                                    <div className="fixed-status" id={`${container.containerID}-Uptime`}>{uptime}%</div>
                                                 </Stack>
                                             </ListGroup.Item>
                                         );
