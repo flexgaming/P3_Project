@@ -62,6 +62,7 @@ function NavCompanies({ regionID }) {
             <Row>
             <Col sm={3}>
                 <Nav variant="pills" className="flex-column">
+                    <h4><b>Companies</b></h4>
                     {companies.map(company => (
                         <Nav.Item key={company.companyID}>
                             <Nav.Link eventKey={`${company.companyName}`}>{`${company.companyName}`}</Nav.Link>
@@ -73,7 +74,7 @@ function NavCompanies({ regionID }) {
                 <Tab.Content>
                     {companies.map(company => (
                         <Tab.Pane eventKey={`${company.companyName}`} key={company.companyID}>
-                            <h4>{`Company: ${company.companyName}`}</h4>
+                            <h4><b>Servers & Containers</b></h4>
                             <NavServers companyID={company.companyID} />
                         </Tab.Pane>
                     ))}

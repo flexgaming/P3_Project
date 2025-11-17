@@ -2,7 +2,6 @@
     max-width: 90%;
     margin: 0 auto;
     text-align: center;
-    color: #213547;
 }
 
 /* Make an element span the full viewport width even when inside a centered container */
@@ -53,4 +52,18 @@
     text-align: left;
     display: block;
     width: 100%;
+}
+
+#main-navbar {
+    background-color: #011425;
+}
+
+#main-navbar .navbar-brand,
+#main-navbar .nav-link {
+    color: #ffffff;
+}
+
+#main-navbar .nav-link:hover {
+    color: #ffffff;
+    opacity: 0.9;
 }

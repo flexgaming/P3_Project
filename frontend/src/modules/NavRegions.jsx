@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-bootstrap";
 import NavCompanies from "./NavCompanies.jsx";
+import "./Nav.css";
 /**
  * AddRegions component
  * - Fetches region names from /api/data/regions on mount

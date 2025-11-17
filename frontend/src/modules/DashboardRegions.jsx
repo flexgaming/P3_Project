@@ -45,7 +45,7 @@ function AddRegionsDashboard() {
         <>
             {regions.map((region) => (
                 <div className="p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
-                    <ListGroup>
+                    <ListGroup className="shadow">
                         <ListGroup.Item>
                             <h3><b>{region.regionName}</b></h3>
                             {/* <small className="text-muted">ID: {region.regionID}</small> */}

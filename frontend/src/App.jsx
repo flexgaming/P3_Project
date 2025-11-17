@@ -12,7 +12,7 @@ const App = () => {
     return (
         <div className="App">
             {/* Navbar */}
-            <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="full-bleed">
+            <Navbar expand="lg" sticky="top" className="full-bleed" id="main-navbar">
                 <Container fluid>
                     <Navbar.Brand href="#home">Container Diagnostics Platform</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Row, Col, Badge, ListGroup, Stack, Image } from "react-bootstrap";
 import warningSmall from "../assets/warning128.png";
+import "./Nav.css";
 
 /**
  * NavServers component
@@ -82,7 +83,7 @@ function NavServers({ regionID, companyID }) {
                 <Row key={`row-${rowIndex}`} className="mb-3">
                     {chunk.map((server) => (
                         <Col className="Server-Column" key={`col-${server.serverID}`}>
-                            <ListGroup className="lg1">
+                            <ListGroup className="lg1 shadow">
                                 <ListGroup.Item as="div" disabled className="Server-Header" key={`header-${server.serverID}`}>
                                     <Stack direction="horizontal" gap={2}>
                                         <div>{server.serverName}</div>

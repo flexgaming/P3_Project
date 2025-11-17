@@ -19,7 +19,8 @@ export default function Dashboard() {
             <h1>
                 <b>Critical Errors</b>
             </h1>
-            <Table striped bordered hover id="errors-table" responsive>
+            
+            <Table striped bordered hover id="errors-table" responsive className="shadow">
                 <thead>
                     <tr>
                         <th>Time</th>
