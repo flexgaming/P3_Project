@@ -1,16 +1,27 @@
 import React from "react";
 import "./css/Manage.css";
-import { Stack, Table, Form, Button } from "react-bootstrap";
+import { Tabs, Tab, Accordion, Stack, Table, Form, Button, ListGroup } from "react-bootstrap";
+import ManageCompanies from "../modules/ManageCompanies.jsx";
+import ManageRegions from "../modules/ManageRegions.jsx";
 
 export default function ManagePage() {
     // Regions are handled by the AddRegionsDashboard component which fetches on mount
 
     return (
         <main className="manage-container">
-            <h2>
-                <b>Manage Page</b>
-            </h2>
-            <p>This is the Manage page.</p>
+            <Tabs
+            defaultActiveKey="Companies"
+            id="manage-tabs"
+            className="mb-3"
+            >
+                <Tab eventKey="Companies" title="Manage Companies">
+                    <ManageCompanies />
+                    
+                </Tab>
+                <Tab eventKey="Regions" title="Manage Regions">
+                    <ManageRegions />
+                </Tab>
+            </Tabs>
         </main>
     );
 }

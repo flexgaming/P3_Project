@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Alert } from "react-bootstrap";
-import "../Dashboard.css";
+import "../pages/css/Dashboard.css";
 
 /**
  * AddRegions component

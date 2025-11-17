@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./Dashboard.css";
+import "./css/Dashboard.css";
 import { Stack, Table, Form, Button } from "react-bootstrap";
-import AddRegionsDashboard from "./modules/DashboardRegions.jsx";
-import CriticalError from "./modules/CriticalError.jsx";
+import AddRegionsDashboard from "../modules/DashboardRegions.jsx";
+import CriticalError from "../modules/CriticalError.jsx";
 
 export default function Dashboard() {
     // Regions are handled by the AddRegionsDashboard component which fetches on mount

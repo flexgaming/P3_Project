@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Routes, Route, Link } from "react-router-dom";
-import Dashboard from "./Dashboard.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import DiagnosticsView from "./pages/DiagnosticsView.jsx";
 import NavRegions from "./modules/NavRegions.jsx";
 import ManagePage from "./pages/Manage.jsx";

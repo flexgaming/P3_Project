@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
 import NavServers from "./NavServers";
-import "./Nav.css";
+import "../pages/css/Nav.css";
 
 /**
  * NavCompanies component

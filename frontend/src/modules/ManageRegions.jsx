@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-bootstrap";
-import NavCompanies from "./NavCompanies.jsx";
-import "../pages/css/Nav.css";
 /**
  * AddRegions component
  * - Fetches region names from /api/data/regions on mount
  * - Renders one ListGroup block per region name
  */
-function NavRegions() {
+function ManageRegions() {
     const [regions, setRegions] = useState([]);
     const [activeKey, setActiveKey] = useState(null);
     const [error, setError] = useState(null);
@@ -53,23 +51,12 @@ function NavRegions() {
         );
 
     return (
-        <Tabs
-            id="regions-tabs"
-            activeKey={activeKey}
-            onSelect={(k) => setActiveKey(k)}
-            className="mb-3"
-            mountOnEnter
-            justify
-        >
+        <ListGroup id="manage-regions-listgroup" className="shadow rounded-4">
             {regions.map((region) => (
-                <Tab eventKey={String(region.regionID)} title={String(region.regionName)} key={String(region.regionID)}>
-                    <div className="p-3">
-                        <NavCompanies regionID={region.regionID} />
-                    </div>
-                </Tab>
+                <ListGroup.Item key={region.regionID}>{region.regionName}</ListGroup.Item>
             ))}
-        </Tabs>
+        </ListGroup>
     );
 }
 
-export default NavRegions;
+export default ManageRegions;

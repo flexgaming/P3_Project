@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Row, Col, Badge, ListGroup, Stack, Image } from "react-bootstrap";
-import warningSmall from "../assets/warning128.png";
-import "./Nav.css";
+import warningSmall from "../assets/Warning128.png";
+import "../pages/css/Nav.css";
 
 /**
  * NavServers component
