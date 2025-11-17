@@ -27,7 +27,7 @@ import P3.Project.util.TestResult;
 import P3.Backend.Docker.DemoApplication;
 import P3.Backend.Docker.manager.DockerClientManager;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
-import static P3.Backend.Docker.Setup.SetupApplications.updateJSONFile;
+import static P3.Backend.Docker.application.SetupApplications.updateJSONFile;
 
 
 @SpringBootTest(classes = DemoApplication.class)
@@ -84,7 +84,19 @@ class ProjectApplicationTests {
 		try {
 			String content = Files.readString(containerListPath);
 			JSONObject JSONFile = new JSONObject(content);
-			updateJSONFile("Joachim-the-container", "107401j", 35, JSONFile);
+
+
+            // Make a JSON object that contains all of the relevant information.
+            JSONObject newContainer = new JSONObject();
+            newContainer.put("name", "Joachim-the-container");
+            newContainer.put("id", "107401j");
+            newContainer.put("interval", 35);
+            newContainer.put("state", "inactive");
+            
+            // Add the new container to the existing content.
+            JSONFile.put("Joachim-the-container", newContainer);
+
+			updateJSONFile(JSONFile);
 			
 			
 		} catch (Exception e) {

@@ -1,10 +1,11 @@
-package P3.Backend.Docker.Setup;
+package P3.Backend.Docker.application;
 
 import static P3.Backend.Docker.Persistent.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -64,7 +65,7 @@ public class SetupApplications {
 
             // Filter the containers into inactive and new container, as well as asking if the inactive containers should be deleted.
             detectInactiveContainers(fetchedContainersArr, existingIdArr, JSONFileObj, newContainersArr, scanner);
-
+            
             // Configure the containers, either all of the containers or just the newly discovered ones.
             showContainers(fetchedContainersArr, newContainersArr, existingIdArr, JSONFileObj, scanner);
 
@@ -115,13 +116,22 @@ public class SetupApplications {
 
         // Adds all of the containers from the JSON file and later removes the active containers from the list, 
         // leaving it with inactive containers.
-        JSONArray oldContainersArr = new JSONArray(existingIdArr.length());
-        for (int i = 0; i < existingIdArr.length(); i++) {
-            oldContainersArr.put(i, existingIdArr.getString(i)); // Maybe this should be the whole thing - we can then get both name and id
-        }
+        ArrayList<String> oldContainerList = new ArrayList<String>(existingIdArr.length());
 
+        for (int i = 0; i < existingIdArr.length(); i++) {
+            oldContainerList.add(existingIdArr.getString(i)); // Maybe this should be the whole thing - we can then get both name and id
+        }
+        
         // Filter all of the containers into either newly dicovered or inactive containers.
-        filterContainerArrays(fetchedContainersArr, existingIdArr, oldContainersArr, newContainersArr);
+        filterContainerArrays(fetchedContainersArr, existingIdArr, oldContainerList, newContainersArr);
+        
+        // Convert the oldContainerList into an array.
+        JSONArray oldContainersArr = new JSONArray(oldContainerList.size());
+        for (int i = 0; i < oldContainerList.size(); i++) {
+            if (!oldContainerList.get(i).isEmpty())
+                oldContainersArr.put(oldContainerList.get(i));
+        }
+        System.out.println("Old containers: " + oldContainersArr.length());
 
         // Asks if the user wants to delete inactive containers.
         manageInactiveContainers(existingIdArr, oldContainersArr, JSONFileObj, scanner);
@@ -135,12 +145,12 @@ public class SetupApplications {
      * containers from the oldContainersArr, leaving just the inactive behind. 
      * @param existingIdArr Is used to identify new or old containers, by comparing the existing id's 
      * in the JSON file with the fetchedContainersArr's id's.
-     * @param oldContainerArr Is used to store all of the inactive containers that are no longer on the system.
+     * @param oldContainerList Is used to store all of the inactive containers that are no longer on the system.
      * @param newContainersArr Is used to store all of the newly discovered containers that is on the system.
      */
     private static void filterContainerArrays(JSONArray fetchedContainersArr, JSONArray existingIdArr, 
-                                                        JSONArray oldContainerArr, JSONArray newContainersArr) {
-        int matchedContainers = 0;
+                                                        ArrayList<String> oldContainerList, JSONArray newContainersArr) {
+        
         // Go through all of the discovered containers.
         for (int i = 0; i < fetchedContainersArr.length(); i++) {
             JSONObject fetchedContainer = fetchedContainersArr.getJSONObject(i); // Get the i'th container from the array.
@@ -149,12 +159,11 @@ public class SetupApplications {
             int count = 0;
             // Make sure that there are any existing id's and goes through each of them. 
             if (existingIdArr.length() != 0) {
-                for (int j = 0; j < existingIdArr.length(); j++) {
+                for (int j = 0; j < oldContainerList.size(); j++) {
                     
-                    // Removes fetchedId from the oldContainersArr, proving that it already exists and is still actively used.
-                    if (existingIdArr.getString(j).equals(fetchedId)) {
-                        oldContainerArr.remove(j - matchedContainers);
-                        matchedContainers++; // This is used to match the correct index. 
+                    // Removes fetchedId from the oldContainersList, proving that it already exists and is still actively used.
+                    if (oldContainerList.get(j).equals(fetchedId)) {
+                        oldContainerList.remove(j);
                         break;
                     }
                     count++;
@@ -212,11 +221,42 @@ public class SetupApplications {
                             break outer;
                             // If user does not want to delete any of the containers, then proceed.
                         } else if (response.toLowerCase().equals("-1")) {
+
+                            // Make sure that all of the inactive is set to be inactive within the JSON file.
+                            setInactiveContainers(existingIdArr, oldContainersArr, JSONFileObj);
                             return;
                         }
                     } // If the user does not want to delete any inactive containers, then proceed.
                 } else if (response.toLowerCase().equals("n")) {
+
+                    // Make sure that all of the inactive is set to be inactive within the JSON file.
+                    setInactiveContainers(existingIdArr, oldContainersArr, JSONFileObj);
                     break; 
+                }
+            }
+        }
+    }
+
+    /** This function is used to set all of the state of all of the inactive containers.
+     * 
+     * @param existingIdArr Is used to find the inactive containers within the JSON file.
+     * @param oldContainersArr Is used to store all of the inactive containers.
+     * @param JSONFileObj Is used to edit the state of each of the containers.
+     */
+    private static void setInactiveContainers(JSONArray existingIdArr, JSONArray oldContainersArr,
+                                                        JSONObject JSONFileObj) {
+        // Go through each of the containers in olContainersArr and compare them with each container in existingIdArr.
+        for (int i = 0; i < oldContainersArr.length(); i++) {
+            if (!oldContainersArr.getString(i).isEmpty()) {
+                for (int j = 0; j < existingIdArr.length(); j++) {
+                    if (existingIdArr.getString(j).equals(oldContainersArr.getString(i))) {
+                        // Set the state of the container to be inactive.
+                        String name = JSONFileObj.names().getString(j);
+                        JSONFileObj.getJSONObject(name).put("state", "inactive");
+
+                        updateJSONFile(JSONFileObj); // Inactive containers get the inactive state.
+                        break;
+                    }
                 }
             }
         }
@@ -279,13 +319,16 @@ public class SetupApplications {
                         if (existingIdArr.getString(j).equals(oldContainersArr.getString(i))) {
                             
                             // Get the name of the container that has to be deleted.
-                            String temp = JSONFileObj.names().getString(j - deletedContainers);
-                            JSONFileObj.remove(temp);
+                            String name = JSONFileObj.names().getString(j - deletedContainers);
+                            JSONFileObj.remove(name);
                             deletedContainers++; // This is used to match the correct index.
                             break inner;
                         }
                     } // If the user does not want this delete this container, then proceed to the next container.
                 } else if (response.equals("n")) {
+
+                    // Make sure that all of the inactive is set to be inactive within the JSON file.
+                    setInactiveContainers(existingIdArr, oldContainersArr, JSONFileObj);
                     break;
                 } else {
                     continue;
@@ -315,7 +358,7 @@ public class SetupApplications {
                                             JSONObject JSONFileObj, Scanner scanner) {
         // If both newContainerArr and existingIdArr has any elements, then proceed to choose which to configure.
         if (newContainersArr.length() > 0 && existingIdArr.length() > 0) {
-            System.out.println("Do you want to configure only the newly discovered containers or every containers?");
+            System.out.println("Do you want to configure only the newly discovered containers or every container?");
             System.out.println("1) Only newly discovered containers. \n 2) Every single container. \n -1) For exiting the setup management.");
             
             while (true) {
@@ -335,13 +378,35 @@ public class SetupApplications {
                 }
             }
         } else if (newContainersArr.length() == 0) { // If there is not any new containers detected.
+            
+            System.out.println("Do you want to configure every container? (y/n)");
+            while (true) {
+                String response = scanner.nextLine();
+                if (response.equals("y")) { // Configure every containers.
 
-            // Go through all of the existing containers and set up the intervals.
-            AppendJSONContainerList(fetchedContainersArr, existingIdArr, JSONFileObj, scanner);
+                    // Go through only the new containers and set up the intervals.
+                    AppendJSONContainerList(fetchedContainersArr, existingIdArr, JSONFileObj, scanner);
+                    break;
+
+                } else if (response.equals("n")) { // Do not configure any containers.
+                    return; 
+                }
+            }
         } else if (existingIdArr.length() == 0) { // If there is not containers in the JSON file.
+            
+            System.out.println("Do you want to configure the newly discovered containers? (y/n)");
+            while (true) {
+                String response = scanner.nextLine();
+                if (response.equals("y")) { // Configure every containers.
 
-            // Go through all of the new containers and set up the intervals.
-            AppendJSONContainerList(newContainersArr, existingIdArr, JSONFileObj, scanner);
+                    // Go through only the new containers and set up the intervals.
+                    AppendJSONContainerList(newContainersArr, existingIdArr, JSONFileObj, scanner);
+                    break;
+                    
+                } else if (response.equals("n")) { // Do not configure any containers.
+                    return; 
+                }
+            }
         }
     }
 
@@ -359,6 +424,9 @@ public class SetupApplications {
         System.out.println("This is the setup for all of the containers.");
         System.out.println("Containers to set up: " + containersArr.length() + "\n");
 
+
+
+
         for (int i = 0; i < containersArr.length(); i++) {
             // Get the individual container from the list of containers (and extract the name and id).
             JSONObject container = containersArr.getJSONObject(i);
@@ -370,7 +438,7 @@ public class SetupApplications {
             if (existingIdArr.length() > 0) {
                 // Find the interval of the existing containers, if the container is newly discovered, 
                 // then the interval is set to the default interval
-                interval = findContainerInterval(containersArr, existingIdArr, id, JSONFileObj);
+                interval = findContainerInterval(container, existingIdArr, JSONFileObj);
             } else {
                 interval = defaultIntervalTime;
             }
@@ -402,31 +470,39 @@ public class SetupApplications {
                 }
 
             }
+            // Make a JSON object that contains all of the relevant information.
+            JSONObject newContainer = new JSONObject();
+            newContainer.put("name", name);
+            newContainer.put("id", id);
+            newContainer.put("interval", interval);
+            newContainer.put("state", "active");
+            
+            // Add the new container to the existing content.
+            JSONFileObj.put(name, newContainer);
+
             // Update the JSON file.
-            updateJSONFile(name, id, interval, JSONFileObj);
+            updateJSONFile(JSONFileObj);
         }
     }
 
     /** This function is used to find the intervals of the existing containers that are within the JSON file.
      * 
-     * @param containersArr Is used for checking if the container in the array already has an interval.
+     * @param currentContainer Is used for checking if the container already has an interval.
      * @param existingIdArr Is used for getting the intervals from the already existing containers in the JSON file.
-     * @param currentId Is used to compare each of the id's in the exisitingIdArr.
      * @param JSONFileObj Is used to get the interval that is inside of the JSON file.
      * @return The return is either the interval from an already existing container or the default interval (used for newly 
      * discovered containers that is not within the JSON file).
      */
-    private static int findContainerInterval(JSONArray containersArr, JSONArray existingIdArr, String currentId, JSONObject JSONFileObj) {
+    private static int findContainerInterval(JSONObject currentContainer, JSONArray existingIdArr, JSONObject JSONFileObj) {
         int count = 0; 
-        
+        String currentId = currentContainer.getString("id");
         // This goes through the containerArr and gets the ID from each of the containers.
         for (int i = 0; i < existingIdArr.length(); i++) {
             
             // If currentId exists in the existing array it returns the correct interval.
             if (existingIdArr.getString(i).equals(currentId)) {
                 
-                String currentName = containersArr.
-                    getJSONObject(i).
+                String currentName = currentContainer.
                     getJSONArray("names").
                     getString(0).
                     substring(1);
@@ -446,23 +522,12 @@ public class SetupApplications {
 
     /** This function is used for setting the JSON file with new input.
      * 
-     * @param name Is used for setting the container's name in the JSON file.
-     * @param id Is used for setting the container's ID in the JSON file.
-     * @param interval Is used for setting the container's interval in the JSON file.
      * @param JSONFileObj Is used to set the parameters that is inside of the JSON file.
      */
-    public static void updateJSONFile(String name, String id, Integer interval, JSONObject JSONFileObj) {
-        // Make a JSON object that contains all of the relevant information.
-        JSONObject newContainer = new JSONObject();
-        newContainer.put("name", name);
-        newContainer.put("id", id);
-        newContainer.put("interval", interval);
-
+    public static void updateJSONFile(JSONObject JSONFileObj) {
         // If the path exists add the content to the JSON file. 
         if (Files.exists(containerListPath)) {
             try {
-                // Add the new container to the existing content.
-                JSONFileObj.put(name, newContainer);
                 
                 // Updates the JSON file.
                 Files.writeString(containerListPath, JSONFileObj.toString(4));
@@ -492,11 +557,13 @@ public class SetupApplications {
                     String name = tempContainer.getString("name");
                     String id = tempContainer.getString("id");
                     Integer interval = tempContainer.getInt("interval");
+                    String state = tempContainer.getString("state");
 
                     // Prints out the parameters from each container.
                     System.out.println("\n" + count + ") Name: " + name);
                     System.out.println(" Id: " + id);
-                    System.out.println(" Interval: " + interval + "\n");
+                    System.out.println(" Interval: " + interval);
+                    System.out.println(" State: " + state + "\n");
                     count++;
                 }
                 // If the user doesn't want the container's parameters printed out, then proceed.

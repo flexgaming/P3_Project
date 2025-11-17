@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import P3.Backend.Docker.application.SetupApplications;
 import P3.Backend.Docker.builder.DockerClientBuilder;
 import P3.Backend.Docker.manager.DockerClientManager;
 import P3.Backend.Docker.manager.DockerStatsService;
@@ -25,7 +26,6 @@ import java.nio.file.Path;
 import java.io.IOException;
 
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
-import P3.Backend.Docker.Setup.SetupApplications;
 
 
 @SpringBootApplication
@@ -38,7 +38,7 @@ public class DemoApplication {
 		dockerClient.pingCmd().exec();
 
 		DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
-		String containerId = "f7e5092e9534ab5e33a2d40835548577aec6b24c3a7a10a00e348511e39f119f";
+		String containerId = "4a32465d120ec154152b061db52ce9a31ba83e92e8a8c8515d6fa6e8f3be0400";
 		try {
 			ContainerStats stats = dockerStatsService.getContainerStats(containerId);
 
@@ -53,8 +53,14 @@ public class DemoApplication {
 			Thread.currentThread().interrupt();
 		}
 
+        // Decide what part of the application user want to use:
+        // IntervalApplication
         SetupApplications.Initiation(dockerClient);
 
+
+        //////////////////////////////////////////////////////////////
+        //  Containers slettet fra JSON, skal kommunikeres videre   //
+        //////////////////////////////////////////////////////////////
 
 /*
         ObjectMapper mapper = new ObjectMapper();
