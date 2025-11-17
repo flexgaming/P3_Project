@@ -92,6 +92,11 @@ public class App {
         );
         database.addDiagnosticsBatch(
                 new String[] {
+                        // 15 dummy entries for ctr-001
+                        "ctr-001","ctr-001","ctr-001","ctr-001","ctr-001",
+                        "ctr-001","ctr-001","ctr-001","ctr-001","ctr-001",
+                        "ctr-001","ctr-001","ctr-001","ctr-001","ctr-001",
+                        // original data follows
                         "ctr-001", "ctr-001", "ctr-001",
                         "ctr-002", "ctr-002", "ctr-002",
                         "ctr-003", "ctr-003", "ctr-003",
@@ -109,6 +114,11 @@ public class App {
                         "ctr-015", "ctr-015", "ctr-015"
                 },
                 new boolean[] {
+                        // 15 dummy booleans
+                        true, false, true, false, true,
+                        true, false, true, false, true,
+                        true, false, true, false, true,
+                        // original data
                         true, true, false,
                         false, true, true,
                         true, true, false,
@@ -126,6 +136,11 @@ public class App {
                         true, true, true
                 },
                 new double[] {
+                        // 15 dummy doubles
+                        1.0,2.0,3.0,4.0,5.0,
+                        6.0,7.0,8.0,9.0,10.0,
+                        11.0,12.0,13.0,14.0,15.0,
+                        // original data
                         8.0, 7.5, 6.0,
                         4.0, 6.0, 8.0,
                         16.0, 15.5, 10.0,
@@ -143,6 +158,11 @@ public class App {
                         12.0, 11.5, 11.0
                 },
                 new double[] {
+                        // 15 dummy doubles
+                        0.5,0.6,0.7,0.8,0.9,
+                        1.0,1.1,1.2,1.3,1.4,
+                        1.5,1.6,1.7,1.8,1.9,
+                        // original data
                         4.0, 3.8, 3.0,
                         2.0, 3.0, 4.0,
                         8.0, 7.5, 5.0,
@@ -160,6 +180,11 @@ public class App {
                         6.0, 5.8, 5.5
                 },
                 new double[] {
+                        // 15 dummy doubles
+                        100.0,110.0,120.0,130.0,140.0,
+                        150.0,160.0,170.0,180.0,190.0,
+                        200.0,210.0,220.0,230.0,240.0,
+                        // original data
                         500.0, 480.0, 400.0,
                         250.0, 300.0, 350.0,
                         1000.0, 980.0, 700.0,
@@ -177,6 +202,11 @@ public class App {
                         800.0, 780.0, 750.0
                 },
                 new int[] {
+                        // 15 dummy ints
+                        10,11,12,13,14,
+                        15,16,17,18,19,
+                        20,21,22,23,24,
+                        // original data
                         120, 118, 110,
                         90, 95, 105,
                         200, 198, 180,
@@ -194,6 +224,11 @@ public class App {
                         150, 145, 140
                 },
                 new String[] {
+                        // 15 dummy process IDs
+                        "proc-001X","proc-001Y","proc-001Z","proc-001AA","proc-001BB",
+                        "proc-001CC","proc-001DD","proc-001EE","proc-001FF","proc-001GG",
+                        "proc-001HH","proc-001II","proc-001JJ","proc-001KK","proc-001LL",
+                        // original data
                         "proc-001A", "proc-001B", "proc-001C",
                         "proc-002A", "proc-002B", "proc-002C",
                         "proc-003A", "proc-003B", "proc-003C",
@@ -211,6 +246,11 @@ public class App {
                         "proc-015A", "proc-015B", "proc-015C"
                 },
                 new String[] {
+                        // 15 dummy statuses
+                        "Healthy","Warning","Crashed","Recovered","Healthy",
+                        "Warning","Healthy","Crashed","Healthy","Recovered",
+                        "Warning","Healthy","Crashed","Healthy","Warning",
+                        // original data
                         "Healthy", "Healthy", "Warning",
                         "Crashed", "Recovered", "Healthy",
                         "Healthy", "Healthy", "Warning",
@@ -228,6 +268,11 @@ public class App {
                         "Crashed", "Recovered", "Healthy"
                 },
                 new String[] {
+                        // 15 dummy notes
+                        "Small pp",null,"Chicken",null,null,
+                        null,"Butter",null,"No maidens",null,
+                        null,"Deep Depression","France",null,null,
+                        // original data
                         null,null,"High memory usage",
                         "NullPointerException at line 42",null,null,
                         null,null,"CPU spike detected",
