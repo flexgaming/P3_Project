@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
 import NavServers from "./NavServers";
+import "./Nav.css";
 
 /**
  * NavCompanies component
@@ -55,6 +56,7 @@ function NavCompanies({ regionID }) {
     return (
         <Tab.Container
             id={`${regionID}`}
+            className="nav-companies-container"
             activeKey={activeKey}
             onSelect={(k) => setActiveKey(k)}
             defaultActiveKey={companies.length ? `${companies[0].companyName}` : null}
@@ -62,7 +64,7 @@ function NavCompanies({ regionID }) {
             <Row>
             <Col sm={3}>
                 <Nav variant="pills" className="flex-column">
-                    <h4><b>Companies</b></h4>
+                    <h4 style={{marginBottom: "28px"}}><b>Companies</b></h4>
                     {companies.map(company => (
                         <Nav.Item key={company.companyID}>
                             <Nav.Link eventKey={`${company.companyName}`}>{`${company.companyName}`}</Nav.Link>

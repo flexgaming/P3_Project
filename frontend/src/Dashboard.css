@@ -8,6 +8,18 @@ h1 {
 	font-size: 1.5rem;
 }
 
-#errors-table {
-    
+.region-cards {
+    margin-bottom: 30px;
+    border-radius: 10px;
 }
+
+#error-table-container {
+    margin: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#error-table-container table { /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
+    margin-bottom: 0;
+}
+

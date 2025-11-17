@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Alert } from "react-bootstrap";
+import "../Dashboard.css";
 
 /**
  * AddRegions component
@@ -44,8 +45,8 @@ function AddRegionsDashboard() {
     return (
         <>
             {regions.map((region) => (
-                <div className="p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
-                    <ListGroup className="shadow">
+                <div className="region-cards p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
+                    <ListGroup className="shadow rounded-4">
                         <ListGroup.Item>
                             <h3><b>{region.regionName}</b></h3>
                             {/* <small className="text-muted">ID: {region.regionID}</small> */}

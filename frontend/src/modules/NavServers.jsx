@@ -83,7 +83,7 @@ function NavServers({ regionID, companyID }) {
                 <Row key={`row-${rowIndex}`} className="mb-3">
                     {chunk.map((server) => (
                         <Col className="Server-Column" key={`col-${server.serverID}`}>
-                            <ListGroup className="lg1 shadow">
+                            <ListGroup className="lg1 shadow rounded-4">
                                 <ListGroup.Item as="div" disabled className="Server-Header" key={`header-${server.serverID}`}>
                                     <Stack direction="horizontal" gap={2}>
                                         <div>{server.serverName}</div>
