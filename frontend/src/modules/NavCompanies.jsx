@@ -8,7 +8,7 @@ import "../pages/css/Nav.css";
  * - Fetches company names from /api/data/{regionID}/companies on mount
  * - Renders one ListGroup block per company name
  */
-function NavCompanies({ regionID }) {
+function NavCompanies({ regionID, regionName}) {
     const [companies, setCompanies] = useState([]);
     const [activeKey, setActiveKey] = useState(null);
     const [error, setError] = useState(null);
@@ -64,7 +64,7 @@ function NavCompanies({ regionID }) {
             <Row>
             <Col sm={3}>
                 <Nav variant="pills" className="flex-column">
-                    <h4 style={{marginBottom: "28px"}}><b>Companies</b></h4>
+                    <h4 style={{marginBottom: "28px"}}><b>Companies in {regionName}</b></h4>
                     {companies.map(company => (
                         <Nav.Item key={company.companyID}>
                             <Nav.Link eventKey={`${company.companyName}`}>{`${company.companyName}`}</Nav.Link>
@@ -76,7 +76,7 @@ function NavCompanies({ regionID }) {
                 <Tab.Content>
                     {companies.map(company => (
                         <Tab.Pane eventKey={`${company.companyName}`} key={company.companyID}>
-                            <h4><b>Servers & Containers</b></h4>
+                            <h4><b>Servers & Containers in {company.companyName}</b></h4>
                             <NavServers companyID={company.companyID} />
                         </Tab.Pane>
                     ))}

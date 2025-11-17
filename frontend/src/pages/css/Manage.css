@@ -14,12 +14,14 @@
 
 #manage-companies-accordion{
     margin: 20px;
+    width: 50%;
     border-radius: 50px;
     overflow: hidden;
 }
 
 #manage-regions-listgroup{
     margin: 20px;
+    width: 50%;
     border-radius: 50px;
     overflow: hidden;
 }

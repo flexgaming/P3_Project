@@ -64,7 +64,7 @@ function NavRegions() {
             {regions.map((region) => (
                 <Tab eventKey={String(region.regionID)} title={String(region.regionName)} key={String(region.regionID)}>
                     <div className="p-3">
-                        <NavCompanies regionID={region.regionID} />
+                        <NavCompanies regionID={region.regionID} regionName={region.regionName} />
                     </div>
                 </Tab>
             ))}
