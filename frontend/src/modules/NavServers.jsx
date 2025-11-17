@@ -118,7 +118,7 @@ function NavServers({ regionID, companyID }) {
                                                             alt="warning"
                                                             width="28px"
                                                             height="28px"
-                                                            hidden={!showWarning}
+                                                            hidden={showWarning}
                                                         />
                                                     </div>
                                                     <div className="ms-auto">Uptime:</div>
