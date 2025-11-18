@@ -40,7 +40,6 @@ export default function Dashboard() {
                         <tr>
                             <th>Time</th>
                             <th>Date</th>
-                            {/* <th>Diagnostics ID</th> */}
                             <th>Container Location</th>
                             <th>Container Name</th>
                             <th>Error Message</th>
