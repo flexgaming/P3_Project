@@ -43,8 +43,9 @@ public class DemoApplication {
 		try {
 			ContainerStats stats = dockerStatsService.getContainerStats(containerId);
 
+            
             System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-            System.out.println(dockerClient.inspectContainerCmd(containerId).withSize(true).exec().toString());
+            System.out.println(dockerClient.inspectContainerCmd(containerId).exec().toString());
             System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
 

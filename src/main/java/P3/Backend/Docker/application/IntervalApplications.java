@@ -3,15 +3,18 @@ package P3.Backend.Docker.application;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.HealthStateLog;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StatsCmd;
+import com.github.dockerjava.api.model.Container;
 
 import P3.Backend.Docker.classes.IntervalClass;
 import P3.Backend.Docker.manager.DockerStatsService;
@@ -193,6 +196,13 @@ public class IntervalApplications {
         
         //fetchSpringActuatorStats();
         
+        String currentId = container.getContainerId();
+
+        // Gets all of the containers that is in the system and puts it into an array (containers).
+        //List<Container> containersTemp = dockerClient.listContainersCmd().withIdFilter(currentId).exec();
+        //JSONArray fetchedContainersArr = new JSONArray(containersTemp);
+
+
 
         // GO BACK TO FUNCTION BEFORE AND SEND DATA VIA HTTP TO OTHER SERVER
     }

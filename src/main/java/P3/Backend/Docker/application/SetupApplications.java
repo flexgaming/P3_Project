@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.DockerClient;
 
-
 @Component
 public class SetupApplications {
 
@@ -470,12 +469,27 @@ public class SetupApplications {
                 }
 
             }
+
             // Make a JSON object that contains all of the relevant information.
             JSONObject newContainer = new JSONObject();
             newContainer.put("name", name);
             newContainer.put("id", id);
             newContainer.put("interval", interval);
             newContainer.put("state", "active");
+
+            // If there exists a directory "ports", then proceed.
+            if (!container.getJSONArray("ports").isEmpty()) {
+                // Get both public and private port.
+                // public port is the port that the system is using to communicate with the docker container.
+                // private port is the port that the docker container is using.
+                JSONArray ports = container.getJSONArray("ports");
+                Integer privatePort = ports.getJSONObject(0).getInt("privatePort");
+                Integer publicPort = ports.getJSONObject(0).getInt("publicPort");
+    
+                // Put the ports in the newContainer.
+                newContainer.put("privatePort", privatePort);
+                newContainer.put("publicPort", publicPort);
+            }
             
             // Add the new container to the existing content.
             JSONFileObj.put(name, newContainer);
