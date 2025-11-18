@@ -565,6 +565,41 @@ public class Database {
         return diagnosticsErrors;
     }
 
+    public JSONObject getDashboardData() {
+        JSONObject dashboardData = new JSONObject();
+        String sql = "SELECT * FROM Region_Dashboard";
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+                // Use a prepared Statement to help format the SQL string to prevent injections.
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Reads all the rows in the Region table and adds them to the JSON object.
+            while (resultSet.next()) {
+                JSONObject regionData = new JSONObject();
+                String regionID = resultSet.getString("Region_ID");
+                String regionName = resultSet.getString("Region_Name");
+                String activeContainers = resultSet.getString("Active_Containers");
+                int companies = resultSet.getInt("Companies");
+                String uptime = resultSet.getString("Total_Uptime");
+                int errors = resultSet.getInt("Errors_Last_Hour");
+                regionData.put("regionID", regionID);
+                regionData.put("regionName", regionName);
+                regionData.put("activeContainers", activeContainers);
+                regionData.put("companies", companies);
+                regionData.put("uptime", uptime);
+                regionData.put("errors", errors);
+                dashboardData.put(regionName, regionData);
+            }
+
+        } catch (SQLException error) {
+            errorHandling(error);
+        }
+
+        return dashboardData;
+    }
+
     public JSONObject getRecentCompanyData(String companyID) {
         JSONObject allCompanyData = new JSONObject();
 
