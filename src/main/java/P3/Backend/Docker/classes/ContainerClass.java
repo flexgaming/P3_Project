@@ -16,11 +16,12 @@ public class ContainerClass {
 
     // Data from docker:
     Boolean runningContainer;       // Is docker container on or off.
-    Double containerRamUsage;       // Is ram usage on docker container.
-    Double containerCpuUsage;       // Is cpu usage on docker container.
-    Double containerDiskUsage;      // Is disk usage on docker container.
+    Long containerRamUsage;       // Is ram usage on docker container.
+    Long containerCpuUsage;       // Is cpu usage on docker container.
+    Long containerDiskUsage;      // Is disk usage on docker container.
     String containerStatus;         // Is the status of the docker container.
 
+    
     // Data from actuator:
     Boolean runningJVM;             // Is internally java application on or off.
     Double JVMRamUsage;             // Is ram usage on java application.
@@ -35,6 +36,8 @@ public class ContainerClass {
     String JVMProcessId;            // Is the process id of the java application.
     //String JVMStatus;               // Is the status of the java application.
     
+    
+
     /////////////////////////
     //      ERROR HERE     //
     /////////////////////////
@@ -45,17 +48,111 @@ public class ContainerClass {
         this.containerInterval = interval;
     }
 
-    public String getcontainerName() {
-        return containerName;
-    }
+    ////////////////////////////////
+    //  JSON GETTERS AND SETTERS  //
+    ////////////////////////////////
+    
+//ContainerName
+    public String getContainerName() { return containerName; }
 
-    public String getcontainerId() {
-        return containerId;
-    }
+    public String getContainerId() { return containerId; }
 
-    public Integer getcontainerInterval() {
-        return containerInterval;
-    }
+//ContainerInterval
+    public Integer getContainerInterval() { return containerInterval; }
+
+    public void setContainerName(String name) { this.containerName = name; }
+
+//ContainerId
+    public void setContainerId(String id) { this.containerId = id; }
+    
+    public void setContainerInterval(Integer interval) { this.containerInterval = interval; }
+
+    //////////////////////////////////////
+    //  CONTAINER GETTERS AND SETTERS   //
+    //////////////////////////////////////
+    
+//RunningContainer
+    public Boolean getRunningContainer() { return runningContainer; }
+
+    public void setRunningContainer(Boolean runningContainer) { this.runningContainer = runningContainer; }
+
+//ContainerRamUsage
+    public Long getContainerRamUsage() { return containerRamUsage; }
+
+    public void setContainerRamUsage(Long containerRamUsage) { this.containerRamUsage = containerRamUsage; }
+
+//ContainerCpuUsage
+    public Long getContainerCpuUsage() { return containerCpuUsage; }
+
+    public void setContainerCpuUsage(Long containerCpuUsage) { this.containerCpuUsage = containerCpuUsage; }
+
+//ContainerDiskUsage
+    public Long getContainerDiskUsage() { return containerDiskUsage; }
+
+    public void setContainerDiskUsage(Long containerDiskUsage) { this.containerDiskUsage = containerDiskUsage; }
+
+//ContainerStatus
+    public String getContainerStatus() { return containerStatus; }
+
+    public void setContainerStatus(String containerStatus) { this.containerStatus = containerStatus; }
+
+    //////////////////////////////////////
+    //  ACTUATOR GETTERS AND SETTERS    //
+    //////////////////////////////////////
+    
+//JVMRamUsage
+    public Double getJVMRamUsage() { return JVMRamUsage; }
+
+    public void setJVMRamUsage(Double jVMRamUsage) { JVMRamUsage = jVMRamUsage; }
+
+//JVMCpuUsagePerc
+    public Double getJVMCpuUsagePerc() { return JVMCpuUsagePerc; }
+
+    public void setJVMCpuUsagePerc(Double jVMCpuUsagePerc) { JVMCpuUsagePerc = jVMCpuUsagePerc; }
+
+//SystemRamUsage
+    public Double getSystemRamUsage() { return systemRamUsage; }
+
+    public void setSystemRamUsage(Double systemRamUsage) { this.systemRamUsage = systemRamUsage; }
+
+//SystemCpuUsagePerc
+    public Double getSystemCpuUsagePerc() { return systemCpuUsagePerc; }
+
+    public void setSystemCpuUsagePerc(Double systemCpuUsagePerc) { this.systemCpuUsagePerc = systemCpuUsagePerc; }
+    
+//SystemCpuCores
+    public Integer getSystemCpuCores() { return SystemCpuCores; }
+
+    public void setSystemCpuCores(Integer systemCpuCores) { SystemCpuCores = systemCpuCores; }
+
+//SystemDiskUsage
+    public Double getSystemDiskUsage() { return systemDiskUsage; }
+
+    public void setSystemDiskUsage(Double systemDiskUsage) { this.systemDiskUsage = systemDiskUsage; }
+
+//SystemDiskTotal
+    public Double getSystemDiskTotal() { return systemDiskTotal; }
+
+    public void setSystemDiskTotal(Double systemDiskTotal) { this.systemDiskTotal = systemDiskTotal; }
+
+//SystemDiskFree
+    public Double getSystemDiskFree() { return systemDiskFree; }
+
+    public void setSystemDiskFree(Double systemDiskFree) { this.systemDiskFree = systemDiskFree; }
+    
+//JVMThreads
+    public Integer getJVMThreads() { return JVMThreads; }
+
+    public void setJVMThreads(Integer jVMThreads) { JVMThreads = jVMThreads; }
+
+//JVMProcessId
+    public String getJVMProcessId() { return JVMProcessId; }
+
+    public void setJVMProcessId(String jVMProcessId) { JVMProcessId = jVMProcessId; }
+
+    /////////////////////////////////
+    //      ERROR GET/SET HERE     //
+    /////////////////////////////////
 
 
 }

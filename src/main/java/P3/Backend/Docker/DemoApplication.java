@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import P3.Backend.Docker.application.IntervalApplications;
 import P3.Backend.Docker.application.SetupApplications;
 import P3.Backend.Docker.builder.DockerClientBuilder;
 import P3.Backend.Docker.manager.DockerClientManager;
@@ -42,6 +43,11 @@ public class DemoApplication {
 		try {
 			ContainerStats stats = dockerStatsService.getContainerStats(containerId);
 
+            System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            System.out.println(dockerClient.inspectContainerCmd(containerId).withSize(true).exec().toString());
+            System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
+
 			// Print stats only when successfully retrieved (stats is in-scope here)
 			System.out.println("CPU Total Usage: " + stats.getCpuTotalUsage()); // Total accumulated CPU time (in nanosec) used by the container since startup.
 			System.out.println("Memory Usage: " + stats.getMemoryUsage()); // Current RAM usage of the container
@@ -54,7 +60,8 @@ public class DemoApplication {
 		}
 
         // Decide what part of the application user want to use:
-        // IntervalApplication
+    
+        //IntervalApplications.Initiation(dockerClient);
         SetupApplications.Initiation(dockerClient);
 
 
