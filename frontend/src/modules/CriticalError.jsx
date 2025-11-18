@@ -7,7 +7,6 @@ function CriticalError() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [pinnedIds, setPinnedIds] = useState([]);
-
     useEffect(() => {
         fetchErrorDetails();
     }, []);
@@ -22,13 +21,45 @@ function CriticalError() {
             }
             
             const json = await response.json();
-            console.log(json);
+            
             // The API returns an object keyed by diagnostics UUID, e.g.
             // { "0efd...": { date: ..., errorLogs: ..., ... }, ... }
             // Convert to an array while preserving the UUID as `id` on each entry.
             const entries = Object.entries(json || {});
             const list = entries.map(([id, value]) => ({ id, ...value }));
-            setErrorDetails(list);
+
+            // Read saved diagnostics directly from localStorage and compute saved ids.
+            // We read localStorage here (synchronously) because React state updates for
+            // `localErrors` are asynchronous and would not be available immediately.
+            let saved = [];
+            try {
+                saved = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
+            } catch {
+                saved = [];
+            }
+
+            const savedIds = Array.isArray(saved)
+                ? saved.map(d => d.id).filter(Boolean)
+                : (saved && typeof saved === 'object')
+                    ? Object.keys(saved)
+                    : [];
+
+            // Mark fetched items as pinned when they exist in saved diagnostics
+            const listWithPinned = list.map(item => ({ ...item, pinned: savedIds.includes(item.id) }));
+
+            // Include any saved-only items (not present in fetched list) so they appear after fetched items
+            const extraSaved = Array.isArray(saved)
+                ? saved.filter(s => !list.some(l => l.id === s.id)).map(s => ({ ...s, pinned: true }))
+                : [];
+
+            // Merge and sort so that pinned items appear at the top on initial load
+            const merged = [...listWithPinned, ...extraSaved];
+            merged.sort((a, b) => {
+                if ((a.pinned ? 1 : 0) === (b.pinned ? 1 : 0)) return 0;
+                return a.pinned ? -1 : 1; // pinned first
+            });
+
+            setErrorDetails(merged);
         } catch (error) {
             console.error("Error fetching error details:", error);
             setError(error.message);
@@ -86,12 +117,12 @@ function CriticalError() {
         let savedDiagnostics = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
         // check if the diagnostic log is already saved
         const exists = savedDiagnostics.find((diag) => diag.id === error.id);
-        if (!exists) {
-            savedDiagnostics.push(error);
-            localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
-            // update React state so UI updates declaratively
-            setPinnedIds(prev => Array.from(new Set([...prev, error.id])));
-        } else {
+            if (!exists) {
+                savedDiagnostics.push(error);
+                localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
+                // update React state so UI updates declaratively
+                setPinnedIds(prev => Array.from(new Set([...prev, error.id])));
+            } else {
             alert("Diagnostic log already pinned!");
         }
     }
@@ -109,7 +140,6 @@ function CriticalError() {
                 <tr key={error.id}>
                     <td>{error.time}</td>
                     <td>{error.date}</td>
-                    {/* <td>--DIAGNOSTICS ID--</td> */}
                     <td>
                         <a href={`/diagnosticsview/${error.containerID}`}>
                             <b><u>{error.regionName} → {error.companyName} → {error.serverName} → {error.containerName}</u></b>

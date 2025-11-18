@@ -69,6 +69,7 @@ Database database = new Database();
         Database database = new Database();
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
         
+        
         // Check if timestamp exists before processing
         /* Object timestampObj = diagnosticsErrors.get("timestamp");
         if (timestampObj != null) {
