@@ -108,7 +108,7 @@ function NavServers({ regionID, companyID }) {
                                             "danger";
 
                                         return (
-                                            <ListGroup.Item key={`${container.containerID}-Item`} action href={`/${container.containerID}`} variant={healthVariant}>
+                                            <ListGroup.Item key={`${container.containerID}-Item`} action href={`/diagnosticsview/${container.containerID}`} variant={healthVariant}>
                                                 <Stack direction="horizontal" gap={2}>
                                                     <div className="Container-Name-Container">{container.containerName}</div>
                                                     <div className="ms-auto">

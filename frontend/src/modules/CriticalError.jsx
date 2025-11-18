@@ -65,7 +65,9 @@ function CriticalError() {
                     <td>{error.date}</td>
                     {/* <td>--DIAGNOSTICS ID--</td> */}
                     <td>
-                        {error.regionName} → {error.companyName} → {error.serverID} → {error.containerID}
+                        <a href={`/diagnosticsview/${error.containerID}`}>
+                            <b><u>{error.regionName} → {error.companyName} → {error.serverName} → {error.containerName}</u></b>
+                        </a>
                     </td>
                     <td>{error.containerName}</td>
                     <td>{error.errorLogs}</td>
@@ -73,7 +75,7 @@ function CriticalError() {
                         <ErrorModal error={error /* Alternatively error.errorLogs */} buttonText="View" buttonVariant="primary" />
                     </td>
                     <td>
-                        <Button variant="success">Resolve</Button>
+                        <Button variant="success">Pin log</Button>
                     </td>
                 </tr>
             ))}

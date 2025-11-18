@@ -45,16 +45,7 @@ export default function Dashboard() {
                             <th>Container Name</th>
                             <th>Error Message</th>
                             <th>Error Code</th>
-                            <th>
-                                <Stack direction="horizontal">
-                                    <div>Resolved?</div>
-                                    <div className="ms-auto">
-                                        <Form>
-                                            <Form.Check type="switch" id="show-resolved-switch" label="Show Resolved?" />
-                                        </Form>
-                                    </div>
-                                </Stack>
-                            </th>
+                            <th>Pinned logs</th>
                         </tr>
                     </thead>
                     <tbody>
