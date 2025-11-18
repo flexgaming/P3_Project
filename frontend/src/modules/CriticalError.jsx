@@ -6,6 +6,7 @@ function CriticalError() {
     const [errorDetails, setErrorDetails] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [pinnedIds, setPinnedIds] = useState([]);
 
     useEffect(() => {
         fetchErrorDetails();
@@ -19,12 +20,15 @@ function CriticalError() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+            
             const json = await response.json();
-
-            // Extract region objects with both regionID and regionName
-            // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
-            setErrorDetails(Object.values(json));
+            console.log(json);
+            // The API returns an object keyed by diagnostics UUID, e.g.
+            // { "0efd...": { date: ..., errorLogs: ..., ... }, ... }
+            // Convert to an array while preserving the UUID as `id` on each entry.
+            const entries = Object.entries(json || {});
+            const list = entries.map(([id, value]) => ({ id, ...value }));
+            setErrorDetails(list);
         } catch (error) {
             console.error("Error fetching error details:", error);
             setError(error.message);
@@ -32,6 +36,18 @@ function CriticalError() {
             setLoading(false);
         }
     }
+
+    // load pinned diagnostics ids from localStorage so we can render button state
+    useEffect(() => {
+        try {
+            const saved = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
+            const ids = Array.isArray(saved) ? saved.map(d => d.id).filter(Boolean) : [];
+            setPinnedIds(ids);
+        } catch {
+            // ignore parse errors and default to empty
+            setPinnedIds([]);
+        }
+    }, []);
 
     if (loading) {
         return (
@@ -57,6 +73,36 @@ function CriticalError() {
         );
     }
 
+    function togglePinDiagnostic(error) {
+        if (pinnedIds.includes(error.id)) {
+            unPinDiagnostic(error.id);
+        } else {
+            saveDiagnostic(error);
+        }
+    }
+
+    function saveDiagnostic(error) {
+        // saves the diagnostic log object on localstorage in an array of saved logs
+        let savedDiagnostics = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
+        // check if the diagnostic log is already saved
+        const exists = savedDiagnostics.find((diag) => diag.id === error.id);
+        if (!exists) {
+            savedDiagnostics.push(error);
+            localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
+            // update React state so UI updates declaratively
+            setPinnedIds(prev => Array.from(new Set([...prev, error.id])));
+        } else {
+            alert("Diagnostic log already pinned!");
+        }
+    }
+
+    function unPinDiagnostic(errorId) {
+        let savedDiagnostics = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
+        savedDiagnostics = savedDiagnostics.filter((diag) => diag.id !== errorId);
+        localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
+        setPinnedIds(prev => prev.filter(id => id !== errorId));
+    }
+
     return (
         <>
             {errorDetails.map((error) => (
@@ -75,7 +121,9 @@ function CriticalError() {
                         <ErrorModal error={error /* Alternatively error.errorLogs */} buttonText="View" buttonVariant="primary" />
                     </td>
                     <td>
-                        <Button variant="success">Pin log</Button>
+                        <Button id={`pin-${error.id}`} variant={pinnedIds.includes(error.id) ? "primary" : "success"} onClick={() => togglePinDiagnostic(error)}>
+                            {pinnedIds.includes(error.id) ? "Pinned" : "Pin Log"}
+                        </Button>
                     </td>
                 </tr>
             ))}
