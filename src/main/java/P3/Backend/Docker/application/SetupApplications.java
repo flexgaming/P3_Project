@@ -431,6 +431,7 @@ public class SetupApplications {
             JSONObject container = containersArr.getJSONObject(i);
             String name = container.getJSONArray("names").getString(0).substring(1);
             String id = container.getString("id");
+            String image = container.getString("image");
             
             // If there are any existing containers in the JSON file, then proceed. 
             Integer interval;
@@ -476,6 +477,7 @@ public class SetupApplications {
             newContainer.put("id", id);
             newContainer.put("interval", interval);
             newContainer.put("state", "active");
+            newContainer.put("image", image);
 
             // If there exists a directory "ports", then proceed.
             if (!container.getJSONArray("ports").isEmpty()) {
@@ -570,12 +572,14 @@ public class SetupApplications {
                     JSONObject tempContainer = JSONFileObj.getJSONObject(key);
                     String name = tempContainer.getString("name");
                     String id = tempContainer.getString("id");
+                    String image = tempContainer.getString("image");
                     Integer interval = tempContainer.getInt("interval");
                     String state = tempContainer.getString("state");
 
                     // Prints out the parameters from each container.
                     System.out.println("\n" + count + ") Name: " + name);
                     System.out.println(" Id: " + id);
+                    System.out.println(" Image: " + image);
                     System.out.println(" Interval: " + interval);
                     System.out.println(" State: " + state + "\n");
                     count++;
