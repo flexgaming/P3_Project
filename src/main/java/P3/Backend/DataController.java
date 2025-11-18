@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import javax.xml.crypto.Data;
+
 import org.json.JSONObject;
 
 
@@ -57,9 +60,11 @@ Database database = new Database();
 
     // GET Dashboard data
     @GetMapping("/dashboard") //Router continuation
-    public ArrayList getDashboardData() {
-        // Get dashboard data from DB
-        return null; //database.getDashboardData();
+    public Map<String, Object> getDashboardData() {
+        Database database = new Database();
+        // Get dashboard region overview data from DB
+        Map<String, Object> dashboardData = database.getDashboardData().toMap();
+        return dashboardData;
     }
 
     // GET Critical Errors data
