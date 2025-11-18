@@ -9,10 +9,24 @@ import "../pages/css/Dashboard.css";
  */
 function AddRegionsDashboard() {
     const [regions, setRegions] = useState([]);
+    const [dashboardData, setDashboardData] = useState({});
     const [error, setError] = useState(null);
 
     useEffect(() => {
         let mounted = true;
+
+        async function fetchDashboardData() {
+            try {
+                const res = await fetch("/api/data/dashboard");
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+
+                if (mounted) setDashboardData(json);
+            } catch (err) {
+                if (mounted) setError(err.message || String(err));
+            }
+        }
+
         async function fetchRegions() {
             try {
                 const res = await fetch("/api/data/regions");
@@ -30,6 +44,7 @@ function AddRegionsDashboard() {
         }
 
         fetchRegions();
+        fetchDashboardData();
         return () => {
             mounted = false;
         };
@@ -44,27 +59,32 @@ function AddRegionsDashboard() {
 
     return (
         <>
-            {regions.map((region) => (
-                <div className="region-cards p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
-                    <ListGroup className="shadow rounded-4">
-                        <ListGroup.Item>
-                            <h3><b>{region.regionName}</b></h3>
-                        </ListGroup.Item>
-                        <ListGroup.Item>
-                            Active Containers: <Badge bg="primary">—</Badge> / <Badge bg="primary">—</Badge>
-                        </ListGroup.Item>
-                        <ListGroup.Item>
-                            Companies: <Badge bg="primary">—</Badge>
-                        </ListGroup.Item>
-                        <ListGroup.Item>
-                            Total uptime: <Badge bg="primary">—</Badge>
-                        </ListGroup.Item>
-                        <ListGroup.Item>
-                            Errors last hour: <Badge bg="primary">—</Badge>
-                        </ListGroup.Item>
-                    </ListGroup>
-                </div>
-            ))}
+            {regions.map((region) => {
+                const currentRegionData = dashboardData[region.regionID] || {};
+                return (
+                    <div className="region-cards p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
+                        <ListGroup className="shadow rounded-4">
+                            <ListGroup.Item>
+                                <h3>
+                                    <b>{region.regionName}</b>
+                                </h3>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                Active Containers: <Badge bg="secondary">{currentRegionData.activeContainers}</Badge>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                Companies: <Badge bg="secondary">{currentRegionData.companies}</Badge>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                Total uptime: <Badge bg="secondary">{currentRegionData.uptime}</Badge>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                Errors last hour: <Badge bg="secondary">{currentRegionData.errors}</Badge>
+                            </ListGroup.Item>
+                        </ListGroup>
+                    </div>
+                );
+            })}
         </>
     );
 }

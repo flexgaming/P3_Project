@@ -590,7 +590,7 @@ public class Database {
                 regionData.put("companies", companies);
                 regionData.put("uptime", uptime);
                 regionData.put("errors", errors);
-                dashboardData.put(regionName, regionData);
+                dashboardData.put(regionID, regionData);
             }
 
         } catch (SQLException error) {

@@ -1,11 +1,11 @@
 /* Styles for Dashboard */
 .dashboard {
-	padding: 1rem;
+    padding: 1rem;
 }
 
 h1 {
-	margin: 0 0 1rem 0;
-	font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
 }
 
 .region-cards {
@@ -19,7 +19,7 @@ h1 {
     overflow: hidden;
 }
 
-#error-table-container table { /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
+#error-table-container table {
+    /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
     margin-bottom: 0;
 }
-
