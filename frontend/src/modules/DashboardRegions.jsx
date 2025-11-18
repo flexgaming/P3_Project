@@ -49,7 +49,6 @@ function AddRegionsDashboard() {
                     <ListGroup className="shadow rounded-4">
                         <ListGroup.Item>
                             <h3><b>{region.regionName}</b></h3>
-                            {/* <small className="text-muted">ID: {region.regionID}</small> */}
                         </ListGroup.Item>
                         <ListGroup.Item>
                             Active Containers: <Badge bg="primary">—</Badge> / <Badge bg="primary">—</Badge>
