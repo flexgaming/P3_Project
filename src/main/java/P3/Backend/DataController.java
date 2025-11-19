@@ -45,7 +45,7 @@ Database database = new Database();
     @GetMapping("/{region}/{companyID}/contents") //Router continuation
     public Map<String, Object> getRecentCompanyData(@PathVariable String region, @PathVariable String companyID) {
         // Get company contents from DB
-        System.out.println(database.getRecentCompanyData(companyID).toString(4));
+        // System.out.println(database.getRecentCompanyData(companyID).toString(4));
         JSONObject companyData = database.getRecentCompanyData(companyID);
         return companyData.toMap();
     }
@@ -61,7 +61,6 @@ Database database = new Database();
     // GET Dashboard data
     @GetMapping("/dashboard") //Router continuation
     public Map<String, Object> getDashboardData() {
-        Database database = new Database();
         // Get dashboard region overview data from DB
         Map<String, Object> dashboardData = database.getDashboardData().toMap();
         return dashboardData;
@@ -71,7 +70,6 @@ Database database = new Database();
     @GetMapping("/errors") //Router continuation
     public Map<String, Object> getCriticalErrorsData() {
         // Get critical errors data from DB
-        Database database = new Database();
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
         
         
