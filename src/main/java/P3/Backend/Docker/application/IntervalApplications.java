@@ -172,6 +172,17 @@ public class IntervalApplications {
                         ////////////////////////////////////
                         //       HTTP FUNCTION HERE       //
                         ////////////////////////////////////
+                    
+                        if (containerArr[i].getRunningContainer().equals(true)) {
+                            // If the server is running - then send all data
+                                // Remember to set the timestamp
+                        } else {
+                            // If the server is closed - then only send docker information
+                                // Can we get the error codes? (if the docker container is not running)
+                                // Properly not, so send that that container is not running.
+
+                        }
+                        
                     } else {
                         intervalArr[i].setTempInterval(newInterval); // Set the new tempInterval.
                     }
@@ -211,7 +222,6 @@ public class IntervalApplications {
         
         
         DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
-        
         
         String containerId = container.getContainerId();
         
