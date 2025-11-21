@@ -1,0 +1,25 @@
+/* Styles for Dashboard */
+.dashboard {
+    padding: 1rem;
+}
+
+h1 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+}
+
+.region-cards {
+    margin-bottom: 30px;
+    border-radius: 10px;
+}
+
+#error-table-container {
+    margin: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#error-table-container table {
+    /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
+    margin-bottom: 0;
+}

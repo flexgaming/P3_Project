@@ -1,0 +1,25 @@
+#regions-tabs {
+    background-color: #011425;
+    
+}
+
+#regions-tabs .nav-link {
+    color: #ffffff;
+}
+
+#regions-tabs .nav-link.active {
+    background-color: #1F4959;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.flex-column .nav-link{
+    background-color: #011425;
+    color: #ffffff
+}
+
+.flex-column .nav-link.active {
+    background-color: #1F4959;
+    color: #ffffff;
+    font-weight: bold;
+}

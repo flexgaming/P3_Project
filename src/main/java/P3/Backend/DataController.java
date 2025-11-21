@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import javax.xml.crypto.Data;
+
 import org.json.JSONObject;
 
 
@@ -42,7 +45,7 @@ Database database = new Database();
     @GetMapping("/{region}/{companyID}/contents") //Router continuation
     public Map<String, Object> getRecentCompanyData(@PathVariable String region, @PathVariable String companyID) {
         // Get company contents from DB
-        System.out.println(database.getRecentCompanyData(companyID).toString(4));
+        // System.out.println(database.getRecentCompanyData(companyID).toString(4));
         JSONObject companyData = database.getRecentCompanyData(companyID);
         return companyData.toMap();
     }
@@ -73,17 +76,18 @@ Database database = new Database();
 
     // GET Dashboard data
     @GetMapping("/dashboard") //Router continuation
-    public ArrayList getDashboardData() {
-        // Get dashboard data from DB
-        return null; //database.getDashboardData();
+    public Map<String, Object> getDashboardData() {
+        // Get dashboard region overview data from DB
+        Map<String, Object> dashboardData = database.getDashboardData().toMap();
+        return dashboardData;
     }
 
     // GET Critical Errors data
     @GetMapping("/errors") //Router continuation
     public Map<String, Object> getCriticalErrorsData() {
         // Get critical errors data from DB
-        Database database = new Database();
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
+        
         
         // Check if timestamp exists before processing
         /* Object timestampObj = diagnosticsErrors.get("timestamp");

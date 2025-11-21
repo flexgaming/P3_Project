@@ -4,7 +4,7 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    background-color: rgba(121, 121, 121, 0.87); /* Background color of the webpage */
+    background-color: #5C7C89; /* Background color of the webpage */
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -28,6 +28,25 @@ body {
 h1 {
     font-size: 3.2em;
     line-height: 1.1;
+    color: #011425;
+}
+
+h2 {
+    font-size: 2.56em;
+    line-height: 1.1;
+    color: #011425;
+}
+
+h3 {
+    font-size: 2.048em;
+    line-height: 1.1;
+    color: #011425;
+}
+
+h4 {
+    font-size: 1.638em;
+    line-height: 1.1;
+    color: #011425;
 }
 
 button {
@@ -55,39 +74,7 @@ button:focus-visible {
     }
 }
 
-.App {
-    width: 100%;
-    min-height: 60vh;
-    margin: 0 auto;
-    box-sizing: border-box;
-    text-align: center;
-    background-color: #c9c9c9;
-}
-
-.Body {
-    padding-left: 10px;
-    padding-right: 20px;
-}
-
-.regions-accordion {
-    width: 80%;
-    text-align: left;
-}
-
-.regions {
-    padding: 1.5rem 0;
-    width: 80%;
-}
-
-.lg1 {
-    
-}
-
-.vr {
-    width: 2px;
-    color: #000;
-}
 
 html {
-  /* filter: grayscale(100%); */
+    /* filter: grayscale(100%); */
 }

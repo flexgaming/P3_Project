@@ -1,36 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-bootstrap";
 import NavCompanies from "./NavCompanies.jsx";
-/**
- * AddRegions component
- * - Fetches region names from /api/data/regions on mount
- * - Renders one ListGroup block per region name
+import "../pages/css/Nav.css";
+import { getRegions } from "../utils/FetchRegions.js";
+
+/*
+ * NavRegions
+ * -----------------
+ * Fetches available regions from the backend and renders them as a
+ * set of React-Bootstrap Tabs. Each Tab contains a `NavCompanies` component
+ * which is responsible for rendering companies/servers/containers for that region.
+ *
+ * Important behavior:
+ * - The component supports multiple JSON shapes from the API (map or array).
+ * - We track `mounted` during async fetch to avoid updating state after unmount.
  */
 function NavRegions() {
+    // regions: array of region objects ({ regionID, regionName, ... })
     const [regions, setRegions] = useState([]);
+    // activeKey: currently selected tab eventKey (string)
     const [activeKey, setActiveKey] = useState(null);
+    // error: stores fetch error message to show to the user
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        // Use the shared getRegions() helper to fetch and normalize region data.
         let mounted = true;
-        async function fetchRegions() {
+
+        async function loadRegions() {
             try {
-                const res = await fetch("/api/data/regions");
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
-
-                // Extract region objects with both regionID and regionName
-                // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
-                // Support multiple shapes: object map or array
-                const regionList = json && !Array.isArray(json)
-                    ? Object.values(json)
-                    : Array.isArray(json)
-                        ? json
-                        : (json.regions || []);
-
+                const regionList = await getRegions();
                 if (mounted) {
                     setRegions(regionList);
-                    // set first tab active (string id)
                     setActiveKey(regionList.length ? String(regionList[0].regionID) : null);
                 }
             } catch (err) {
@@ -38,12 +39,11 @@ function NavRegions() {
             }
         }
 
-        fetchRegions();
-        return () => {
-            mounted = false;
-        };
-    }, []);
+        loadRegions();
+        return () => { mounted = false; };
+    }, []); // run once on mount
 
+    // If there was a fetching error show an Alert and don't render the tabs
     if (error)
         return (
             <div className="p-2">
@@ -55,15 +55,22 @@ function NavRegions() {
         <Tabs
             id="regions-tabs"
             activeKey={activeKey}
+            // update activeKey when a tab is selected
             onSelect={(k) => setActiveKey(k)}
             className="mb-3"
-            mountOnEnter
-            justify
+            mountOnEnter // only mount tab content when selected
+            justify // make tabs stretch to full width
         >
+            {/* Render a Tab for each region. Use regionID as the eventKey/key. */}
             {regions.map((region) => (
-                <Tab eventKey={String(region.regionID)} title={String(region.regionName)} key={String(region.regionID)}>
+                <Tab
+                    eventKey={String(region.regionID)} // unique key used by Tabs
+                    title={String(region.regionName)} // visible tab title
+                    key={String(region.regionID)}
+                >
                     <div className="p-3">
-                        <NavCompanies regionID={region.regionID} />
+                        {/* Each Tab renders a NavCompanies component for that region */}
+                        <NavCompanies regionID={region.regionID} regionName={region.regionName} />
                     </div>
                 </Tab>
             ))}
