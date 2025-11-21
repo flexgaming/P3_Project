@@ -194,5 +194,4 @@ function NavServers({ regionID, companyID }) {
     );
 }
 
-// Export the NavServers component as default
 export default NavServers;

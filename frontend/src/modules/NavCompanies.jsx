@@ -16,7 +16,6 @@ function NavCompanies({ regionID, regionName}) {
     // activeKey: currently selected Tab eventKey (companyName)
     // error: error message when fetching fails
 
-
     // Fetch companies for the given region on mount
     useEffect(() => {
         let mounted = true;
@@ -74,6 +73,7 @@ function NavCompanies({ regionID, regionName}) {
                 <Col sm={3}>
                     <Nav variant="pills" className="flex-column">
                         <h4 style={{marginBottom: "28px"}}><b>Companies in {regionName}</b></h4>
+                        {/* Render Nav.Items for each company */}
                         {companies.map(company => (
                             <Nav.Item key={company.companyID}>
                                 <Nav.Link eventKey={`${company.companyName}`}>{`${company.companyName}`}</Nav.Link>
@@ -83,10 +83,11 @@ function NavCompanies({ regionID, regionName}) {
                 </Col>
                 <Col sm={9}>
                     <Tab.Content>
+                        {/* Render Tab.Pane for each company */}
                         {companies.map(company => (
                             <Tab.Pane eventKey={`${company.companyName}`} key={company.companyID}>
                                 <h4><b>Servers & Containers in {company.companyName}</b></h4>
-                                {/* Render NavServers for this company */}
+                                {/* Request and render servers and containers for this company */}
                                 <NavServers companyID={company.companyID} />
                             </Tab.Pane>
                         ))}

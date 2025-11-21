@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./css/Dashboard.css";
 import { Stack, Table, Form, Button } from "react-bootstrap";
-import AddRegionsDashboard from "../modules/DashboardRegions.jsx";
+import DashboardRegions from "../modules/DashboardRegions.jsx";
 import CriticalError from "../modules/CriticalError.jsx";
 
 export default function Dashboard() {
-    // Regions are handled by the AddRegionsDashboard component which fetches on mount
+    // Regions are handled by the DashboardRegions component which fetches on mount
     window.history.replaceState({}, "", `/dashboard/`); // set URL to /dashboard/
     // control the Stack direction responsively using React state
     const [direction, setDirection] = useState(() => (typeof window !== "undefined" && window.innerWidth < 1105) ? "vertical" : "horizontal");
@@ -27,7 +27,7 @@ export default function Dashboard() {
                 <b>Dashboard</b>
             </h2>
             <Stack direction={direction} gap={3} id="Region-Cards-Dashboard">
-                <AddRegionsDashboard />
+                <DashboardRegions />
             </Stack>
             
 

@@ -7,7 +7,6 @@ import { Accordion, ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-boo
  */
 function ManageCompanies() {
     const [regions, setRegions] = useState([]);
-    const [activeKey, setActiveKey] = useState(null);
     const [error, setError] = useState(null);
     // map of regionID -> array of companies
     const [companiesByRegion, setCompaniesByRegion] = useState({});

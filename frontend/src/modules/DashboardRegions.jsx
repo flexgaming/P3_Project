@@ -7,14 +7,16 @@ import "../pages/css/Dashboard.css";
  * - Fetches region names from /api/data/regions on mount
  * - Renders one ListGroup block per region name
  */
-function AddRegionsDashboard() {
+function DashboardRegions() {
     const [regions, setRegions] = useState([]);
     const [dashboardData, setDashboardData] = useState({});
     const [error, setError] = useState(null);
 
+    // Fetch regions and dashboard data on mount
     useEffect(() => {
         let mounted = true;
 
+        // Fetch regions and dashboard data on mount
         async function fetchDashboardData() {
             try {
                 const res = await fetch("/api/data/dashboard");
@@ -22,11 +24,13 @@ function AddRegionsDashboard() {
                 const json = await res.json();
 
                 if (mounted) setDashboardData(json);
+                console.log(json);
             } catch (err) {
                 if (mounted) setError(err.message || String(err));
             }
         }
 
+        // Fetch regions for the given region on mount
         async function fetchRegions() {
             try {
                 const res = await fetch("/api/data/regions");
@@ -43,6 +47,7 @@ function AddRegionsDashboard() {
             }
         }
 
+        // Fetch regions and dashboard data on mount
         fetchRegions();
         fetchDashboardData();
         return () => {
@@ -50,6 +55,7 @@ function AddRegionsDashboard() {
         };
     }, []);
 
+    // Render error if fetch failed
     if (error)
         return (
             <div className="p-2">
@@ -59,15 +65,15 @@ function AddRegionsDashboard() {
 
     return (
         <>
+            {/* Render ListGroup of regions and dashboard data fetched from the backend */}
             {regions.map((region) => {
                 const currentRegionData = dashboardData[region.regionID] || {};
                 return (
+                    // Each region card
                     <div className="region-cards p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
                         <ListGroup className="shadow rounded-4">
                             <ListGroup.Item>
-                                <h3>
-                                    <b>{region.regionName}</b>
-                                </h3>
+                                <h3><b>{region.regionName}</b></h3>
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 Active Containers: <Badge bg="secondary">{currentRegionData.activeContainers}</Badge>
@@ -89,4 +95,4 @@ function AddRegionsDashboard() {
     );
 }
 
-export default AddRegionsDashboard;
+export default DashboardRegions;
