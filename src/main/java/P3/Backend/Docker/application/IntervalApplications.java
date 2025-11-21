@@ -190,7 +190,7 @@ public class IntervalApplications {
                         //       HTTP FUNCTION HERE       //
                         ////////////////////////////////////
                     
-                        if (containerArr[i].getRunningContainer().equals(true)) {
+                        if (containerArr[i].getContainerRunning().equals(true)) {
                             containerArr[i].setTimestamp(new Date());
 
                             // If the server is running - then send all data
