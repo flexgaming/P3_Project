@@ -37,7 +37,8 @@ import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 public class DemoApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
+        SpringApplication.run(DemoApplication.class, args);
+        //ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
         DockerClient dockerClient = DockerClientBuilder.dockerConnection();
         
 
@@ -48,8 +49,8 @@ public class DemoApplication {
         DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
 
         // Get the Spring-managed bean
-        IntervalApplications intervalApp = context.getBean(IntervalApplications.class);
-        intervalApp.fetchSpringActuatorStats("http://localhost");
+        // IntervalApplications intervalApp = context.getBean(IntervalApplications.class);
+        // intervalApp.fetchSpringActuatorStats("http://localhost");
 
         // String containerId = "4a32465d120ec154152b061db52ce9a31ba83e92e8a8c8515d6fa6e8f3be0400";
         // try {

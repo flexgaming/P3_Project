@@ -21,23 +21,42 @@ public class ContainerClass {
     Long containerCpuUsage;         // Is cpu usage on docker container.
     Long containerDiskUsage;        // Is disk usage on docker container.
     String containerStatus;         // Is the status of the docker container.
+    Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
 
     
     // Data from actuator:
+    //JVM Data
     Boolean JVMRunning;             // Is internally java application on or off.
+    long JVMRamMax;               // Is max ram usage on java application.
     Long JVMRamUsage;             // Is ram usage on java application.
     Long JVMCpuUsagePerc;         // Is cpu usage on java application in percentage.
+    Integer JVMThreads;             // Is the number of threads on the java application.
+    Integer JVMThreadsStates;       // Is the number of threads states on the java application.
+    Integer JVMThreadQueued;       // Is the number of threads queued on the java application.
+    Long JVMCpuUsageStart;         // Is the start time of CPU usage on the java application.
+    Long JVMUptime;                // Is the uptime of the java application.
+
+    //System Data
     Long systemRamUsage;          // Is all of the ram usage on the system.
     Long systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
     Integer SystemCpuCores;         // Is the number of cpu cores on the system.
     Long systemDiskUsage;         // Is all of the disk usage on the system.
     Long systemDiskTotal;         // Is the total disk space on the system.
     Long systemDiskFree;          // Is the free disk space on the system.
-    Integer JVMThreads;             // Is the number of threads on the java application.
-    String JVMProcessId;            // Is the process id of the java application.
+    Integer poolCore;             // Is the core number of threads allocated for the pool of the java application.
+    Integer logbackEvents;        // Is the number of logback events on the java application.
+    Integer logbackEventsError;   // Is the number of logback error events on the java application.
+    Integer logbackEventsWarn;    // Is the number of logback warn events on the java application.  
+    Long garbageCollectSize;   // Is the size of garbage collection on the java application.
+
+
     //String JVMStatus;               // Is the status of the java application.
     
     
+
+
+
+
 
     /////////////////////////
     //      ERROR HERE     //
@@ -107,10 +126,24 @@ public class ContainerClass {
 
     public void setContainerStatus(String containerStatus) { this.containerStatus = containerStatus; }
 
+//ContainerPid
+    public Long getContainerPid() { return containerPid; }
+
+    public void setContainerPid(Long containerPid) { this.containerPid = containerPid; }
+
     //////////////////////////////////////
     //  ACTUATOR GETTERS AND SETTERS    //
     //////////////////////////////////////
-    
+
+    //=================================//
+    // JVM GETTERS AND SETTERS         //
+    //=================================//
+
+//JVMRamMax
+    public long getJVMRamMax() { return JVMRamMax; }
+
+    public void setJVMRamMax(long jVMRamMax) { JVMRamMax = jVMRamMax; }
+
 //JVMRamUsage
     public Long getJVMRamUsage() { return JVMRamUsage; }
 
@@ -120,6 +153,41 @@ public class ContainerClass {
     public Long getJVMCpuUsagePerc() { return JVMCpuUsagePerc; }
 
     public void setJVMCpuUsagePerc(Long jVMCpuUsagePerc) { JVMCpuUsagePerc = jVMCpuUsagePerc; }
+
+//JVMThreads
+    public Integer getJVMThreads() { return JVMThreads; }
+
+    public void setJVMThreads(Integer jVMThreads) { JVMThreads = jVMThreads; }
+
+//JVMRunning
+    public Boolean getJVMRunning() { return JVMRunning; }
+
+    public void setJVMRunning(Boolean JVMRunning) { this.JVMRunning = JVMRunning; }
+
+//JVMThreadsStates
+    public Integer getJVMThreadsStates() { return JVMThreadsStates; }
+
+    public void setJVMThreadsStates(Integer JVMThreadsStates) { this.JVMThreadsStates = JVMThreadsStates; }
+
+//JVMThreadQueued
+    public Integer getJVMThreadQueued() { return JVMThreadQueued; }
+
+    public void setJVMThreadQueued(Integer jVMThreadQueued) { JVMThreadQueued = jVMThreadQueued; }
+
+//JVMCpuUsageStart
+    public Long getJVMCpuUsageStart() { return JVMCpuUsageStart; }
+
+    public void setJVMCpuUsageStart(Long jVMCpuUsageStart) { JVMCpuUsageStart = jVMCpuUsageStart; }
+
+//JVMUptime
+    public Long getJVMUptime() { return JVMUptime; }
+
+    public void setJVMUptime(Long jVMUptime) { JVMUptime = jVMUptime; }
+
+
+    //=================================//
+    //   SYSTEM GETTERS AND SETTERS    //
+    //=================================//
 
 //SystemRamUsage
     public Long getSystemRamUsage() { return systemRamUsage; }
@@ -150,26 +218,44 @@ public class ContainerClass {
     public Long getSystemDiskFree() { return systemDiskFree; }
 
     public void setSystemDiskFree(Long systemDiskFree) { this.systemDiskFree = systemDiskFree; }
-    
-//JVMThreads
-    public Integer getJVMThreads() { return JVMThreads; }
 
-    public void setJVMThreads(Integer jVMThreads) { JVMThreads = jVMThreads; }
+//PoolCore
+    public Integer getPoolCore() { return poolCore; }
 
-//JVMProcessId
-    public String getJVMProcessId() { return JVMProcessId; }
+    public void setPoolCore(Integer poolCore) { this.poolCore = poolCore; }
 
-    public void setJVMProcessId(String jVMProcessId) { JVMProcessId = jVMProcessId; }
+//LogbackEvents
+    public Integer getLogbackEvents() { return logbackEvents; }
 
-//JVMProcessId
-    public Boolean getJVMRunning() { return JVMRunning; }
+    public void setLogbackEvents(Integer logbackEvents) { this.logbackEvents = logbackEvents; }
 
-    public void setJVMRunning(Boolean JVMRunning) { this.JVMRunning = JVMRunning; }
+//LogbackEventsError
+    public Integer getLogbackEventsError() { return logbackEventsError; }
+
+    public void setLogbackEventsError(Integer logbackEventsError) { this.logbackEventsError = logbackEventsError; }
+
+//LogbackEventsWarn
+    public Integer getLogbackEventsWarn() { return logbackEventsWarn; }
+
+    public void setLogbackEventsWarn(Integer logbackEventsWarn) { this.logbackEventsWarn = logbackEventsWarn; }
+
+//GarbageCollectSize
+    public Long getGarbageCollectSize() { return garbageCollectSize; }
+
+    public void setGarbageCollectSize(Long garbageCollectSize) { this.garbageCollectSize = garbageCollectSize; }
+
 
 //Timestamp
     public Date getTimestamp() { return timestamp; }
 
     public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
+
+
+
+
+
+
+
 
 
 

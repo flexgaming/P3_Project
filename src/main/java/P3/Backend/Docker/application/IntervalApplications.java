@@ -253,75 +253,94 @@ public class IntervalApplications {
                     .withSize(true)
                     .exec();
 
+                    
+
             container.setContainerRamUsage(stats.getMemoryUsage()); // Current RAM usage of the container.
             container.setContainerCpuUsage(stats.getCpuTotalUsage()); // Current CPU total usage of the container.
             container.setContainerDiskUsage(response.getSizeRootFs());  // Total size (image + writable layer)
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
+            container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
+            
             
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
             e.printStackTrace();
         }
     }
+
+
+
+
     
-    @Autowired
-    private WebClient webClient;
+    // @Autowired
+    // private WebClient webClient;
 
-    public void fetchSpringActuatorStats(String actuatorUrl) {
-        String url = actuatorUrl + ":9090";
-        callActuator(url, "/actuator/metrics/jvm.memory.used");
-        callActuator( url, "/actuator/metrics/jvm.threads.live");
-        callActuator( url, "/actuator/metrics/process.cpu.usage");
-        callActuator( url, "/actuator/metrics/system.cpu.count");
-        callActuator( url, "/actuator/metrics/system.cpu.usage");        
-    }
-    //ENDPOINT = "/actuator/metrics/jvm.memory.used"
-    private void callActuator(String url, String endpoint) {
-        // Get the raw JSON response as a string
-        String jsonString = webClient.get()
-                .uri(url + endpoint)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+    // public void fetchSpringActuatorStats(String actuatorUrl) {
+    //     String url = actuatorUrl + ":9090";
+    //     callActuator(url, "/actuator/metrics/jvm.memory.used");
+    //     callActuator( url, "/actuator/metrics/jvm.threads.live");
+    //     callActuator( url, "/actuator/metrics/process.cpu.usage");
+    //     callActuator( url, "/actuator/metrics/system.cpu.count");
+    //     callActuator( url, "/actuator/metrics/system.cpu.usage");        
+    // }
+    // //ENDPOINT = "/actuator/metrics/jvm.memory.used"
+    // private void callActuator(String url, String endpoint) {
+    //     // Get the raw JSON response as a string
+    //     String jsonString = webClient.get()
+    //             .uri(url + endpoint)
+    //             .retrieve()
+    //             .bodyToMono(String.class)
+    //             .block();
 
-        // Parse the JSON
-        JSONObject response = new JSONObject(jsonString);
+    //     // Parse the JSON
+    //     JSONObject response = new JSONObject(jsonString);
 
-        // Extract the numeric value from measurements[0].value
-        double value = response
-                .getJSONArray("measurements")
-                .getJSONObject(0)
-                .getDouble("value");
+    //     // Extract the numeric value from measurements[0].value
+    //     double value = response
+    //             .getJSONArray("measurements")
+    //             .getJSONObject(0)
+    //             .getDouble("value");
 
-        // Return as a string
-        System.out.println("Actuator Call to " + url + endpoint + " returned value: " + value);
-    }
+    //     // Return as a string
+    //     System.out.println("Actuator Call to " + url + endpoint + " returned value: " + value);
+    // }
 
-/* 
+
+
+
+
+
     @Autowired
     private static WebClient webClient;
 
     private static void fetchSpringActuatorStats(ContainerClass container, DockerClient dockerClient, String actuatorUrl) {
         String url = actuatorUrl + ":" + container.getPublicPort();
+
+        container.setJVMRamMax(callActuator( url, "/actuator/metrics/jvm.memory.max").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setJVMRamUsage(callActuator(url, "/actuator/metrics/jvm.memory.used").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setJVMCpuUsageStart(callActuator( url, "/actuator/metrics/process.start.time").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setJVMCpuUsagePerc(callActuator( url, "/actuator/metrics/process.cpu.usage").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setJVMThreads (callActuator( url, "/actuator/metrics/jvm.threads.live").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setJVMThreadsStates(callActuator( url, "/actuator/metrics/jvm.threads.states").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setJVMThreadQueued(callActuator( url, "/actuator/metrics/executor.queued").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setJVMUptime(callActuator( url, "/actuator/metrics/process.uptime").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+
+        container.setSystemDiskFree(callActuator( url, "/actuator/metrics/disk.free").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setSystemDiskTotal(callActuator( url, "/actuator/metrics/disk.total").getJSONArray("measurements").getJSONObject(0).getLong("value"));
         
-        //container.setPoolCore(Long.parseLong(callActuator(url, "/actuator/metrics/executor.pool.core")));
-        //container.setJVMThreadQueued    (Long.parseLong(callActuator(   url, "/actuator/metrics/executor.queued")));
-        //container.setGarbageCollectSize (Long.parseLong(callActuator(   url, "/actuator/metrics/jvm.gc.overhead")));
-        //container.setJVMRamMax          (Long.parseLong(callActuator(   url, "/actuator/metrics/jvm.memory.max")));
-        container.setJVMRamUsage        (Long.parseLong(    callActuator(url, "/actuator/metrics/jvm.memory.used")));
-        container.setJVMThreads         (Integer.parseInt(  callActuator( url, "/actuator/metrics/jvm.threads.live")));
-        //container.setJVMThreadsStates   (Long.parseLong(callActuator(   url, "/actuator/metrics/jvm.threads.states")));
-        //container.setLogbackEvents      (Long.parseLong(callActuator(   url, "/actuator/metrics/logback.events")));
-        container.setJVMCpuUsagePerc    (Long.parseLong(    callActuator( url, "/actuator/metrics/process.cpu.usage")));
-        //container.setJVMCpuUsageStart   (Long.parseLong(callActuator(   url, "/actuator/metrics/process.start.time")));
-        //container.setJVMUptime          (Long.parseLong(callActuator(   url, "/actuator/metrics/process.uptime")));
-        container.setSystemCpuCores     (Integer.parseInt(  callActuator( url, "/actuator/metrics/system.cpu.count")));
-        container.setSystemCpuUsagePerc (Long.parseLong(    callActuator( url, "/actuator/metrics/system.cpu.usage")));
-        
+        container.setSystemCpuCores(callActuator( url, "/actuator/metrics/system.cpu.count").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setSystemCpuUsagePerc(callActuator( url, "/actuator/metrics/system.cpu.usage").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+
+        container.setPoolCore(callActuator( url, "/actuator/metrics/executor.pool.core").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setLogbackEvents(callActuator( url, "/actuator/metrics/logback.events").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setLogbackEventsError(callActuator( url, "/actuator/metrics/logback.events?tag=level:error").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setLogbackEventsWarn(callActuator( url, "/actuator/metrics/logback.events?tag=level:warn").getJSONArray("measurements").getJSONObject(0).getInt("value"));
+        container.setGarbageCollectSize(callActuator( url, "/actuator/metrics/jvm.gc.overhead").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+
     }
     //ENDPOINT = "/actuator/metrics/jvm.memory.used"
-    private static String callActuator(String url, String endpoint) {
+    private static JSONObject callActuator(String url, String endpoint) {
         // Get the raw JSON response as a string
         String jsonString = webClient.get()
                 .uri(url + endpoint)
@@ -329,20 +348,10 @@ public class IntervalApplications {
                 .bodyToMono(String.class)
                 .block();
 
-        // Parse the JSON
-        JSONObject response = new JSONObject(jsonString);
-
-        // Extract the numeric value from measurements[0].value
-        double value = response
-                .getJSONArray("measurements")
-                .getJSONObject(0)
-                .getDouble("value");
-
-        // Return as a string
-        System.out.println("Actuator Call to " + url + endpoint + " returned value: " + value);
-        return String.valueOf(value);
+        // Convert and return the value as a JSON object
+        return new JSONObject(jsonString);
     }
-        */
+
 
 //"jvm.memory.used", "jvm.memory.max", "jvm.threads.live", "jvm.threads.states", "system.disk.free", "logback.events", "logback.events?tag=level:warn", "logback.events?tag:level=trace", "logback.events?tag:level=debug", "logback.events?tag:level=error", "logback.events?tag:level=info", "process.cpu.usage","process.start.time", "process.uptime", "system.cpu.count", "system.cpu.usage"
 
