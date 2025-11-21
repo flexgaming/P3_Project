@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
 import NavServers from "./NavServers";
 import "../pages/css/Nav.css";
+import { getCompanies } from "../utils/FetchCompanies";
 
 /**
  * NavCompanies component
@@ -19,25 +20,12 @@ function NavCompanies({ regionID, regionName}) {
     // Fetch companies for the given region on mount
     useEffect(() => {
         let mounted = true;
-        async function fetchCompanies() {
-            try {
-                const res = await fetch(`/api/data/${regionID}/companies`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                // If backend responded with non-2xx => throw and show error
-                const json = await res.json();
-                console.log(json);
 
-                // Extract region objects with both regionID and companyName
-                // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
-                // Support multiple shapes: object map or array
-                const companyList = json && !Array.isArray(json)
-                    ? Object.values(json)
-                    : Array.isArray(json)
-                        ? json
-                        : (json.companies || []);
+        async function loadCompanies() {
+            try {
+                const companyList = await getCompanies(regionID);
                 if (mounted) {
                     setCompanies(companyList);
-                    // set first tab active by companyName (matches Nav.Link/Tab.Pane eventKey)
                     setActiveKey(companyList.length ? String(companyList[0].companyName) : null);
                 }
             } catch (err) {
@@ -45,10 +33,8 @@ function NavCompanies({ regionID, regionName}) {
             }
         }
 
-        fetchCompanies();
-        return () => {
-            mounted = false;
-        };
+        loadCompanies();
+        return () => { mounted = false; };
     }, [regionID]);
 
     // Render error if fetch failed

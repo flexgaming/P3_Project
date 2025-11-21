@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Accordion, ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-bootstrap";
+import { getCompanies } from "../utils/FetchCompanies";
 /**
  * AddRegions component
  * - Fetches region names from /api/data/regions on mount
@@ -13,35 +14,19 @@ function ManageCompanies() {
 
     useEffect(() => {
         let mounted = true;
-        async function fetchRegions() {
+        async function loadRegions() {
             try {
-                const res = await fetch("/api/data/regions");
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
-
-                // Extract region objects with both regionID and regionName
-                // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
-                // Support multiple shapes: object map or array
-                const regionList = json && !Array.isArray(json)
-                    ? Object.values(json)
-                    : Array.isArray(json)
-                        ? json
-                        : (json.regions || []);
-
-                if (mounted) {
-                    setRegions(regionList);
-                    // set first tab active (string id)
-                    setActiveKey(regionList.length ? String(regionList[0].regionID) : null);
-                }
+                // call shared helper
+                const { getRegions } = await import("../utils/FetchRegions");
+                const regionList = await getRegions();
+                if (mounted) setRegions(regionList);
             } catch (err) {
                 if (mounted) setError(err.message || String(err));
             }
         }
 
-        fetchRegions();
-        return () => {
-            mounted = false;
-        };
+        loadRegions();
+        return () => { mounted = false; };
     }, []);
 
     // When regions load, fetch companies for each region and store in companiesByRegion
@@ -51,16 +36,7 @@ function ManageCompanies() {
 
         async function fetchCompaniesForRegion(region) {
             try {
-                const res = await fetch(`/api/data/${region.regionID}/companies`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
-
-                const companyList = json && !Array.isArray(json)
-                    ? Object.values(json)
-                    : Array.isArray(json)
-                        ? json
-                        : (json.companies || []);
-
+                const companyList = await getCompanies(region.regionID);
                 if (mounted) {
                     setCompaniesByRegion(prev => ({ ...prev, [region.regionID]: companyList }));
                 }
@@ -78,6 +54,7 @@ function ManageCompanies() {
         return () => { mounted = false; };
     }, [regions, companiesByRegion]);
 
+    // Render error if fetch failed
     if (error)
         return (
             <div className="p-2">
@@ -86,11 +63,14 @@ function ManageCompanies() {
         );
 
     return (
+        // Render Accordion of regions and their companies fetched from the backend
         <Accordion id="manage-companies-accordion" className="shadow rounded-4"> 
+            {/* Iterate over regions to create Accordion items */}
             {regions.map((region, index) => (
                 <Accordion.Item eventKey={String(index)} key={region.regionID}>
                     <Accordion.Header>{region.regionName}</Accordion.Header>
                     <Accordion.Body>
+                        {/* ListGroup of companies for this region */}
                         <ListGroup className="rounded-4">
                             {(companiesByRegion[region.regionID] || []).map((company) => (
                                 <ListGroup.Item key={company.companyID}>{company.companyName}</ListGroup.Item>

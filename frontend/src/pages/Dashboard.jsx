@@ -4,12 +4,20 @@ import { Stack, Table, Form, Button } from "react-bootstrap";
 import DashboardRegions from "../modules/DashboardRegions.jsx";
 import CriticalError from "../modules/CriticalError.jsx";
 
+
+/* * Dashboard Page
+ * -----------------
+ * Renders the main Dashboard page including:
+ * - DashboardRegions component which fetches and displays region cards
+ * - Critical Errors table displaying recent critical errors
+ */
 export default function Dashboard() {
     // Regions are handled by the DashboardRegions component which fetches on mount
     window.history.replaceState({}, "", `/dashboard/`); // set URL to /dashboard/
     // control the Stack direction responsively using React state
     const [direction, setDirection] = useState(() => (typeof window !== "undefined" && window.innerWidth < 1105) ? "vertical" : "horizontal");
 
+    // Update direction on window resize
     useEffect(() => {
         function handleResize() {
             setDirection(window.innerWidth < 1105 ? "vertical" : "horizontal");
@@ -26,16 +34,18 @@ export default function Dashboard() {
             <h2>
                 <b>Dashboard</b>
             </h2>
+            {/* Region Cards Section */}
             <Stack direction={direction} gap={3} id="Region-Cards-Dashboard">
                 <DashboardRegions />
             </Stack>
             
-
+            {/* Critical Errors Section */}
             <h1>
-                <b>Critical Errors</b>
+                <b>Critical Errors:</b>
             </h1>
             <div id="error-table-container" className="shadow">
                 <Table striped bordered hover id="error-table" responsive>
+                    {/* Table Headers */}
                     <thead>
                         <tr>
                             <th>Time</th>
@@ -47,6 +57,7 @@ export default function Dashboard() {
                             <th>Pinned logs</th>
                         </tr>
                     </thead>
+                    {/* Table Body function to fetch from the backend view */}
                     <tbody>
                         <CriticalError />
                     </tbody>

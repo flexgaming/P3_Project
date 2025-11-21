@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-bootstrap";
 import NavCompanies from "./NavCompanies.jsx";
 import "../pages/css/Nav.css";
+import { getRegions } from "../utils/FetchRegions.js";
 
 /*
  * NavRegions
@@ -23,45 +24,23 @@ function NavRegions() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // `mounted` flag prevents state updates after the component unmounts
+        // Use the shared getRegions() helper to fetch and normalize region data.
         let mounted = true;
 
-        async function fetchRegions() {
+        async function loadRegions() {
             try {
-                // Request the list of regions from the backend
-                const res = await fetch("/api/data/regions");
-                // If response is not ok throw to be caught below
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
-
-                // The API may return either:
-                // - a map keyed by name (object), or
-                // - an array of region objects, or
-                // - an object with a `regions` array property.
-                // Normalize to an array of region objects.
-                const regionList = json && !Array.isArray(json)
-                    ? Object.values(json) // map -> array of values
-                    : Array.isArray(json)
-                        ? json // already an array
-                        : (json.regions || []); // fallback to json.regions
-
-                // Only set state if the component is still mounted
+                const regionList = await getRegions();
                 if (mounted) {
                     setRegions(regionList);
-                    // Make the first region active by default (if present)
                     setActiveKey(regionList.length ? String(regionList[0].regionID) : null);
                 }
             } catch (err) {
-                // Save error for display, but only when still mounted
                 if (mounted) setError(err.message || String(err));
             }
         }
 
-        fetchRegions();
-        // Cleanup: flip mounted so in-flight fetch doesn't call setState
-        return () => {
-            mounted = false;
-        };
+        loadRegions();
+        return () => { mounted = false; };
     }, []); // run once on mount
 
     // If there was a fetching error show an Alert and don't render the tabs
