@@ -71,9 +71,9 @@ Database database = new Database();
     public Map<String, Object> getCriticalErrorsData() {
         // Get critical errors data from DB
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
-        
-        
-        
-        return diagnosticsErrors;
+        // Create an object to asses the severity of the error messages
+        SeverityCalculator severityCalculator = new SeverityCalculator();
+        //Return the updated map of error messages with severities assigned
+        return severityCalculator.assessSeverity(diagnosticsErrors);
     }
 }
