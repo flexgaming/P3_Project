@@ -19,9 +19,9 @@ function CriticalError() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const json = await response.json();
-            
+
             // The API returns an object keyed by diagnostics UUID, e.g.
             // { "0efd...": { date: ..., errorLogs: ..., ... }, ... }
             // Convert to an array while preserving the UUID as `id` on each entry.
@@ -38,19 +38,13 @@ function CriticalError() {
                 saved = [];
             }
 
-            const savedIds = Array.isArray(saved)
-                ? saved.map(d => d.id).filter(Boolean)
-                : (saved && typeof saved === 'object')
-                    ? Object.keys(saved)
-                    : [];
+            const savedIds = Array.isArray(saved) ? saved.map((d) => d.id).filter(Boolean) : saved && typeof saved === "object" ? Object.keys(saved) : [];
 
             // Mark fetched items as pinned when they exist in saved diagnostics
-            const listWithPinned = list.map(item => ({ ...item, pinned: savedIds.includes(item.id) }));
+            const listWithPinned = list.map((item) => ({ ...item, pinned: savedIds.includes(item.id) }));
 
             // Include any saved-only items (not present in fetched list) so they appear after fetched items
-            const extraSaved = Array.isArray(saved)
-                ? saved.filter(s => !list.some(l => l.id === s.id)).map(s => ({ ...s, pinned: true }))
-                : [];
+            const extraSaved = Array.isArray(saved) ? saved.filter((s) => !list.some((l) => l.id === s.id)).map((s) => ({ ...s, pinned: true })) : [];
 
             // Merge and sort so that pinned items appear at the top on initial load
             const merged = [...listWithPinned, ...extraSaved];
@@ -72,7 +66,7 @@ function CriticalError() {
     useEffect(() => {
         try {
             const saved = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
-            const ids = Array.isArray(saved) ? saved.map(d => d.id).filter(Boolean) : [];
+            const ids = Array.isArray(saved) ? saved.map((d) => d.id).filter(Boolean) : [];
             setPinnedIds(ids);
         } catch {
             // ignore parse errors and default to empty
@@ -80,6 +74,7 @@ function CriticalError() {
         }
     }, []);
 
+    // Render loading, error, or no errors states
     if (loading) {
         return (
             <tr key="loading">
@@ -88,6 +83,7 @@ function CriticalError() {
         );
     }
 
+    // Render error state
     if (error) {
         return (
             <tr key="error">
@@ -96,6 +92,7 @@ function CriticalError() {
         );
     }
 
+    // Render no errors state
     if (errorDetails.length === 0) {
         return (
             <tr key="no-errors">
@@ -104,6 +101,7 @@ function CriticalError() {
         );
     }
 
+    // Handlers to pin/unpin diagnostic logs
     function togglePinDiagnostic(error) {
         if (pinnedIds.includes(error.id)) {
             unPinDiagnostic(error.id);
@@ -117,32 +115,39 @@ function CriticalError() {
         let savedDiagnostics = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
         // check if the diagnostic log is already saved
         const exists = savedDiagnostics.find((diag) => diag.id === error.id);
-            if (!exists) {
-                savedDiagnostics.push(error);
-                localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
-                // update React state so UI updates declaratively
-                setPinnedIds(prev => Array.from(new Set([...prev, error.id])));
-            } else {
+        if (!exists) {
+            savedDiagnostics.push(error);
+            localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
+            // update React state so UI updates declaratively
+            setPinnedIds((prev) => Array.from(new Set([...prev, error.id])));
+        } else {
             alert("Diagnostic log already pinned!");
         }
     }
 
+    // Unpin diagnostic log by removing it from localStorage
     function unPinDiagnostic(errorId) {
         let savedDiagnostics = JSON.parse(localStorage.getItem("savedDiagnostics")) || [];
         savedDiagnostics = savedDiagnostics.filter((diag) => diag.id !== errorId);
         localStorage.setItem("savedDiagnostics", JSON.stringify(savedDiagnostics));
-        setPinnedIds(prev => prev.filter(id => id !== errorId));
+        setPinnedIds((prev) => prev.filter((id) => id !== errorId));
     }
 
     return (
         <>
+            {" "}
+            {/* Render each error detail row */}
             {errorDetails.map((error) => (
                 <tr key={error.id}>
                     <td>{error.time}</td>
                     <td>{error.date}</td>
                     <td>
                         <a href={`/diagnosticsview/${error.containerID}`}>
-                            <b><u>{error.regionName} → {error.companyName} → {error.serverName} → {error.containerName}</u></b>
+                            <b>
+                                <u>
+                                    {error.regionName} → {error.companyName} → {error.serverName} → {error.containerName}
+                                </u>
+                            </b>
                         </a>
                     </td>
                     <td>{error.containerName}</td>

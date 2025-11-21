@@ -59,7 +59,9 @@ function DashboardRegions() {
                     <div className="region-cards p-2 w-100" id={`${currentDashboardData.regionID}`} key={currentDashboardData.regionID}>
                         <ListGroup className="shadow rounded-4">
                             <ListGroup.Item>
-                                <h3><b>{currentDashboardData.regionName}</b></h3>
+                                <h3>
+                                    <b>{currentDashboardData.regionName}</b>
+                                </h3>
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 Active Containers: <Badge bg="secondary">{currentDashboardData.activeContainers}</Badge>
