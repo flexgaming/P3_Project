@@ -8,8 +8,9 @@ import "../pages/css/Dashboard.css";
  * - Renders one ListGroup block per region name
  */
 function DashboardRegions() {
-    const [regions, setRegions] = useState([]);
-    const [dashboardData, setDashboardData] = useState({});
+    // dashboardData should be an array so we can call .map() when rendering.
+    // The backend may return an object keyed by UUIDs; convert that to an array when fetched.
+    const [dashboardData, setDashboardData] = useState([]);
     const [error, setError] = useState(null);
 
     // Fetch regions and dashboard data on mount
@@ -23,32 +24,18 @@ function DashboardRegions() {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
 
-                if (mounted) setDashboardData(json);
-                console.log(json);
-            } catch (err) {
-                if (mounted) setError(err.message || String(err));
-            }
-        }
+                // Normalize the backend response to an array. If the backend already
+                // returns an array, use it directly; otherwise convert the object
+                // (map keyed by UUID) to an array of values so .map() works below.
+                const dataArray = Array.isArray(json) ? json : Object.values(json || {});
 
-        // Fetch regions for the given region on mount
-        async function fetchRegions() {
-            try {
-                const res = await fetch("/api/data/regions");
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
-
-                // Extract region objects with both regionID and regionName
-                // json structure: { "North America": { regionID: "NA", regionName: "North America" }, ... }
-                const regionList = Object.values(json);
-
-                if (mounted) setRegions(regionList);
+                if (mounted) setDashboardData(dataArray);
             } catch (err) {
                 if (mounted) setError(err.message || String(err));
             }
         }
 
         // Fetch regions and dashboard data on mount
-        fetchRegions();
         fetchDashboardData();
         return () => {
             mounted = false;
@@ -66,26 +53,25 @@ function DashboardRegions() {
     return (
         <>
             {/* Render ListGroup of regions and dashboard data fetched from the backend */}
-            {regions.map((region) => {
-                const currentRegionData = dashboardData[region.regionID] || {};
+            {dashboardData.map((currentDashboardData) => {
                 return (
                     // Each region card
-                    <div className="region-cards p-2 w-100" id={`${region.regionID}`} key={region.regionID}>
+                    <div className="region-cards p-2 w-100" id={`${currentDashboardData.regionID}`} key={currentDashboardData.regionID}>
                         <ListGroup className="shadow rounded-4">
                             <ListGroup.Item>
-                                <h3><b>{region.regionName}</b></h3>
+                                <h3><b>{currentDashboardData.regionName}</b></h3>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Active Containers: <Badge bg="secondary">{currentRegionData.activeContainers}</Badge>
+                                Active Containers: <Badge bg="secondary">{currentDashboardData.activeContainers}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Companies: <Badge bg="secondary">{currentRegionData.companies}</Badge>
+                                Companies: <Badge bg="secondary">{currentDashboardData.companies}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Total uptime: <Badge bg="secondary">{currentRegionData.uptime}</Badge>
+                                Total uptime: <Badge bg="secondary">{currentDashboardData.uptime}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Errors last hour: <Badge bg="secondary">{currentRegionData.errors}</Badge>
+                                Errors last hour: <Badge bg="secondary">{currentDashboardData.errors}</Badge>
                             </ListGroup.Item>
                         </ListGroup>
                     </div>
