@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from "react";
 import "./css/DiagnosticsView.css";
-import RunningView from "./RunningView.jsx"
-import { Tab, Stack, Table, Form, Button, Row, Col, Nav} from "react-bootstrap";
-import { Line, Bar } from "react-chartjs-2";
-import {
-    Chart as ChartJS,
-    LineElement,
-    BarElement,
-    PointElement,
-    LinearScale,
-    CategoryScale,
-    Tooltip,
-    Legend
-} from "chart.js";
-import pattern from "patternomaly"
-
-ChartJS.register(BarElement, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
+import React, { useEffect, useState } from "react";
+import { Tab, Row, Col, Nav} from "react-bootstrap";
+import RunningView from "./RunningView.jsx";
+import CpuView from "./CpuView.jsx";
+import RamView from "./RamView.jsx";
+import DiskUsageView from "./DiskUsageView.jsx";
 
 export default function DiagnosticsView({ containerID }) {
-    // Regions are handled by the AddRegionsDashboard component which fetches on mount
-    const [diagnosticsList, setDiagnosticsList] = useState([]);
+    const [containerData, setContainerData] = useState([]);
+    const [serverData, setServerData] = useState([]);
     const [runningChart, setRunningChart] = useState(null);
     const [error, setError] = useState(null);
 
@@ -48,21 +37,40 @@ export default function DiagnosticsView({ containerID }) {
 
                 const json = await res.json();
 
-                const diagnosticsList = json && !Array.isArray(json)
-                    ? Object.values(json)
-                    : Array.isArray(json)
-                        ? json
-                        : (json.companies || []);
+                const containerData = json;
 
-                setDiagnosticsList(diagnosticsList);
-                console.log(diagnosticsList);
+                setContainerData(containerData);
+                console.log(containerData);
             } catch (err) {
                 setError(err.message || String(err));
             }
         }
 
+
         fetchDiagnosticsData();
     }, [containerID]);
+
+    useEffect(() => {
+        if (!containerData ||!containerData.containerData) return;
+
+        async function fetchServerData() {
+            try {
+                const res = await fetch(`/api/data/serverdata/${containerData.containerData.serverReference}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const json = await res.json();
+
+                const serverData = json;
+
+                setServerData(serverData);
+                console.log(serverData);
+            } catch (err) {
+                setError(err.message || String(err));
+            }
+        }
+
+        fetchServerData();
+    }, [containerData]);
 
     return (
         <div className="Yes">
@@ -87,16 +95,16 @@ export default function DiagnosticsView({ containerID }) {
                     <Col sm={9}>
                         <Tab.Content>
                             <Tab.Pane eventKey="running">
-                                <RunningView diagnosticsList={diagnosticsList}/>
+                                <RunningView diagnosticsData={containerData.diagnosticsData} timeAgo={timeAgo}/>
                             </Tab.Pane>
                             <Tab.Pane eventKey="cpuUsage">
-                                <p>CPU Usage</p>
+                                <CpuView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
                             </Tab.Pane>
                             <Tab.Pane eventKey="ramUsage">
-                                <p>RAM Usage</p>
+                                <RamView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
                             </Tab.Pane>
                             <Tab.Pane eventKey="diskUsage">
-                                <p>Disk Usage</p>
+                                <DiskUsageView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
                             </Tab.Pane>
                         </Tab.Content>
                     </Col>

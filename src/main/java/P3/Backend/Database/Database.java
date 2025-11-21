@@ -200,10 +200,15 @@ public class Database {
      * @param containerID The ID of the container being added.
      * @param serverReference The ID of the server running the container.
      * @param containerName The name of the container being added.
+     * @param ramMax The max RAM of the container being added.
+     * @param cpuMax The max CPU of the container being added.
+     * @param diskUsageMax The max Disk Usage of the container being added.
      */
-    public void addContainers(String containerID, String serverReference, String containerName) {
+    public void addContainers(String containerID, String serverReference, String containerName, double ramMax,
+                              double cpuMax, double diskUsageMax) {
         // Reformats the input parameters to fit the signature of the below addContainers method.
-        addContainers(new String[]{containerID}, new String[]{serverReference}, new String[]{containerName});
+        addContainers(new String[]{containerID}, new String[]{serverReference}, new String[]{containerName},
+                new double[]{ramMax}, new double[]{cpuMax}, new double[]{diskUsageMax});
     }
 
     /**
@@ -212,26 +217,34 @@ public class Database {
      * @param containerIDs The IDs of the containers being added.
      * @param serverReferences The IDs of the servers running these containers.
      * @param containerNames the names of the containers being added.
+     * @param ramMaxes The max RAMs of the containers being added.
+     * @param cpuMaxes The max CPUs of the containers being added.
+     * @param diskUsageMaxes The max Disk Usages of the containers being added.
      */
-    public void addContainers(String[] containerIDs, String[] serverReferences, String[] containerNames) {
+    public void addContainers(String[] containerIDs, String[] serverReferences, String[] containerNames,
+                              double[] ramMaxes, double[] cpuMaxes, double[] diskUsageMaxes) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(containerIDs, serverReferences)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Container (Container_ID, Server_Reference, Container_Name) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Container (Container_ID, Server_Reference, Container_Name, Ram_Max, Cpu_Max, " +
+                "Disk_Usage_Max) VALUES (?, ?, ?, ?, ?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
                 // Use Prepared Statement to help format the SQL string to prevent injections.
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            // Queue all companies to be added.
+            // Queue all containers to be added.
             for (int i = 0; i < serverReferences.length; i++) {
                 preparedStatement.setString(1, containerIDs[i]);
                 preparedStatement.setString(2, serverReferences[i]);
                 preparedStatement.setString(3, containerNames[i]);
+                preparedStatement.setDouble(4, ramMaxes[i]);
+                preparedStatement.setDouble(5, cpuMaxes[i]);
+                preparedStatement.setDouble(6, diskUsageMaxes[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -448,9 +461,15 @@ public class Database {
                 String containerID = resultSet.getString("Container_ID");
                 String serverReference = resultSet.getString("Server_Reference");
                 String containerName = resultSet.getString("Container_Name");
+                double ramMax = resultSet.getDouble("Ram_Max");
+                double cpuMax = resultSet.getDouble("CPU_Max");
+                double diskUsageMax = resultSet.getDouble("Disk_Usage_Max");
                 container.put("containerID", containerID);
                 container.put("serverReference", serverReference);
                 container.put("containerName", containerName);
+                container.put("ramMax", ramMax);
+                container.put("cpuMax", cpuMax);
+                container.put("diskUsageMax", diskUsageMax);
                 containers.put(containerName, container);
             }
 
@@ -465,6 +484,7 @@ public class Database {
      * Fetches all diagnostics data saved in the database.
      */
     public JSONObject getDiagnosticsData(String containerID) {
+        JSONObject containerData = new JSONObject();
         JSONObject diagnosticsData = new JSONObject();
         // Read all data from View Company_Diagnostics that are within time scope.
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.Timestamp >= " +
@@ -510,7 +530,10 @@ public class Database {
             errorHandling(error);
         }
 
-        return diagnosticsData;
+        containerData.put("containerData", getContainerData(containerID));
+        containerData.put("diagnosticsData", diagnosticsData);
+
+        return containerData;
     }
 
     /**
@@ -601,6 +624,70 @@ public class Database {
             JSONObject tempDiagnosticsData = diagnosticsData.getJSONObject(diagnosticsKey);
             tempContainerDiagnosticsData.put(tempDiagnosticsData);
         }
+    }
+
+    /**
+     * Gets max RAM, max CPU and max Disk Usage for the container.
+     *
+     * @param containerID The ID of the container.
+     * @return JSON Object containing max RAM, max CPU and max Disk Usage.
+     */
+    public JSONObject getContainerData(String containerID) {
+        JSONObject container = new JSONObject();
+        String sql = "SELECT * FROM Container WHERE Container_ID = ?";
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, containerID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            // Reads the data from the container and saves it into the JSON object.
+            while (resultSet.next()) {
+                String serverReference = resultSet.getString("Server_Reference");
+                double ramMax = resultSet.getDouble("Ram_Max");
+                double cpuMax = resultSet.getDouble("CPU_Max");
+                double diskUsageMax = resultSet.getDouble("Disk_Usage_Max");
+                container.put("serverReference", serverReference);
+                container.put("ramMax", ramMax);
+                container.put("cpuMax", cpuMax);
+                container.put("diskUsageMax", diskUsageMax);
+            }
+
+        } catch (SQLException error) {
+            errorHandling(error);
+        }
+
+        return container;
+    }
+
+    public JSONObject getServerData(String serverID) {
+        JSONObject server = new JSONObject();
+        String sql = "SELECT * FROM Server WHERE Server_ID = ?";
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, serverID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            // Reads the data from the container and saves it into the JSON object.
+            while (resultSet.next()) {
+                double ramTotal = resultSet.getDouble("Ram_Total");
+                double cpuTotal = resultSet.getDouble("CPU_Total");
+                double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
+                server.put("ramTotal", ramTotal);
+                server.put("cpuTotal", cpuTotal);
+                server.put("diskUsageTotal", diskUsageTotal);
+            }
+
+        } catch (SQLException error) {
+            errorHandling(error);
+        }
+
+        return server;
     }
 
     // ===============================================================================================

@@ -13,7 +13,7 @@ public class App {
         SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        // addDummyData(database);
+        addDummyData(database);
         // printData(database);
 
         // Test getting diagnostics data for a specific container
@@ -57,7 +57,8 @@ public class App {
                         regions.getJSONObject("Australia").getString("regionID")
                 },
                 new String[]{"TechNova Inc.", "CloudForge LLC", "EuroCloud GmbH", "Datastream Systems",
-                        "AsiaNet Solutions", "PacificWare Co.", "Anders Data Corp.", "AussieCompute Ltd."}
+                        "AsiaNet Solutions", "PacificWare Co.", "Anders Data Corp.", "AussieCompute Ltd."
+                }
         );
         
         database.addServers(
@@ -88,7 +89,19 @@ public class App {
                         "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" },
                 new String[] { "blue_whale", "iron_squid", "frosty_mongoose", "crimson_fox", "silent_panda",
                         "cosmic_turtle", "rapid_lynx", "shadow_otter", "amber_crow", "lunar_badger", "mystic_serpent",
-                        "glacial_hawk", "rusty_wombat", "silver_iguana", "electric_ferret" }
+                        "glacial_hawk", "rusty_wombat", "silver_iguana", "electric_ferret" },
+                new double[]{
+                        16.0, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8,
+                        9.9, 10.1, 11.2, 12.3, 13.4, 14.5, 15.6
+                },
+                new double[]{
+                        10.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0,
+                        4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5
+                },
+                new double[]{
+                        1000.0, 9.8, 9.6, 9.4, 9.2, 9.0, 8.8, 8.6,
+                        8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2
+                }
         );
         database.addDiagnosticsBatch(
                 new String[] {

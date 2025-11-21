@@ -58,10 +58,17 @@ Database database = new Database();
     // GET Diagnostics data by container ID
     @GetMapping("/diagnosticsdata/{containerID}")
     public Map<String, Object> getDiagnosticsData(@PathVariable String containerID) {
-        System.out.println("I am a man");
         JSONObject diagnosticsData = database.getDiagnosticsData(containerID);
 
         return diagnosticsData.toMap();
+    }
+
+    // GET Server data by server ID
+    @GetMapping("/serverdata/{serverID}")
+    public Map<String, Object> getServerData(@PathVariable String serverID) {
+        JSONObject serverData = database.getServerData(serverID);
+
+        return serverData.toMap();
     }
 
     // GET Dashboard data

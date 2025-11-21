@@ -1,51 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { Tab, Stack, Table, Form, Button, Row, Col, Nav} from "react-bootstrap";
-import { Line, Bar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
     Chart as ChartJS,
-    LineElement,
     BarElement,
-    PointElement,
     LinearScale,
     CategoryScale,
     Tooltip,
     Legend
 } from "chart.js";
-import pattern from "patternomaly"
+import pattern from "patternomaly";
 
-ChartJS.register(BarElement, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
+ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
 
-export default function RunningView({diagnosticsList}) {
+export default function RunningView({ diagnosticsData, timeAgo }) {
     const [runningChart, setRunningChart] = useState(null);
 
-    const timeAgo = (timestamp) => {
-        const now = new Date();
-        const then = new Date(timestamp);
-
-        const diffMs = now - then;
-        const diffSec = Math.floor(diffMs / 1000);
-        const diffMin = Math.floor(diffSec / 60);
-        const diffHr = Math.floor(diffMin / 60);
-        const diffDay = Math.floor(diffHr / 24);
-
-        if (diffSec < 60) return `${diffSec}s ago`;
-        if (diffMin < 60) return `${diffMin}m ago`;
-        if (diffHr < 24) return `${diffHr}h ago`;
-        return `${diffDay}d ago`;
-    };
-
     useEffect(() => {
-        diagnosticsList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        if (!diagnosticsData) {
+            return;
+        }
 
-        const labels = diagnosticsList.map(item => timeAgo(item.timestamp));
-        const runningValues = diagnosticsList.map(item => (item.running ? 1 : 1));
+        diagnosticsData = diagnosticsData && !Array.isArray(diagnosticsData)
+            ? Object.values(diagnosticsData)
+            : Array.isArray(diagnosticsData)
+                ? diagnosticsData
+                : [];
 
-        const barColors = diagnosticsList.map(item =>
-            item.running ? pattern.draw("line", "green") : pattern.draw("diagonal", "red")
+        diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+        const errors = [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
+        const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
+        const runningValues = diagnosticsData.map(item => -1);
+        const errorValues = errors.map(item => item ? [0.02, 1] : [0, 0]);
+
+        const barColors = diagnosticsData.map(item =>
+            item.running ? pattern.draw("dot", "green") : pattern.draw("cross-dash", "red")
         );
+        const errorColors = errors.map(item => "yellow");
 
         setRunningChart({
-//             key: containerID,
             type: "bar",
             data: {
                 labels,
@@ -54,46 +48,84 @@ export default function RunningView({diagnosticsList}) {
                         label: "Running",
                         data: runningValues,
                         backgroundColor: barColors,
-                        borderColor: barColors,
-                        borderWidth: 1,
+                        borderColor: "black",
+                        borderWidth: 3,
+                        borderSkipped: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: "Error",
+                        data: errorValues,
+                        backgroundColor: errorColors,
+                        borderColor: "black",
+                        borderWidth: 3,
+                        borderSkipped: false,
                         tension: 0.1
                     }
                 ]
             },
             options: {
+                animation: false,
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: true,
                         labels: {
                             generateLabels: function(chart) {
                                 return [
                                     {
                                         text: "Running",
-                                        fillStyle: pattern.draw("line", "green"),
-                                        strokeStyle: "green"
+                                        fillStyle: pattern.draw("dot", "green"),
+                                        strokeStyle: "black",
+                                        lineWidth: 2.5
                                     },
                                     {
                                         text: "Stopped",
-                                        fillStyle: pattern.draw("diagonal", "red"),
-                                        strokeStyle: "red"
+                                        fillStyle: pattern.draw("cross-dash", "red"),
+                                        strokeStyle: "black",
+                                        lineWidth: 2.5
+                                    },
+                                    {
+                                        text: "Error",
+                                        fillStyle: "yellow",
+                                        strokeStyle: "black",
+                                        lineWidth: 2.5
                                     }
                                 ];
+                            },
+                            boxHeight: 20,
+                            usePointStyle: false,
+                            pointStyle: 'rect',
+                            // Custom render function for the boxes
+                            render: function(ctx, x, y, legendItem) {
+                                const size = legendItem.boxWidth;
+                                const lineWidth = legendItem.lineWidth || 1;
+
+                                ctx.save();
+                                ctx.fillStyle = legendItem.fillStyle;
+                                ctx.strokeStyle = legendItem.strokeStyle || 'black';
+                                ctx.lineWidth = lineWidth;
+
+                                ctx.fillRect(x, y, size, size);
+                                ctx.strokeRect(x, y, size, size);
+                                ctx.restore();
                             }
                         }
-                    }
+                    },
                 },
                 scales: {
+                    x: {
+                        stacked: true
+                    },
                     y: {
-                        min: 0,
+                        min: -1,
                         max: 1,
                         display: false,
                     }
                 }
             }
         });
-    }, [diagnosticsList]);
+    }, [diagnosticsData]);
 
     return (
         <>
