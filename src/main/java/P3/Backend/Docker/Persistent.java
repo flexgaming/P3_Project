@@ -26,5 +26,7 @@ public final class Persistent {
     // -------------------------------
     public static final String WINDOWS_DOCKER_SOCKET = "npipe:////./pipe/docker_engine";
     public static final String LINUX_MAC_DOCKER_SOCKET = "unix:///var/run/docker.sock";
+
+    public static final String SPRING_ACTUATOR_DEFAULT_ENDPOINT = "http://localhost";
             
 }
