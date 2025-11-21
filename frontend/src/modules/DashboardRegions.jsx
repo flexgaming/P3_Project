@@ -4,7 +4,7 @@ import "../pages/css/Dashboard.css";
 
 /**
  * AddRegions component
- * - Fetches region names from /api/data/regions on mount
+ * - Fetches region names from /api/data/dashboard on mount
  * - Renders one ListGroup block per region name
  */
 function DashboardRegions() {
@@ -54,26 +54,44 @@ function DashboardRegions() {
         <>
             {/* Render ListGroup of regions and dashboard data fetched from the backend */}
             {dashboardData.map((currentDashboardData) => {
+                // Determine health badge variant based on uptime
+                const healthBg =
+                    parseFloat(currentDashboardData.uptime) === "N/A" ? "secondary" :
+                    parseFloat(currentDashboardData.uptime) >= 75 ? "success" :
+                    parseFloat(currentDashboardData.uptime) >= 50 ? "warning" :
+                    "danger";
+                // If the bg color is yellow (warning), use dark text for readability
+                const textColor = (healthBg === "warning") ? "dark" : "light";
+                // Render active containers in two different badges: active / total
+                const activeContainersParts = currentDashboardData.activeContainers.split("/");
+                const activeContainers = activeContainersParts[0] || "N/A";
+                const totalContainers = activeContainersParts[1] || "N/A";
+                // Change color of active containers badge based on percentage
+                const runningPercentage = (totalContainers !== "N/A" && parseInt(totalContainers) > 0)
+                    ? (parseInt(activeContainers) / parseInt(totalContainers)) * 100
+                    : 0;
+                const runningBg =
+                    runningPercentage >= 75 ? "success" :
+                    runningPercentage >= 50 ? "warning" :
+                    "danger";
                 return (
                     // Each region card
                     <div className="region-cards p-2 w-100" id={`${currentDashboardData.regionID}`} key={currentDashboardData.regionID}>
                         <ListGroup className="shadow rounded-4">
                             <ListGroup.Item>
-                                <h3>
-                                    <b>{currentDashboardData.regionName}</b>
-                                </h3>
+                                <h3><b>{currentDashboardData.regionName}</b></h3>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Active Containers: <Badge bg="secondary">{currentDashboardData.activeContainers}</Badge>
+                                Active Containers: <Badge bg={runningBg}>{activeContainers}</Badge> / <Badge bg={runningBg}>{totalContainers}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Companies: <Badge bg="secondary">{currentDashboardData.companies}</Badge>
+                                Companies: <Badge bg="primary" >{currentDashboardData.companies}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Total uptime: <Badge bg="secondary">{currentDashboardData.uptime}</Badge>
+                                Total uptime: <Badge bg={healthBg} text={textColor}>{currentDashboardData.uptime}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Errors last hour: <Badge bg="secondary">{currentDashboardData.errors}</Badge>
+                                Errors last hour: <Badge bg="primary">{currentDashboardData.errors}</Badge>
                             </ListGroup.Item>
                         </ListGroup>
                     </div>
