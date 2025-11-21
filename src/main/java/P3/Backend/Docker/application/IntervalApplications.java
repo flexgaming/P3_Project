@@ -256,7 +256,7 @@ public class IntervalApplications {
             container.setContainerRamUsage(stats.getMemoryUsage()); // Current RAM usage of the container.
             container.setContainerCpuUsage(stats.getCpuTotalUsage()); // Current CPU total usage of the container.
             container.setContainerDiskUsage(response.getSizeRootFs());  // Total size (image + writable layer)
-            container.setRunningContainer(response.getState().getRunning()); // Is the container running or not.
+            container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             
         } catch (Exception e) {

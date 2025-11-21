@@ -16,7 +16,7 @@ public class ContainerClass {
     Integer containerInterval;      // Is the interval for sending data to another server. 
 
     // Data from docker:
-    Boolean runningContainer;       // Is docker container on or off.
+    Boolean containerRunning;       // Is docker container on or off.
     Long containerRamUsage;         // Is ram usage on docker container.
     Long containerCpuUsage;         // Is cpu usage on docker container.
     Long containerDiskUsage;        // Is disk usage on docker container.
@@ -24,7 +24,7 @@ public class ContainerClass {
 
     
     // Data from actuator:
-    Boolean runningJVM;             // Is internally java application on or off.
+    Boolean JVMRunning;             // Is internally java application on or off.
     Long JVMRamUsage;             // Is ram usage on java application.
     Long JVMCpuUsagePerc;         // Is cpu usage on java application in percentage.
     Long systemRamUsage;          // Is all of the ram usage on the system.
@@ -83,9 +83,9 @@ public class ContainerClass {
     //////////////////////////////////////
     
 //RunningContainer
-    public Boolean getRunningContainer() { return runningContainer; }
+    public Boolean getContainerRunning() { return containerRunning; }
 
-    public void setRunningContainer(Boolean runningContainer) { this.runningContainer = runningContainer; }
+    public void setContainerRunning(Boolean containerRunning) { this.containerRunning = containerRunning; }
 
 //ContainerRamUsage
     public Long getContainerRamUsage() { return containerRamUsage; }
@@ -162,9 +162,9 @@ public class ContainerClass {
     public void setJVMProcessId(String jVMProcessId) { JVMProcessId = jVMProcessId; }
 
 //JVMProcessId
-    public Boolean getRunningJVM() { return runningJVM; }
+    public Boolean getJVMRunning() { return JVMRunning; }
 
-    public void setRunningJVM(Boolean runningJVM) { this.runningJVM = runningJVM; }
+    public void setJVMRunning(Boolean JVMRunning) { this.JVMRunning = JVMRunning; }
 
 //Timestamp
     public Date getTimestamp() { return timestamp; }
