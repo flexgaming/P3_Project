@@ -73,19 +73,6 @@ Database database = new Database();
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
         
         
-        // Check if timestamp exists before processing
-        /* Object timestampObj = diagnosticsErrors.get("timestamp");
-        if (timestampObj != null) {
-            String tmstmp = timestampObj.toString();
-            diagnosticsErrors.put("timestamp", tmstmp);
-            String[] timesStamp = TimeUtils.splitIsoToLocalDateAndTime(tmstmp);
-            diagnosticsErrors.put("date", timesStamp[0]);
-            diagnosticsErrors.put("time", timesStamp[1]);
-        } else {
-            System.out.println("Timestamp: " + diagnosticsErrors.get("timestamp"));
-            System.out.println("date: " + null);
-            System.out.println("time: " + null);
-        } */
         
         return diagnosticsErrors;
     }
