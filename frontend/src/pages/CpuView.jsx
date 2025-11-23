@@ -142,7 +142,7 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
 
     return (
         <>
-            <h3>Container running status</h3>
+            <h3>CPU usage status</h3>
 
             {cpuChart ? (
                 <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>

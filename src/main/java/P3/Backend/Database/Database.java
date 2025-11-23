@@ -680,10 +680,12 @@ public class Database {
             ResultSet resultSet = preparedStatement.executeQuery();
             // Reads the data from the container and saves it into the JSON object.
             while (resultSet.next()) {
+                String containerName = resultSet.getString("Container_Name");
                 String serverReference = resultSet.getString("Server_Reference");
                 double ramMax = resultSet.getDouble("Ram_Max");
                 double cpuMax = resultSet.getDouble("CPU_Max");
                 double diskUsageMax = resultSet.getDouble("Disk_Usage_Max");
+                container.put("containerName", containerName);
                 container.put("serverReference", serverReference);
                 container.put("ramMax", ramMax);
                 container.put("cpuMax", cpuMax);
@@ -710,9 +712,11 @@ public class Database {
             ResultSet resultSet = preparedStatement.executeQuery();
             // Reads the data from the container and saves it into the JSON object.
             while (resultSet.next()) {
+                String serverName = resultSet.getString("Server_Name");
                 double ramTotal = resultSet.getDouble("Ram_Total");
                 double cpuTotal = resultSet.getDouble("CPU_Total");
                 double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
+                server.put("serverName", serverName);
                 server.put("ramTotal", ramTotal);
                 server.put("cpuTotal", cpuTotal);
                 server.put("diskUsageTotal", diskUsageTotal);

@@ -1,12 +1,17 @@
 import "./css/DiagnosticsView.css";
 import React, { useEffect, useState } from "react";
 import { Tab, Row, Col, Nav} from "react-bootstrap";
+import Overview from "./Overview.jsx";
 import RunningView from "./RunningView.jsx";
 import CpuView from "./CpuView.jsx";
 import RamView from "./RamView.jsx";
 import DiskUsageView from "./DiskUsageView.jsx";
+import ThreadCountView from "./ThreadCountView.jsx";
+import { useParams } from "react-router-dom";
 
-export default function DiagnosticsView({ containerID }) {
+export default function DiagnosticsView() {
+    const { containerID } = useParams();
+
     const [containerData, setContainerData] = useState([]);
     const [serverData, setServerData] = useState([]);
     const [runningChart, setRunningChart] = useState(null);
@@ -40,7 +45,6 @@ export default function DiagnosticsView({ containerID }) {
                 const containerData = json;
 
                 setContainerData(containerData);
-                console.log(containerData);
             } catch (err) {
                 setError(err.message || String(err));
             }
@@ -63,7 +67,6 @@ export default function DiagnosticsView({ containerID }) {
                 const serverData = json;
 
                 setServerData(serverData);
-                console.log(serverData);
             } catch (err) {
                 setError(err.message || String(err));
             }
@@ -80,20 +83,25 @@ export default function DiagnosticsView({ containerID }) {
                 <b>Diagnostics View</b>
             </h2>
 
-            <Tab.Container id="DiagnosticsView" defaultActiveKey="running">
+            <Tab.Container id="DiagnosticsView" defaultActiveKey="overview">
                 <Row>
                     <Col sm={3}>
                         <Nav variant="pills" className="flex-column">
                             <Nav.Item>
+                                <Nav.Link eventKey="overview">Overview</Nav.Link>
                                 <Nav.Link eventKey="running">Running</Nav.Link>
                                 <Nav.Link eventKey="cpuUsage">CPU Usage</Nav.Link>
                                 <Nav.Link eventKey="ramUsage">RAM Usage</Nav.Link>
                                 <Nav.Link eventKey="diskUsage">Disk Usage</Nav.Link>
+                                <Nav.Link eventKey="threadCount">Thread Count</Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
                     <Col sm={9}>
                         <Tab.Content>
+                            <Tab.Pane eventKey="overview">
+                                <Overview containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                            </Tab.Pane>
                             <Tab.Pane eventKey="running">
                                 <RunningView diagnosticsData={containerData.diagnosticsData} timeAgo={timeAgo}/>
                             </Tab.Pane>
@@ -105,6 +113,9 @@ export default function DiagnosticsView({ containerID }) {
                             </Tab.Pane>
                             <Tab.Pane eventKey="diskUsage">
                                 <DiskUsageView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="threadCount">
+                                <ThreadCountView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
                             </Tab.Pane>
                         </Tab.Content>
                     </Col>

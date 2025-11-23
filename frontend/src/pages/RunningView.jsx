@@ -28,7 +28,7 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
 
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-        const errors = [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        const errors = [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1];
 
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const runningValues = diagnosticsData.map(item => -1);

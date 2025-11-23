@@ -142,7 +142,7 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
 
     return (
         <>
-            <h3>Container running status</h3>
+            <h3>Disk usage status</h3>
 
             {diskUsageChart ? (
                 <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>

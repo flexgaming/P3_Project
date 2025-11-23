@@ -142,7 +142,7 @@ export default function RamView({ containerData, serverData, timeAgo }) {
 
     return (
         <>
-            <h3>Container running status</h3>
+            <h3>Ram usage status</h3>
 
             {ramChart ? (
                 <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>
