@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import P3.Backend.Docker.application.IntervalApplications;
@@ -37,16 +38,23 @@ import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 public class DemoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-        //ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
         DockerClient dockerClient = DockerClientBuilder.dockerConnection();
         
-
         dockerClient.pingCmd().exec();
 
+        // Get WebClient from Spring context
+        WebClient webClient = context.getBean(WebClient.class);
+/*         String resp = webClient
+                        .post()
+                        .uri("")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Mono.just(data, "idk"))
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block(); */
 
-
-        DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
+         DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
 
         // Get the Spring-managed bean
         // IntervalApplications intervalApp = context.getBean(IntervalApplications.class);
@@ -68,9 +76,10 @@ public class DemoApplication {
         // 	System.err.println("Failed to get container stats: " + e.getMessage());
         // 	Thread.currentThread().interrupt();
         // }
+
         // Decide what part of the application user want to use:
-        //IntervalApplications.Initiation(dockerClient);
         SetupApplications.Initiation(dockerClient);
+        IntervalApplications.Initiation(dockerClient, webClient);
 		
 		
 	}

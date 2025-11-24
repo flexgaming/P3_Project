@@ -1,5 +1,6 @@
 package P3.Backend.Docker.application;
 
+import java.io.File;
 import java.net.http.HttpClient;
 
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
@@ -10,6 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.fasterxml.jackson.databind.ObjectMapper; 
+import com.fasterxml.jackson.databind.ObjectWriter; 
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,8 +28,6 @@ import com.github.dockerjava.api.command.HealthStateLog;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StatsCmd;
 import com.github.dockerjava.api.model.Container;
-
-
 
 import reactor.core.publisher.Mono;
 
@@ -46,7 +48,7 @@ public class IntervalApplications {
     public static IntervalClass[] intervalArr;
 
 
-    public static void Initiation(DockerClient dockerClient) {
+    public static void Initiation(DockerClient dockerClient, WebClient webClient) {
         
         //////////////////////////////////
         //      Maintenance HTTP        // 
@@ -67,7 +69,7 @@ public class IntervalApplications {
         checkUserInputThread(userInputDetected);
 
         // Start interval scheduler to fetch data based on intervals
-        checkIntervalScheduler(userInputDetected, dockerClient);
+        checkIntervalScheduler(userInputDetected, dockerClient, webClient);
         
     }
 
@@ -154,12 +156,20 @@ public class IntervalApplications {
     private static void checkUserInputThread(AtomicBoolean bool) {
 
         Thread thread = new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                scanner.nextLine(); // Go past this if there is user input.
-                bool.set(true); // Set the userInputDetected to be true.
+            try {
+                Scanner scanner = new Scanner(System.in);
+                while (true) {
+                    if (scanner.hasNextLine()) {
+                        scanner.nextLine(); // Go past this if there is user input.
+                        bool.set(true); // Set the userInputDetected to be true.
+                        break;
+                    }
+                    Thread.sleep(100); // Avoid tight loop
+                }
                 scanner.close();
-                break;
+                // Don't close scanner - System.in may be needed elsewhere
+            } catch (Exception e) {
+                // Silently handle if System.in is already closed
             }
         });
 
@@ -170,7 +180,7 @@ public class IntervalApplications {
         thread.start();
     }
 
-    private static void checkIntervalScheduler(AtomicBoolean bool, DockerClient dockerClient) {
+    private static void checkIntervalScheduler(AtomicBoolean bool, DockerClient dockerClient, WebClient webClient) {
         while (!bool.get()) {
             try {
                 // Go through each index in intervalArr and remove 1 second from tempInterval.
@@ -184,23 +194,27 @@ public class IntervalApplications {
                         intervalArr[i].setTempInterval(newInterval);
 
                         // Fetch all of the container information and put it into containerArr at current index.
-                        fetchAllContainerInformation(containerArr[i], dockerClient);
+                        fetchAllContainerInformation(containerArr[i], dockerClient, webClient);
                         
                         ////////////////////////////////////
                         //       HTTP FUNCTION HERE       //
                         ////////////////////////////////////
-                    
                         if (containerArr[i].getContainerRunning().equals(true)) {
-                            containerArr[i].setTimestamp(new Date());
+                            containerArr[i].setTimestamp(new Date().getTime());
 
-                            // If the server is running - then send all data
+                            ObjectMapper mapper = new ObjectMapper();
+                            mapper.writeValue(new File("containerData.json"), containerArr[i]);
+                            
+
+                             // If the server is running - then send all data
                                 // Remember to set the timestamp
 
+                            // Temp for printing all container stats (Actuator + Stats)
                         } else {
+                            // Temp for printing all container stats (Actuator + Stats)
                             // If the server is closed - then only send docker information
                                 // Can we get the error codes? (if the docker container is not running)
                                 // Properly not, so send that that container is not running.
-
                         }
                         
                     } else {
@@ -217,23 +231,18 @@ public class IntervalApplications {
         }
     }
 
-    private static void fetchAllContainerInformation(ContainerClass container, DockerClient dockerClient) {
+    private static void fetchAllContainerInformation(ContainerClass container, DockerClient dockerClient, WebClient webClient) {
         
         // Get data from docker container.
         fetchDockerStats(container, dockerClient);
         
         
         // GET ALL OF THE DATA FROM THE SPRING ACTUATOR:
-        
-        //fetchSpringActuatorStats(container, dockerClient, Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT);
-        
-        String currentId = container.getContainerId();
-
-        // Gets all of the containers that is in the system and puts it into an array (containers).
-        //List<Container> containersTemp = dockerClient.listContainersCmd().withIdFilter(currentId).exec();
-        //JSONArray fetchedContainersArr = new JSONArray(containersTemp);
-
-
+        if (container.getContainerRunning().equals(true)) {
+            fetchSpringActuatorStats(container, webClient, Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT);
+        } else {
+            System.out.println("Couldn't fetch data from " + container.getContainerName());
+        }
 
         // GO BACK TO FUNCTION BEFORE AND SEND DATA VIA HTTP TO OTHER SERVER
     }
@@ -261,129 +270,168 @@ public class IntervalApplications {
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
+            container.setContainerExitCode(response.getState().getExitCodeLong()); // Exit Code for the container
             
             
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
-            e.printStackTrace();
+            // e.printStackTrace();
+            container.setContainerRunning(false); // Is the container running or not.
+            container.setContainerStatus("exited"); // Current status of the container (running or exited).
+            //throw new RuntimeException(containerId + " - Error fetching Docker stats.");
         }
     }
 
 
-
-
-    
-    // @Autowired
-    // private WebClient webClient;
-
-    // public void fetchSpringActuatorStats(String actuatorUrl) {
-    //     String url = actuatorUrl + ":9090";
-    //     callActuator(url, "/actuator/metrics/jvm.memory.used");
-    //     callActuator( url, "/actuator/metrics/jvm.threads.live");
-    //     callActuator( url, "/actuator/metrics/process.cpu.usage");
-    //     callActuator( url, "/actuator/metrics/system.cpu.count");
-    //     callActuator( url, "/actuator/metrics/system.cpu.usage");        
-    // }
-    // //ENDPOINT = "/actuator/metrics/jvm.memory.used"
-    // private void callActuator(String url, String endpoint) {
-    //     // Get the raw JSON response as a string
-    //     String jsonString = webClient.get()
-    //             .uri(url + endpoint)
-    //             .retrieve()
-    //             .bodyToMono(String.class)
-    //             .block();
-
-    //     // Parse the JSON
-    //     JSONObject response = new JSONObject(jsonString);
-
-    //     // Extract the numeric value from measurements[0].value
-    //     double value = response
-    //             .getJSONArray("measurements")
-    //             .getJSONObject(0)
-    //             .getDouble("value");
-
-    //     // Return as a string
-    //     System.out.println("Actuator Call to " + url + endpoint + " returned value: " + value);
-    // }
-
-
-
-
-
-
     @Autowired
-    private static WebClient webClient;
-
-    private static void fetchSpringActuatorStats(ContainerClass container, DockerClient dockerClient, String actuatorUrl) {
+    private static void fetchSpringActuatorStats(ContainerClass container, WebClient webClient, String actuatorUrl) {
         String url = actuatorUrl + ":" + container.getPublicPort();
 
-        container.setJVMRamMax(callActuator( url, "/actuator/metrics/jvm.memory.max").getJSONArray("measurements").getJSONObject(0).getLong("value"));
-        container.setJVMRamUsage(callActuator(url, "/actuator/metrics/jvm.memory.used").getJSONArray("measurements").getJSONObject(0).getLong("value"));
-        container.setJVMCpuUsageStart(callActuator( url, "/actuator/metrics/process.start.time").getJSONArray("measurements").getJSONObject(0).getLong("value"));
-        container.setJVMCpuUsagePerc(callActuator( url, "/actuator/metrics/process.cpu.usage").getJSONArray("measurements").getJSONObject(0).getLong("value"));
-        container.setJVMThreads (callActuator( url, "/actuator/metrics/jvm.threads.live").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setJVMThreadsStates(callActuator( url, "/actuator/metrics/jvm.threads.states").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setJVMThreadQueued(callActuator( url, "/actuator/metrics/executor.queued").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setJVMUptime(callActuator( url, "/actuator/metrics/process.uptime").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setJVMRamMax(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.max")));
+        container.setJVMRamUsage(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.used")));
+        container.setJVMCpuUsageStart(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.start.time")));
+        container.setJVMCpuUsagePerc(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.cpu.usage")));
+        container.setJVMThreads(getIntSafe(callActuator(webClient, url, "/actuator/metrics/jvm.threads.live")));
+        container.setJVMThreadsStates(getIntSafe(callActuator(webClient, url, "/actuator/metrics/jvm.threads.states")));
+        container.setJVMThreadQueued(getIntSafe(callActuator(webClient, url, "/actuator/metrics/executor.queued")));
+        container.setJVMUptime(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.uptime")));
 
-        container.setSystemDiskFree(callActuator( url, "/actuator/metrics/disk.free").getJSONArray("measurements").getJSONObject(0).getLong("value"));
-        container.setSystemDiskTotal(callActuator( url, "/actuator/metrics/disk.total").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setSystemDiskFree(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.free")));
+        container.setSystemDiskTotal(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.total")));
         
-        container.setSystemCpuCores(callActuator( url, "/actuator/metrics/system.cpu.count").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setSystemCpuUsagePerc(callActuator( url, "/actuator/metrics/system.cpu.usage").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setSystemCpuCores(getIntSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.count")));
+        container.setSystemCpuUsagePerc(getLongSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.usage")));
 
-        container.setPoolCore(callActuator( url, "/actuator/metrics/executor.pool.core").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setLogbackEvents(callActuator( url, "/actuator/metrics/logback.events").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setLogbackEventsError(callActuator( url, "/actuator/metrics/logback.events?tag=level:error").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setLogbackEventsWarn(callActuator( url, "/actuator/metrics/logback.events?tag=level:warn").getJSONArray("measurements").getJSONObject(0).getInt("value"));
-        container.setGarbageCollectSize(callActuator( url, "/actuator/metrics/jvm.gc.overhead").getJSONArray("measurements").getJSONObject(0).getLong("value"));
+        container.setPoolCore(getIntSafe(callActuator(webClient, url, "/actuator/metrics/executor.pool.core")));
+        container.setLogbackEvents(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events")));
+        container.setLogbackEventsError(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events?tag=level:error")));
+        container.setLogbackEventsWarn(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events?tag=level:warn")));
+        container.setGarbageCollectSize(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.gc.overhead")));
 
     }
     //ENDPOINT = "/actuator/metrics/jvm.memory.used"
-    private static JSONObject callActuator(String url, String endpoint) {
+    private static JSONObject callActuator(WebClient webClient, String url, String endpoint) {
         // Get the raw JSON response as a string
-        String jsonString = webClient.get()
-                .uri(url + endpoint)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        try {
+            String jsonString = webClient.get()
+                    .uri(url + endpoint)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+    
+            // Convert and return the value as a JSON object
+            return new JSONObject(jsonString);
+            
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-        // Convert and return the value as a JSON object
-        return new JSONObject(jsonString);
+    private static Long getLongSafe(JSONObject json) {
+        try {
+            return json
+                .getJSONArray("measurements")
+                .getJSONObject(0)
+                .getLong("value");
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static Integer getIntSafe(JSONObject json) {
+        try {
+            return json
+                .getJSONArray("measurements")
+                .getJSONObject(0)
+                .getInt("value");
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 
-//"jvm.memory.used", "jvm.memory.max", "jvm.threads.live", "jvm.threads.states", "system.disk.free", "logback.events", "logback.events?tag=level:warn", "logback.events?tag:level=trace", "logback.events?tag:level=debug", "logback.events?tag:level=error", "logback.events?tag:level=info", "process.cpu.usage","process.start.time", "process.uptime", "system.cpu.count", "system.cpu.usage"
+    /* private static void jsonPut(JSONObject json, String name, String getStr, Integer getInt, Long getLong, Boolean getBool) {
+        try {
+            if (getStr != null) {
+                json.put(name, getStr);
+            }
+            if (getInt != null) {
+                json.put(name, getInt);
+            }
+            if (getLong != null) {
+                json.put(name, getLong);
+            }
+            if (getBool != null) {
+                json.put(name, getBool);
+            }    
+        } catch (Exception e) {
+            json.put(name, "Failure to put value into JSON.");    
+        }
+    }
 
 
-// 	    "executor.pool.core",
-// "executor.queued",
+    // For now: pretty-print the payload that would be sent
+    private static void printContainerData(ContainerClass c) {
+        JSONObject root = new JSONObject();
+        root.put("name", c.getContainerName());
+        root.put("id", c.getContainerId());
+        root.put("timestamp", c.getTimestamp());
 
-// 	"jvm.gc.overhead",
+        JSONObject meta = new JSONObject();
+        jsonPut(meta, "name", c.getContainerName(), null, null, null);
+        jsonPut(meta, "id", c.getContainerId(), null, null, null);
+        jsonPut(meta, "publicPort", null, c.getPublicPort(), null, null);
+        jsonPut(meta, "interval", null, c.getContainerInterval(), null, null);
+        if (c.getTimestamp() != null) {
+            jsonPut(meta, "timestamp", null, null, c.getTimestamp(), null);
+        }
+        root.put("metadata", meta);
 
-// "jvm.memory.max"
-// "jvm.memory.used",
+        JSONObject docker = new JSONObject();
 
-// "jvm.threads.live",
-	
-// 	    "jvm.threads.states",
-	
+        jsonPut(docker, "running", null, null, null, c.getContainerRunning());
+        jsonPut(docker, "ramUsage", null, null, c.getContainerRamUsage(), null);
+        jsonPut(docker, "cpuUsage", null, null, c.getContainerCpuUsage(), null);
+        jsonPut(docker, "diskUsage", null, null, c.getContainerDiskUsage(), null);
+        jsonPut(docker, "status", c.getContainerStatus(), null, null, null);
+        jsonPut(docker, "pid", null, null, c.getContainerPid(), null);
+        jsonPut(docker, "exitCode", null, null, c.getContainerExitCode(), null);
+        root.put("docker", docker);
 
-// "logback.events",
+        JSONObject actuator = new JSONObject();
+            JSONObject jvm = new JSONObject();
+            jsonPut(jvm, "jvmRunning", null, null, null, c.getJVMRunning());
+            jsonPut(jvm, "jvmRamMax", null, null, c.getJVMRamMax(), null);
+            jsonPut(jvm, "jvmRamUsage", null, null, c.getJVMRamUsage(), null);
+            jsonPut(jvm, "jvmCpuUsagePerc", null, null, c.getJVMCpuUsagePerc(), null);
+            jsonPut(jvm, "jvmThreads", null, c.getJVMThreads(), null, null);
+            jsonPut(jvm, "jvmThreadsStates", null, c.getJVMThreadsStates(), null, null);
+            jsonPut(jvm, "jvmThreadQueued", null, c.getJVMThreadQueued(), null, null);
+            jsonPut(jvm, "jvmCpuUsageStart", null, null, c.getJVMCpuUsageStart(), null);
+            jsonPut(jvm, "jvmUptime", null, null, c.getJVMUptime(), null);
+            actuator.put("jvm", jvm);
 
+            JSONObject system = new JSONObject();
+            jsonPut(system, "systemRamUsage", null, null, c.getSystemRamUsage(), null);
+            jsonPut(system, "systemCpuUsagePerc", null, null, c.getSystemCpuUsagePerc(), null);
+            jsonPut(system, "systemCpuCores", null, c.getSystemCpuCores(), null, null);
+            jsonPut(system, "systemDiskUsage", null, null, c.getSystemDiskUsage(), null);
+            jsonPut(system, "systemDiskTotal", null, null, c.getSystemDiskTotal(), null);
+            jsonPut(system, "systemDiskFree", null, null, c.getSystemDiskFree(), null);
+            actuator.put("system", system);
 
-// "process.cpu.usage",	//procentage of cpu usage on java application
+            JSONObject misc = new JSONObject();
+            jsonPut(misc, "poolCore", null, c.getPoolCore(), null, null);
+            jsonPut(misc, "logbackEvents", null, c.getLogbackEvents(), null, null);
+            jsonPut(misc, "logbackEventsError", null, c.getLogbackEventsError(), null, null);
+            jsonPut(misc, "logbackEventsWarn", null, c.getLogbackEventsWarn(), null, null);
+            jsonPut(misc, "garbageCollectSize", null, null, c.getGarbageCollectSize(), null);
+            actuator.put("misc", misc);
 
+        root.put("actuator", actuator);
 
-// "process.start.time",
-// "process.uptime",
-
-// "system.cpu.count", 	//number of cores on system
-// "system.cpu.usage",		//procentage of cpu usage on system
-
-
-
-
-//"jvm.cpu.usage",
-//"system.memory.used",
+        System.out.println(root.toString(2));
+    } */
 }

@@ -584,6 +584,7 @@ public class SetupApplications {
                     System.out.println(" State: " + state + "\n");
                     count++;
                 }
+                return;
                 // If the user doesn't want the container's parameters printed out, then proceed.
             } else if (response.toLowerCase().equals("n")) {
                 return;
