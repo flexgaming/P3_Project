@@ -32,7 +32,6 @@ const App = () => {
                         <Nav className="me-auto">
                             <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
                             <Nav.Link as={Link} to="/nav">Navigate</Nav.Link>
-                            <Nav.Link as={Link} to="/diagnosticsview">DiagnosticsView</Nav.Link>
                             <Nav.Link as={Link} to="/manage">Manage</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
@@ -42,7 +41,7 @@ const App = () => {
             <div className="Body">
                 <Routes>
                     <Route path="/*" element={<Dashboard />} />
-                    <Route path="/diagnosticsview" element={<DiagnosticsView />} />
+                    <Route path="/diagnosticsview/:containerID" element={<DiagnosticsView/>} />
                     <Route path="/manage" element={<ManagePage />} />
                     <Route path="/nav/*" element={<NavRegions />} />
                 </Routes>
