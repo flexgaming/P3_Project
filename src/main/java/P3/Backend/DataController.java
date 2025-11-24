@@ -42,8 +42,8 @@ Database database = new Database();
     }
 
     // GET company Servers, Dockers and latest Diagnostics by company ID
-    @GetMapping("/{region}/{companyID}/contents") //Router continuation
-    public Map<String, Object> getRecentCompanyData(@PathVariable String region, @PathVariable String companyID) {
+    @GetMapping("/{regionID}/{companyID}/contents") //Router continuation
+    public Map<String, Object> getRecentCompanyData(@PathVariable String regionID, @PathVariable String companyID) {
         // Get company contents from DB
         // System.out.println(database.getRecentCompanyData(companyID).toString(4));
         JSONObject companyData = database.getRecentCompanyData(companyID);
