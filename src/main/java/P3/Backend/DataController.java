@@ -61,7 +61,11 @@ Database database = new Database();
     // GET Diagnostics data by container ID
     @GetMapping("/diagnosticsdata/{containerID}")
     public Map<String, Object> getDiagnosticsData(@PathVariable String containerID) {
-        JSONObject diagnosticsData = database.getDiagnosticsData(containerID);
+        JSONObject diagnosticsData = new JSONObject();
+
+        diagnosticsData.put("containerData", database.getContainerData(containerID));
+        diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(new Container(containerID)));
+        
 
         return diagnosticsData.toMap();
     }

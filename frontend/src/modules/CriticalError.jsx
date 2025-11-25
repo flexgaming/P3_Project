@@ -21,6 +21,7 @@ function CriticalError() {
             }
 
             const json = await response.json();
+            console.log(json);
 
             // The API returns an object keyed by diagnostics UUID, e.g.
             // { "0efd...": { date: ..., errorLogs: ..., ... }, ... }

@@ -40,11 +40,7 @@ export default function DiagnosticsView() {
                 const res = await fetch(`/api/data/diagnosticsdata/${containerID}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-                const json = await res.json();
-
-                const containerData = json;
-
-                setContainerData(containerData);
+                setContainerData(await res.json());
             } catch (err) {
                 setError(err.message || String(err));
             }
@@ -62,11 +58,7 @@ export default function DiagnosticsView() {
                 const res = await fetch(`/api/data/serverdata/${containerData.containerData.serverReference}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-                const json = await res.json();
-
-                const serverData = json;
-
-                setServerData(serverData);
+                setServerData(await res.json());
             } catch (err) {
                 setError(err.message || String(err));
             }

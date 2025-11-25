@@ -48,6 +48,7 @@ function NavServers({ regionID, companyID }) {
                 // If the response is not OK, throw to be caught below.
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
+                console.log(json);
 
                 // The API returns a map keyed by server id. Convert to an array with normalized fields.
                 // Input shape (example):

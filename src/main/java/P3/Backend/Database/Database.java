@@ -483,7 +483,6 @@ public class Database {
      * Fetches all diagnostics data saved in the database.
      */
     public JSONObject getDiagnosticsData(String containerID) {
-        JSONObject containerData = new JSONObject();
         JSONObject diagnosticsData = new JSONObject();
         // Read all data from View Company_Diagnostics that are within time scope.
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.Timestamp >= " +
@@ -529,10 +528,10 @@ public class Database {
             errorHandling(error);
         }
 
-        containerData.put("containerData", getContainerData(containerID));
-        containerData.put("diagnosticsData", diagnosticsData);
+        /* containerData.put("containerData", getContainerData(containerID));
+        containerData.put("diagnosticsData", diagnosticsData); */
 
-        return containerData;
+        return diagnosticsData;
     }
 
     /**
@@ -563,8 +562,8 @@ public class Database {
                 String diagnosticsID = resultSet.getString("Diagnostics_ID");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 String errorLogs = resultSet.getString("Error_Logs");
-//                String date = resultSet.getString("diagnosticDate");
-//                String time = resultSet.getString("diagnosticTime");
+                String date = resultSet.getString("diagnosticDate");
+                String time = resultSet.getString("diagnosticTime");
                 diagnosticsError.put("regionID", regionID);
                 diagnosticsError.put("regionName", regionName);
                 diagnosticsError.put("companyID", companyID);
@@ -575,8 +574,8 @@ public class Database {
                 diagnosticsError.put("containerName", containerName);
                 diagnosticsError.put("timestamp", timestamp);
                 diagnosticsError.put("errorLogs", errorLogs);
-//                diagnosticsError.put("date", date);
-//                diagnosticsError.put("time", time);
+                diagnosticsError.put("date", date);
+                diagnosticsError.put("time", time);
                 diagnosticsErrors.put(diagnosticsID, diagnosticsError);
             }
 
@@ -650,6 +649,17 @@ public class Database {
             translateDiagnosticsData(tempContainerDiagnosticsData, diagnosticsData);
             tempContainer.put("diagnosticsData", tempContainerDiagnosticsData);
             tempServerContainers.put(tempContainer.getString("containerID"), tempContainer);
+            // Print all variables in a nice list
+            System.out.println("===== Container Data Debugging =====");
+            System.out.println("\nTemp Server Containers: " + tempServerContainers);
+            System.out.println("\n" + containers.getJSONObject(containerKey).getString("containerID"));
+            System.out.println("\nContainers : " + containers);
+            System.out.println("\nTemp Container: " + tempContainer);
+            System.out.println("\nDiagnostics Data: " + diagnosticsData);
+            System.out.println("\nTemp Container Diagnostics Data: " + tempContainerDiagnosticsData);
+            System.out.println("\nContainer Key: " + containerKey);
+            System.out.println("=====================================");
+            
         }
     }
 
@@ -657,6 +667,11 @@ public class Database {
         for (String diagnosticsKey : diagnosticsData.keySet()) {
             JSONObject tempDiagnosticsData = diagnosticsData.getJSONObject(diagnosticsKey);
             tempContainerDiagnosticsData.put(tempDiagnosticsData);
+            System.out.println(tempDiagnosticsData);
+            
+
+
+
         }
     }
 
