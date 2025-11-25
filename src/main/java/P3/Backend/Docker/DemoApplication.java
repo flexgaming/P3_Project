@@ -45,14 +45,19 @@ public class DemoApplication {
 
         // Get WebClient from Spring context
         WebClient webClient = context.getBean(WebClient.class);
-/*         String resp = webClient
-                        .post()
-                        .uri("")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(Mono.just(data, "idk"))
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block(); */
+
+/*         public Mono<String> sendData(MyRequest request) {
+            return 
+            webClient
+            .post()
+            .uri("")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            //.body(Mono.just(data, "idk"))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block(); 
+        } */
 
          DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
 
