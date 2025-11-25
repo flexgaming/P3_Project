@@ -85,13 +85,13 @@ function DashboardRegions() {
                                 Active Containers: <Badge bg={runningBg}>{activeContainers}</Badge> / <Badge bg={runningBg}>{totalContainers}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Companies: <Badge bg="primary" >{currentDashboardData.companies}</Badge>
+                                Companies: <Badge bg="secondary" >{currentDashboardData.companies}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 Total uptime: <Badge bg={healthBg} text={textColor}>{currentDashboardData.uptime}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Errors last hour: <Badge bg="primary">{currentDashboardData.errors}</Badge>
+                                Errors last hour: <Badge bg="secondary">{currentDashboardData.errors}</Badge>
                             </ListGroup.Item>
                         </ListGroup>
                     </div>

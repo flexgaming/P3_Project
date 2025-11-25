@@ -10,6 +10,7 @@ import {
     Legend
 } from "chart.js";
 import pattern from "patternomaly";
+import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -61,11 +62,11 @@ const dashedLegendPlugin = {
     },
 };
 
-export default function RamView({ containerData, serverData, timeAgo }) {
-    const [ramChart, setRamChart] = useState(null);
+export default function CpuView({ containerData, serverData, timeAgo }) {
+    const [cpuChart, setCpuChart] = useState(null);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.cpuTotal) {
             return;
         }
 
@@ -78,37 +79,37 @@ export default function RamView({ containerData, serverData, timeAgo }) {
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const ramContainer = diagnosticsData.map(item => 1 - item.ramFree / containerData.containerData.ramMax);
-        const ramServer = diagnosticsData.map(item => (containerData.containerData.ramMax - item.ramFree) / serverData.ramTotal);
+        const cpuContainer = diagnosticsData.map(item => 1 - item.cpuFree / containerData.containerData.cpuMax);
+        const cpuServer = diagnosticsData.map(item => (containerData.containerData.cpuMax - item.cpuFree) / serverData.cpuTotal);
 
         const lineColorContainer = diagnosticsData.map(item => "blue");
         const lineColorServer = diagnosticsData.map(item => "red");
 
-        setRamChart({
+        setCpuChart({
             type: "line",
             data: {
                 labels,
                 datasets: [
                     {
-                        label: "RAM usage of the container resources",
-                        data: ramContainer,
+                        label: "CPU usage of the container resources",
+                        data: cpuContainer,
                         backgroundColor: lineColorContainer,
                         borderColor: typeof lineColorServer === "string"
                                        ? lineColorContainer
                                        : lineColorContainer[0],
                         borderWidth: 1.5,
-                        tension: 0.1
+                        tension: 0.1,
                     },
                     {
-                        label: "RAM usage of the server resources",
-                        data: ramServer,
+                        label: "CPU usage of the server resources",
+                        data: cpuServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"
                                        ? lineColorServer
                                        : lineColorServer[0],
                         borderDash: [5, 5],
                         borderWidth: 1.5,
-                        tension: 0.1
+                        tension: 0.1,
                     }
                 ]
             },
@@ -142,11 +143,10 @@ export default function RamView({ containerData, serverData, timeAgo }) {
 
     return (
         <>
-            <h3>Ram usage status</h3>
-
-            {ramChart ? (
-                <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>
-                    <Line data={ramChart?.data} options={ramChart?.options} plugins={[dashedLegendPlugin]}/>
+            {cpuChart ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>
             ) : (
                 <p>Loading chart…</p>
@@ -154,3 +154,4 @@ export default function RamView({ containerData, serverData, timeAgo }) {
         </>
     )
 }
+

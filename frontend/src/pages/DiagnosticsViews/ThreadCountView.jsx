@@ -10,6 +10,7 @@ import {
     Legend
 } from "chart.js";
 import pattern from "patternomaly";
+import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -70,10 +71,9 @@ export default function ThreadCountView({ containerData, serverData, timeAgo }) 
 
     return (
         <>
-            <h3>Thread count</h3>
-
             {threadCountChart ? (
-                <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
                     <Line data={threadCountChart?.data} options={threadCountChart?.options}/>
                 </div>
             ) : (

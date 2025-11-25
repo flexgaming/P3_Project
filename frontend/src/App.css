@@ -4,6 +4,10 @@
     text-align: center;
 }
 
+#body {
+    background-color: #5C7C89; /* Overall page background color */
+}
+
 .App {
     width: 100%;
     min-height: 60vh;
@@ -47,7 +51,7 @@
 
 
 #main-navbar {
-    background-color: #011425;
+    background-color: #011425; /* Dark blue background */
 }
 
 #main-navbar .navbar-brand,
@@ -59,3 +63,5 @@
     color: #ffffff;
     opacity: 0.9;
 }
+
+

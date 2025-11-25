@@ -9,7 +9,7 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
-import pattern from "patternomaly";
+import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -61,11 +61,11 @@ const dashedLegendPlugin = {
     },
 };
 
-export default function DiskUsageView({ containerData, serverData, timeAgo }) {
-    const [diskUsageChart, setDiskUsageChart] = useState(null);
+export default function RamView({ containerData, serverData, timeAgo }) {
+    const [ramChart, setRamChart] = useState(null);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.diskUsageTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
             return;
         }
 
@@ -78,20 +78,20 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const diskUsageContainer = diagnosticsData.map(item => 1 - item.diskUsageFree / containerData.containerData.diskUsageMax);
-        const diskUsageServer = diagnosticsData.map(item => (containerData.containerData.diskUsageMax - item.diskUsageFree) / serverData.diskUsageTotal);
+        const ramContainer = diagnosticsData.map(item => 1 - item.ramFree / containerData.containerData.ramMax);
+        const ramServer = diagnosticsData.map(item => (containerData.containerData.ramMax - item.ramFree) / serverData.ramTotal);
 
         const lineColorContainer = diagnosticsData.map(item => "blue");
         const lineColorServer = diagnosticsData.map(item => "red");
 
-        setDiskUsageChart({
+        setRamChart({
             type: "line",
             data: {
                 labels,
                 datasets: [
                     {
-                        label: "Disk usage of the container resources",
-                        data: diskUsageContainer,
+                        label: "RAM usage of the container resources",
+                        data: ramContainer,
                         backgroundColor: lineColorContainer,
                         borderColor: typeof lineColorServer === "string"
                                        ? lineColorContainer
@@ -100,8 +100,8 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
                         tension: 0.1
                     },
                     {
-                        label: "Disk usage of the server resources",
-                        data: diskUsageServer,
+                        label: "RAM usage of the server resources",
+                        data: ramServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"
                                        ? lineColorServer
@@ -140,13 +140,15 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
         });
     }, [containerData, serverData]);
 
+
+    
+
     return (
         <>
-            <h3>Disk usage status</h3>
-
-            {diskUsageChart ? (
-                <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>
-                    <Line data={diskUsageChart?.data} options={diskUsageChart?.options} plugins={[dashedLegendPlugin]}/>
+            {ramChart ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <Line data={ramChart?.data} options={ramChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>
             ) : (
                 <p>Loading chart…</p>

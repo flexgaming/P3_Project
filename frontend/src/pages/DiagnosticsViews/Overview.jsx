@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import "./css/DiagnosticsView.css";
+import "../css/DiagnosticsView.css";
 
 export default function Overview({ containerData, serverData, timeAgo }) {
     const [dataTable, setDataTable] = useState(null);

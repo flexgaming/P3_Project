@@ -649,17 +649,6 @@ public class Database {
             translateDiagnosticsData(tempContainerDiagnosticsData, diagnosticsData);
             tempContainer.put("diagnosticsData", tempContainerDiagnosticsData);
             tempServerContainers.put(tempContainer.getString("containerID"), tempContainer);
-            // Print all variables in a nice list
-            System.out.println("===== Container Data Debugging =====");
-            System.out.println("\nTemp Server Containers: " + tempServerContainers);
-            System.out.println("\n" + containers.getJSONObject(containerKey).getString("containerID"));
-            System.out.println("\nContainers : " + containers);
-            System.out.println("\nTemp Container: " + tempContainer);
-            System.out.println("\nDiagnostics Data: " + diagnosticsData);
-            System.out.println("\nTemp Container Diagnostics Data: " + tempContainerDiagnosticsData);
-            System.out.println("\nContainer Key: " + containerKey);
-            System.out.println("=====================================");
-            
         }
     }
 
@@ -668,10 +657,6 @@ public class Database {
             JSONObject tempDiagnosticsData = diagnosticsData.getJSONObject(diagnosticsKey);
             tempContainerDiagnosticsData.put(tempDiagnosticsData);
             System.out.println(tempDiagnosticsData);
-            
-
-
-
         }
     }
 

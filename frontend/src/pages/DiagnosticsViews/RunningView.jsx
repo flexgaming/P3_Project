@@ -11,6 +11,8 @@ import {
 import pattern from "patternomaly";
 import { useHref } from "react-router-dom";
 import { Modal } from "react-bootstrap";
+import { Dropdown, DropdownButton } from "react-bootstrap";
+import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -131,10 +133,9 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
 
     return (
         <>
-            <h3>Container running status</h3>
-
             {runningChart ? (
-                <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
                     <Bar data={runningChart?.data} options={runningChart?.options}/>
                 </div>
             ) : (

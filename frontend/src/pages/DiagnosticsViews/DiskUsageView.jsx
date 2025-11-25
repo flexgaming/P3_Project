@@ -10,6 +10,7 @@ import {
     Legend
 } from "chart.js";
 import pattern from "patternomaly";
+import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -61,11 +62,11 @@ const dashedLegendPlugin = {
     },
 };
 
-export default function CpuView({ containerData, serverData, timeAgo }) {
-    const [cpuChart, setCpuChart] = useState(null);
+export default function DiskUsageView({ containerData, serverData, timeAgo }) {
+    const [diskUsageChart, setDiskUsageChart] = useState(null);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.cpuTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.diskUsageTotal) {
             return;
         }
 
@@ -78,37 +79,37 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const cpuContainer = diagnosticsData.map(item => 1 - item.cpuFree / containerData.containerData.cpuMax);
-        const cpuServer = diagnosticsData.map(item => (containerData.containerData.cpuMax - item.cpuFree) / serverData.cpuTotal);
+        const diskUsageContainer = diagnosticsData.map(item => 1 - item.diskUsageFree / containerData.containerData.diskUsageMax);
+        const diskUsageServer = diagnosticsData.map(item => (containerData.containerData.diskUsageMax - item.diskUsageFree) / serverData.diskUsageTotal);
 
         const lineColorContainer = diagnosticsData.map(item => "blue");
         const lineColorServer = diagnosticsData.map(item => "red");
 
-        setCpuChart({
+        setDiskUsageChart({
             type: "line",
             data: {
                 labels,
                 datasets: [
                     {
-                        label: "CPU usage of the container resources",
-                        data: cpuContainer,
+                        label: "Disk usage of the container resources",
+                        data: diskUsageContainer,
                         backgroundColor: lineColorContainer,
                         borderColor: typeof lineColorServer === "string"
                                        ? lineColorContainer
                                        : lineColorContainer[0],
                         borderWidth: 1.5,
-                        tension: 0.1,
+                        tension: 0.1
                     },
                     {
-                        label: "CPU usage of the server resources",
-                        data: cpuServer,
+                        label: "Disk usage of the server resources",
+                        data: diskUsageServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"
                                        ? lineColorServer
                                        : lineColorServer[0],
                         borderDash: [5, 5],
                         borderWidth: 1.5,
-                        tension: 0.1,
+                        tension: 0.1
                     }
                 ]
             },
@@ -142,11 +143,10 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
 
     return (
         <>
-            <h3>CPU usage status</h3>
-
-            {cpuChart ? (
-                <div style={{ width: "95%", height: "50vh", margin: "2.5%" }}>
-                    <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>
+            {diskUsageChart ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <Line data={diskUsageChart?.data} options={diskUsageChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>
             ) : (
                 <p>Loading chart…</p>
@@ -154,4 +154,3 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
         </>
     )
 }
-

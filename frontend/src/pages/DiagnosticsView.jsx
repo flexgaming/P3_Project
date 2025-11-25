@@ -1,12 +1,12 @@
 import "./css/DiagnosticsView.css";
 import React, { useEffect, useState } from "react";
-import { Tab, Row, Col, Nav} from "react-bootstrap";
-import Overview from "./Overview.jsx";
-import RunningView from "./RunningView.jsx";
-import CpuView from "./CpuView.jsx";
-import RamView from "./RamView.jsx";
-import DiskUsageView from "./DiskUsageView.jsx";
-import ThreadCountView from "./ThreadCountView.jsx";
+import { Tab, Row, Col, Nav, Dropdown, DropdownButton} from "react-bootstrap";
+import Overview from "./DiagnosticsViews/Overview.jsx";
+import RunningView from "./DiagnosticsViews/RunningView.jsx";
+import CpuView from "./DiagnosticsViews/CpuView.jsx";
+import RamView from "./DiagnosticsViews/RamView.jsx";
+import DiskUsageView from "./DiagnosticsViews/DiskUsageView.jsx";
+import ThreadCountView from "./DiagnosticsViews/ThreadCountView.jsx";
 import { useParams } from "react-router-dom";
 
 export default function DiagnosticsView() {
@@ -71,14 +71,14 @@ export default function DiagnosticsView() {
         <div id="DiagnosticsView">
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
-            <h2>
+            <h2 style={{ padding: "10px" }}>
                 <b>Diagnostics View</b>
             </h2>
 
-            <Tab.Container id="DiagnosticsView" defaultActiveKey="overview">
+            <Tab.Container defaultActiveKey="overview">
                 <Row>
                     <Col sm={3}>
-                        <Nav variant="pills" className="flex-column">
+                        <Nav variant="pills" className="flex-column" id="DiagnosticsView-tabs">
                             <Nav.Item>
                                 <Nav.Link eventKey="overview">Overview</Nav.Link>
                                 <Nav.Link eventKey="running">Running</Nav.Link>
