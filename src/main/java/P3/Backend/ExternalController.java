@@ -3,6 +3,9 @@ package P3.Backend;
 import P3.Backend.DTO.ContainerStatsDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
@@ -28,9 +31,12 @@ public class ExternalController {
                 ContainerStatsDTO single = objectMapper.readValue(json, ContainerStatsDTO.class);
                 statsList = List.of(single);
             }
+            JSONArray data = new JSONArray(statsList);
 
             // Print container name and id for each container DTO to console
             statsList.forEach(dto -> System.out.println("Container name: " + dto.getContainerName() + ", container id: " + dto.getContainerId()));
+            System.out.println(data.toString(2));
+            
 
             return ResponseEntity.ok("Received " + statsList.size() + " container(s). Check console for details.");
         } catch (Exception e) {
