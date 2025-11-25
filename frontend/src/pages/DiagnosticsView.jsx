@@ -68,10 +68,10 @@ export default function DiagnosticsView() {
     }, [containerData]);
 
     return (
-        <div className="Yes">
+        <div id="DiagnosticsView">
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
-            <h2 style={{ marginLeft: "25%", marginTop: "2%", marginBottom: "2%" }}>
+            <h2>
                 <b>Diagnostics View</b>
             </h2>
 

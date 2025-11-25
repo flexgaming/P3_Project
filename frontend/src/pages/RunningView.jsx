@@ -9,6 +9,8 @@ import {
     Legend
 } from "chart.js";
 import pattern from "patternomaly";
+import { useHref } from "react-router-dom";
+import { Modal } from "react-bootstrap";
 
 ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
 

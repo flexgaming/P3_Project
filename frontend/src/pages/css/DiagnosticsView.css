@@ -1,0 +1,17 @@
+#overview-table {
+    border-radius: 20px;
+    overflow: hidden;
+    width: 50%;
+}
+
+#overview-table table {
+    /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
+    margin-bottom: 0;
+}
+
+#DiagnosticsView {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+

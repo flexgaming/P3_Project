@@ -23,3 +23,25 @@
     color: #ffffff;
     font-weight: bold;
 }
+.Server-Column {
+    padding-top: 20px;
+    max-width: 33.333%;
+}
+
+.Company-List-Column {
+    padding-top: 20px;
+    border-radius: 2px;
+    text-align: left;
+}
+
+.Company-List-Item {
+    border-radius: 2px;
+    text-align: left;
+}
+
+.Company-List-Link {
+    border-radius: 2px;
+    text-align: left;
+    display: block;
+    width: 100%;
+}
