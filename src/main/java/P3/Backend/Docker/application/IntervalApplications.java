@@ -94,6 +94,12 @@ public class IntervalApplications {
                 // If the current container's state is inactive, it should not get set up (or sent with HTTP).
                 if (tempContainer.getString("state").equals("inactive")) continue;
 
+
+
+                // Check that the container is up an running in Docker
+                // ####################################################### //
+
+
                 // Set variables; name, id & interval based on data from JSON file.
                 String name = tempContainer.getString("name");
                 String id = tempContainer.getString("id");
@@ -199,8 +205,8 @@ public class IntervalApplications {
                         ////////////////////////////////////
                         //       HTTP FUNCTION HERE       //
                         ////////////////////////////////////
-                        if (containerArr[i].getContainerRunning().equals(true)) {
-                            containerArr[i].setTimestamp(new Date().getTime());
+                        containerArr[i].setTimestamp(new Date().getTime());
+                        if (containerArr[i].getContainerRunning().equals(true)) { // maybe deletus?
 
                             ObjectMapper mapper = new ObjectMapper();
                             mapper.writeValue(new File("containerData.json"), containerArr[i]);
@@ -210,7 +216,7 @@ public class IntervalApplications {
                                 // Remember to set the timestamp
 
                             // Temp for printing all container stats (Actuator + Stats)
-                        } else {
+                        } else { // Maybe deletus?
                             // Temp for printing all container stats (Actuator + Stats)
                             // If the server is closed - then only send docker information
                                 // Can we get the error codes? (if the docker container is not running)
@@ -239,6 +245,15 @@ public class IntervalApplications {
         
         // GET ALL OF THE DATA FROM THE SPRING ACTUATOR:
         if (container.getContainerRunning().equals(true)) {
+
+            // Check that the Spring Actuator endpoint is reachable.
+                // If the endpoint is not reachable, then skip fetching the data.
+                    // Set the JVMRunning to false.
+                // Else if the endpoint is reachable, then proceed.
+                    // Set JVMRunning to true.
+            // ####################################################### //
+
+
             fetchSpringActuatorStats(container, webClient, Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT);
         } else {
             System.out.println("Couldn't fetch data from " + container.getContainerName());
@@ -282,8 +297,7 @@ public class IntervalApplications {
         }
     }
 
-
-    @Autowired
+    
     private static void fetchSpringActuatorStats(ContainerClass container, WebClient webClient, String actuatorUrl) {
         String url = actuatorUrl + ":" + container.getPublicPort();
 
