@@ -9,9 +9,6 @@ import {
     Legend
 } from "chart.js";
 import pattern from "patternomaly";
-import { useHref } from "react-router-dom";
-import { Modal } from "react-bootstrap";
-import { Dropdown, DropdownButton } from "react-bootstrap";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
@@ -25,6 +22,7 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
             return;
         }
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         diagnosticsData = diagnosticsData && !Array.isArray(diagnosticsData)
             ? Object.values(diagnosticsData)
             : Array.isArray(diagnosticsData)
@@ -36,13 +34,13 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
         const errors = [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1];
 
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const runningValues = diagnosticsData.map(item => -1);
+        const runningValues = diagnosticsData.map(() => -1);
         const errorValues = errors.map(item => item ? [0.02, 1] : [0, 0]);
 
         const barColors = diagnosticsData.map(item =>
             item.running ? pattern.draw("dot", "green") : pattern.draw("cross-dash", "red")
         );
-        const errorColors = errors.map(item => "yellow");
+        const errorColors = errors.map(() => "yellow");
 
         if (diagnosticsData.length === 0) {
             setNoData(true);
@@ -84,7 +82,7 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
                 plugins: {
                     legend: {
                         labels: {
-                            generateLabels: function(chart) {
+                            generateLabels: function() {
                                 return [
                                     {
                                         text: "Running",
