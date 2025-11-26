@@ -1,5 +1,9 @@
 package P3.Backend.Docker.manager;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -9,20 +13,33 @@ import reactor.core.publisher.Mono;
 @Component
 public class WebClientPost {
 
-
-/*     public Mono<String> sendData(WebClient webClient, Object request) {
-        return webClient
-                .post()
-                .uri("/api/upload-json") // <-- replace with real path (e.g. "localhost:port/api/upload-json")
+    // Send arbitrary object as JSON to the given URI (relative or absolute).
+    public static Mono<String> sendData(WebClient webClient, Object requestBody, String uri) {
+        return webClient.post()
+                .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
-                .bodyValue(request)
+                .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class);
-    } */
+    }
 
+    // Blocking convenience wrapper
+    public static String sendDataBlocking(WebClient webClient, Object requestBody, String uri) {
+        return sendData(webClient, requestBody, uri).block();
+    }
 
-/*     public String sendDataBlocking(WebClient webClient, Object request) {
-        return sendData(webClient, request).block();
-    } */
-} 
+    // Read file as UTF-8 and send raw JSON text (useful when you already have containerData.json)
+    public static Mono<String> sendFileContent(WebClient webClient, Path filePath, String uri) throws Exception {
+        String json = Files.readString(filePath, StandardCharsets.UTF_8);
+        return webClient.post()
+                .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(json)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    public static String sendFileContentBlocking(WebClient webClient, Path filePath, String uri) throws Exception {
+        return sendFileContent(webClient, filePath, uri).block();
+    }
+}

@@ -34,6 +34,7 @@ import reactor.core.publisher.Mono;
 import P3.Backend.Docker.classes.IntervalClass;
 import P3.Backend.Docker.manager.DockerStatsService;
 import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
+import P3.Backend.Docker.manager.WebClientPost;
 import P3.Backend.Docker.classes.ContainerClass;
 
 import P3.Backend.Docker.Persistent;
@@ -210,6 +211,14 @@ public class IntervalApplications {
 
                             ObjectMapper mapper = new ObjectMapper();
                             mapper.writeValue(new File("containerData.json"), containerArr[i]);
+
+                            try {
+                                // Example: http://localhost:9000/api/containers
+                                String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], Persistent.INTERNAL_SERVER_URL);
+                                System.out.println("POST response: " + resp);
+                            } catch (Exception e) {
+                                System.err.println("Failed to POST container data: " + e.getMessage());
+                            }
                             
 
                              // If the server is running - then send all data
