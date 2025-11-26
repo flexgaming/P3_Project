@@ -18,6 +18,7 @@ ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
 
 export default function RunningView({ diagnosticsData, timeAgo }) {
     const [runningChart, setRunningChart] = useState(null);
+    const [noData, setNoData] = useState(false);
 
     useEffect(() => {
         if (!diagnosticsData) {
@@ -42,6 +43,14 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
             item.running ? pattern.draw("dot", "green") : pattern.draw("cross-dash", "red")
         );
         const errorColors = errors.map(item => "yellow");
+
+        if (diagnosticsData.length === 0) {
+            setNoData(true);
+            setRunningChart(null);
+            return;
+        }
+
+        setNoData(false);
 
         setRunningChart({
             type: "bar",
@@ -133,7 +142,12 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
 
     return (
         <>
-            {runningChart ? (
+            {noData ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                </div>
+            ) : runningChart ? (
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown />
                     <Bar data={runningChart?.data} options={runningChart?.options}/>

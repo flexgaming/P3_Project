@@ -64,6 +64,7 @@ const dashedLegendPlugin = {
 
 export default function CpuView({ containerData, serverData, timeAgo }) {
     const [cpuChart, setCpuChart] = useState(null);
+    const [noData, setNoData] = useState(false);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.cpuTotal) {
@@ -78,12 +79,21 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
 
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+        if (diagnosticsData.length === 0) {
+            // No diagnostics in selected timeframe — show friendly message instead of chart
+            setNoData(true);
+            setCpuChart(null);
+            return;
+        }
+
+        // We have data — ensure noData flag is cleared before building chart
+        setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const cpuContainer = diagnosticsData.map(item => 1 - item.cpuFree / containerData.containerData.cpuMax);
         const cpuServer = diagnosticsData.map(item => (containerData.containerData.cpuMax - item.cpuFree) / serverData.cpuTotal);
 
-        const lineColorContainer = diagnosticsData.map(item => "blue");
-        const lineColorServer = diagnosticsData.map(item => "red");
+        const lineColorContainer = diagnosticsData.map(() => "blue");
+        const lineColorServer = diagnosticsData.map(() => "red");
 
         setCpuChart({
             type: "line",
@@ -139,11 +149,16 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
                 }
             }
         });
-    }, [containerData, serverData]);
+    }, [containerData, serverData, timeAgo]);
 
     return (
         <>
-            {cpuChart ? (
+            {noData ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                </div>
+            ) : cpuChart ? (
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown />
                     <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>

@@ -7,14 +7,15 @@ import CpuView from "./DiagnosticsViews/CpuView.jsx";
 import RamView from "./DiagnosticsViews/RamView.jsx";
 import DiskUsageView from "./DiagnosticsViews/DiskUsageView.jsx";
 import ThreadCountView from "./DiagnosticsViews/ThreadCountView.jsx";
+import TimeRangeDropdown from "./DiagnosticsViews/TimeRangeDropdown.jsx";
 import { useParams } from "react-router-dom";
 
 export default function DiagnosticsView() {
     const { containerID } = useParams();
 
+    const [timeFrame, setTimeFrame] = useState("10minutes"); // Default to last 10 minutes
     const [containerData, setContainerData] = useState([]);
     const [serverData, setServerData] = useState([]);
-    const [runningChart, setRunningChart] = useState(null);
     const [error, setError] = useState(null);
 
     // --- Helper: Convert timestamp -> "x minutes ago" ---
@@ -35,20 +36,38 @@ export default function DiagnosticsView() {
     };
 
     useEffect(() => {
+        // Send the selected timeFrame as JSON in the request body. Use POST
+        // because GET requests should not include a body. The endpoint should
+        // accept POST with JSON { timeFrame } and return diagnostics for that range.
         async function fetchDiagnosticsData() {
             try {
-                const res = await fetch(`/api/data/diagnosticsdata/${containerID}`);
+                const res = await fetch(`/api/data/diagnosticsdata/${containerID}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ timeFrame }),
+                });
+                console.log(res);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
                 setContainerData(await res.json());
             } catch (err) {
                 setError(err.message || String(err));
             }
         }
 
-
+        // Fetch when component mounts and whenever containerID or timeFrame changes
         fetchDiagnosticsData();
-    }, [containerID]);
+    }, [containerID, timeFrame]);
+
+    // Listen for global timeframe changes dispatched by standalone dropdowns
+    useEffect(() => {
+        function onGlobalTimeFrame(e) {
+            const tf = e && e.detail ? e.detail : null;
+            if (tf && tf !== timeFrame) setTimeFrame(tf);
+        }
+
+        window.addEventListener("p3:timeFrameChanged", onGlobalTimeFrame);
+        return () => window.removeEventListener("p3:timeFrameChanged", onGlobalTimeFrame);
+    }, [timeFrame]);
 
     useEffect(() => {
         if (!containerData ||!containerData.containerData) return;

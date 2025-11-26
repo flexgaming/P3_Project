@@ -9,7 +9,6 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
-import pattern from "patternomaly";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
@@ -19,7 +18,7 @@ const dashedLegendPlugin = {
 
     afterUpdate(chart) {
         const legend = chart.legend;
-        const ctx = chart.ctx;
+        // chart.ctx is available if needed for drawing, not required here
 
         legend.legendItems.forEach((item) => {
             const dataset = chart.data.datasets[item.datasetIndex];
@@ -64,6 +63,7 @@ const dashedLegendPlugin = {
 
 export default function DiskUsageView({ containerData, serverData, timeAgo }) {
     const [diskUsageChart, setDiskUsageChart] = useState(null);
+    const [noData, setNoData] = useState(false);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.diskUsageTotal) {
@@ -78,12 +78,20 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
 
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+        if (diagnosticsData.length === 0) {
+            setNoData(true);
+            setDiskUsageChart(null);
+            return;
+        }
+
+        // Data is present — clear the no-data state so chart can render
+        setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const diskUsageContainer = diagnosticsData.map(item => 1 - item.diskUsageFree / containerData.containerData.diskUsageMax);
         const diskUsageServer = diagnosticsData.map(item => (containerData.containerData.diskUsageMax - item.diskUsageFree) / serverData.diskUsageTotal);
 
-        const lineColorContainer = diagnosticsData.map(item => "blue");
-        const lineColorServer = diagnosticsData.map(item => "red");
+    const lineColorContainer = diagnosticsData.map(() => "blue");
+    const lineColorServer = diagnosticsData.map(() => "red");
 
         setDiskUsageChart({
             type: "line",
@@ -139,11 +147,16 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
                 }
             }
         });
-    }, [containerData, serverData]);
+    }, [containerData, serverData, timeAgo]);
 
     return (
         <>
-            {diskUsageChart ? (
+            {noData ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                </div>
+            ) : diskUsageChart ? (
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown />
                     <Line data={diskUsageChart?.data} options={diskUsageChart?.options} plugins={[dashedLegendPlugin]}/>

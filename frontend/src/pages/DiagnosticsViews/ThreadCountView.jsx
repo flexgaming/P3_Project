@@ -16,6 +16,7 @@ ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip,
 
 export default function ThreadCountView({ containerData, serverData, timeAgo }) {
     const [threadCountChart, setThreadCountChart] = useState(null);
+    const [noData, setNoData] = useState(false);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
@@ -30,11 +31,18 @@ export default function ThreadCountView({ containerData, serverData, timeAgo }) 
 
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+        if (diagnosticsData.length === 0) {
+            setNoData(true);
+            setThreadCountChart(null);
+            return;
+        }
+
+        setNoData(false);
+
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const threadCount = diagnosticsData.map(item => item.threadCount);
 
-        const lineColor = diagnosticsData.map(item => "blue");
-
+        const lineColor = diagnosticsData.map(() => "blue");
         setThreadCountChart({
             type: "line",
             data: {
@@ -71,7 +79,12 @@ export default function ThreadCountView({ containerData, serverData, timeAgo }) 
 
     return (
         <>
-            {threadCountChart ? (
+            {noData ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                </div>
+            ) : threadCountChart ? (
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown />
                     <Line data={threadCountChart?.data} options={threadCountChart?.options}/>

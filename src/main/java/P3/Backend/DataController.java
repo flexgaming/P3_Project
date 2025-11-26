@@ -58,14 +58,21 @@ Database database = new Database();
         return diagnostics.toMap();
     }
 
-    // GET Diagnostics data by container ID
-    @GetMapping("/diagnosticsdata/{containerID}")
-    public Map<String, Object> getDiagnosticsData(@PathVariable String containerID) {
-        JSONObject diagnosticsData = new JSONObject();
+    // POST Get Diagnostics data by container ID
+    @PostMapping("/diagnosticsdata/{containerID}")
+    public Map<String, Object> getDiagnosticsData(@PathVariable String containerID,
+                                                  @RequestBody(required = false) Map<String, Object> payload) {
+        // Accept an optional JSON body (e.g. { "timeFrame": "1h" })
+        String timeFrame = "10m";
+        if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
+            timeFrame = payload.get("timeFrame").toString();
+            // TODO: pass timeFrame into the database query when DB supports it.
+            System.out.println("Diagnostics request for container " + containerID + " with timeFrame: " + timeFrame);
+        }
 
+        JSONObject diagnosticsData = new JSONObject();
         diagnosticsData.put("containerData", database.getContainerData(containerID));
-        diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(new Container(containerID)));
-        
+        diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(new Container(containerID), timeFrame));
 
         return diagnosticsData.toMap();
     }

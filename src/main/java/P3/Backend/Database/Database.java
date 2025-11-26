@@ -1,6 +1,7 @@
 package P3.Backend.Database;
 
 import P3.Backend.Constants;
+import P3.Backend.HelperFunctions;
 
 import java.lang.reflect.Array;
 import java.sql.*;
@@ -8,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -480,21 +482,22 @@ public class Database {
     }
 
     /**
-     * Fetches all diagnostics data saved in the database.
+     * Fetches all diagnostics data saved in the database in the requested time frame.
      */
     public JSONObject getDiagnosticsData(String containerID) {
+        JSONObject containerData = new JSONObject();
         JSONObject diagnosticsData = new JSONObject();
-        // Read all data from View Company_Diagnostics that are within time scope.
+        // Read all data from View Company_Diagnostics that are within time frame.
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.Timestamp >= " +
                 "NOW() - make_interval(mins => ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-             // Use Prepared Statement to help format the SQL string to prevent injections.
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Use Prepared Statement to help format the SQL string to prevent injections.
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, containerID);
-            preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIME_SCOPE);
+            preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIME_SCOPE); 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Company_Diagnostics View and adds them to the JSON object.
@@ -528,10 +531,10 @@ public class Database {
             errorHandling(error);
         }
 
-        /* containerData.put("containerData", getContainerData(containerID));
-        containerData.put("diagnosticsData", diagnosticsData); */
+        // containerData.put("containerData", getContainerData(containerID));
+        containerData.put("diagnosticsData", diagnosticsData);
 
-        return diagnosticsData;
+        return containerData;
     }
 
     /**
@@ -562,8 +565,8 @@ public class Database {
                 String diagnosticsID = resultSet.getString("Diagnostics_ID");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 String errorLogs = resultSet.getString("Error_Logs");
-                String date = resultSet.getString("diagnosticDate");
-                String time = resultSet.getString("diagnosticTime");
+//                String date = resultSet.getString("diagnosticDate");
+//                String time = resultSet.getString("diagnosticTime");
                 diagnosticsError.put("regionID", regionID);
                 diagnosticsError.put("regionName", regionName);
                 diagnosticsError.put("companyID", companyID);
@@ -574,8 +577,8 @@ public class Database {
                 diagnosticsError.put("containerName", containerName);
                 diagnosticsError.put("timestamp", timestamp);
                 diagnosticsError.put("errorLogs", errorLogs);
-                diagnosticsError.put("date", date);
-                diagnosticsError.put("time", time);
+//                diagnosticsError.put("date", date);
+//                diagnosticsError.put("time", time);
                 diagnosticsErrors.put(diagnosticsID, diagnosticsError);
             }
 
@@ -645,7 +648,7 @@ public class Database {
         for (String containerKey : containers.keySet()) {
             JSONObject tempContainer = containers.getJSONObject(containerKey);
             JSONArray tempContainerDiagnosticsData = new JSONArray();
-            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID"));
+            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID")).getJSONObject("diagnosticsData");
             translateDiagnosticsData(tempContainerDiagnosticsData, diagnosticsData);
             tempContainer.put("diagnosticsData", tempContainerDiagnosticsData);
             tempServerContainers.put(tempContainer.getString("containerID"), tempContainer);
@@ -656,7 +659,6 @@ public class Database {
         for (String diagnosticsKey : diagnosticsData.keySet()) {
             JSONObject tempDiagnosticsData = diagnosticsData.getJSONObject(diagnosticsKey);
             tempContainerDiagnosticsData.put(tempDiagnosticsData);
-            System.out.println(tempDiagnosticsData);
         }
     }
 
@@ -668,6 +670,7 @@ public class Database {
      */
     public JSONObject getContainerData(String containerID) {
         JSONObject container = new JSONObject();
+        // Read all data from View Company_Containers in a selected time frame.
         String sql = "SELECT * FROM Container WHERE Container_ID = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
@@ -732,16 +735,24 @@ public class Database {
     // =============================== MAKESHIFT ADDITIONS - NOT FINAL ===============================
     // ===============================================================================================
 
-    public JSONObject getDiagnosticsData(Container docker) {
-        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = '" + docker.getContainerID() + "';";
+    public JSONObject getDiagnosticsData(Container docker, String timeFrameString) {
+        int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
+        if (timeFrameString != null){
+            // Use Helper Function to convert time frame string to minutes.
+            timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
+            System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
+        }
+        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= "+" NOW() - make_interval(mins => ?)";
         JSONObject diagnosticsData = new JSONObject();
 
-        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
-        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user input.
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql)) {
+         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+            // Use Prepared Statement to help format the SQL string to prevent injections.
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
+            preparedStatement.setString(1, docker.getContainerID());
+            preparedStatement.setInt(2, timeFrameMinutes); 
+            ResultSet resultSet = preparedStatement.executeQuery();
+            
             // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
             while (resultSet.next()) {
                 JSONObject diagnostics = new JSONObject();

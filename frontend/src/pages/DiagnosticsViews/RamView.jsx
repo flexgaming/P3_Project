@@ -63,6 +63,7 @@ const dashedLegendPlugin = {
 
 export default function RamView({ containerData, serverData, timeAgo }) {
     const [ramChart, setRamChart] = useState(null);
+    const [noData, setNoData] = useState(false);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
@@ -77,12 +78,21 @@ export default function RamView({ containerData, serverData, timeAgo }) {
 
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+        if (diagnosticsData.length === 0) {
+            // No diagnostics in selected timeframe — show friendly message instead of chart
+            setNoData(true);
+            setRamChart(null);
+            return;
+        }
+
+        // We have data — ensure noData flag is cleared before building chart
+        setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const ramContainer = diagnosticsData.map(item => 1 - item.ramFree / containerData.containerData.ramMax);
         const ramServer = diagnosticsData.map(item => (containerData.containerData.ramMax - item.ramFree) / serverData.ramTotal);
 
-        const lineColorContainer = diagnosticsData.map(item => "blue");
-        const lineColorServer = diagnosticsData.map(item => "red");
+    const lineColorContainer = diagnosticsData.map(() => "blue");
+    const lineColorServer = diagnosticsData.map(() => "red");
 
         setRamChart({
             type: "line",
@@ -138,14 +148,19 @@ export default function RamView({ containerData, serverData, timeAgo }) {
                 }
             }
         });
-    }, [containerData, serverData]);
+    }, [containerData, serverData, timeAgo]);
 
 
     
 
     return (
         <>
-            {ramChart ? (
+            {noData ? (
+                <div className="chart-container shadow rounded-4">
+                    <TimeRangeDropdown />
+                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                </div>
+            ) : ramChart ? (
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown />
                     <Line data={ramChart?.data} options={ramChart?.options} plugins={[dashedLegendPlugin]}/>
