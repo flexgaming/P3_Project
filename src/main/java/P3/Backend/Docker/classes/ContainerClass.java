@@ -1,56 +1,54 @@
 package P3.Backend.Docker.classes;
 
-import java.util.Date;
-
 public class ContainerClass {
     
     // All of the variables that we want to store from each container.
     // That is also sent to the database.
     
-    Long timestamp;                 // Is the time when data is fetched.
+    private Long timestamp;                 // Is the time when data is fetched.
     
     // Data from JSON:
-    String containerName;           // Is the name of the docker container.
-    String containerId;             // Is the id of the docker container.
-    Integer publicPort;             // Is the port number of the docker container.    
-    Integer containerInterval;      // Is the interval for sending data to another server. 
+    private String containerName;           // Is the name of the docker container.
+    private String containerId;             // Is the id of the docker container.
+    private Integer publicPort;             // Is the port number of the docker container.    
+    private Integer containerInterval;      // Is the interval for sending data to another server. 
 
     // Data from docker:
-    Boolean containerRunning;       // Is docker container on or off.
-    Long containerRamUsage;         // Is ram usage on docker container.
-    Long containerCpuUsage;         // Is cpu usage on docker container.
-    Long containerDiskUsage;        // Is disk usage on docker container.
-    String containerStatus;         // Is the status of the docker container.
-    Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
-    Long containerExitCode;         // Is the exit code received from the program (CHROOT EXIT CODES - https://stackoverflow.com/questions/31297616/what-is-the-authoritative-list-of-docker-run-exit-codes).
+    private Boolean containerRunning;       // Is docker container on or off.
+    private Long containerRamUsage;         // Is ram usage on docker container.
+    private Long containerCpuUsage;         // Is cpu usage on docker container.
+    private Long containerDiskUsage;        // Is disk usage on docker container.
+    private String containerStatus;         // Is the status of the docker container.
+    private Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
+    private Long containerExitCode;         // Is the exit code received from the program (CHROOT EXIT CODES - https://stackoverflow.com/questions/31297616/what-is-the-authoritative-list-of-docker-run-exit-codes).
     
 
     // Data from actuator:
     //JVM Data
-    Boolean JVMRunning;             // Is internally java application on or off.
-    long JVMRamMax;               // Is max ram usage on java application.
-    Long JVMRamUsage;             // Is ram usage on java application.
-    Long JVMCpuUsagePerc;         // Is cpu usage on java application in percentage.
-    Integer JVMThreads;             // Is the number of threads on the java application.
-    Integer JVMThreadsStates;       // Is the number of threads states on the java application.
-    Integer JVMThreadQueued;       // Is the number of threads queued on the java application.
-    Long JVMCpuUsageStart;         // Is the start time of CPU usage on the java application.
-    Long JVMUptime;                // Is the uptime of the java application.
+    private Boolean JVMRunning;             // Is internally java application on or off.
+    private Long JVMRamMax;               // Is max ram usage on java application.
+    private Long JVMRamUsage;             // Is ram usage on java application.
+    private Long JVMCpuUsagePerc;         // Is cpu usage on java application in percentage.
+    private Integer JVMThreads;             // Is the number of threads on the java application.
+    private Integer JVMThreadsStates;       // Is the number of threads states on the java application.
+    private Integer JVMThreadQueued;       // Is the number of threads queued on the java application.
+    private Long JVMCpuUsageStart;         // Is the start time of CPU usage on the java application.
+    private Long JVMUptime;                // Is the uptime of the java application.
     
     //System Data
-    Long systemRamUsage;          // Is all of the ram usage on the system.
-    Long systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
-    Integer SystemCpuCores;         // Is the number of cpu cores on the system.
-    Long systemDiskUsage;         // Is all of the disk usage on the system.
-    Long systemDiskTotal;         // Is the total disk space on the system.
-    Long systemDiskFree;          // Is the free disk space on the system.
+    private Long systemRamUsage;          // Is all of the ram usage on the system.
+    private Long systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
+    private Integer SystemCpuCores;         // Is the number of cpu cores on the system.
+    private Long systemDiskUsage;         // Is all of the disk usage on the system.
+    private Long systemDiskTotal;         // Is the total disk space on the system.
+    private Long systemDiskFree;          // Is the free disk space on the system.
 
     // Misc Data
-    Integer poolCore;             // Is the core number of threads allocated for the pool of the java application.
-    Integer logbackEvents;        // Is the number of logback events on the java application.
-    Integer logbackEventsError;   // Is the number of logback error events on the java application.
-    Integer logbackEventsWarn;    // Is the number of logback warn events on the java application.  
-    Long garbageCollectSize;   // Is the size of garbage collection on the java application.
+    private Integer poolCore;             // Is the core number of threads allocated for the pool of the java application.
+    private Integer logbackEvents;        // Is the number of logback events on the java application.
+    private Integer logbackEventsError;   // Is the number of logback error events on the java application.
+    private Integer logbackEventsWarn;    // Is the number of logback warn events on the java application.  
+    private Long garbageCollectSize;   // Is the size of garbage collection on the java application.
     
     
     //String JVMStatus;               // Is the status of the java application.
@@ -146,9 +144,9 @@ public class ContainerClass {
     //=================================//
 
     //JVMRamMax
-    public long getJVMRamMax() { return JVMRamMax; }
+    public Long getJVMRamMax() { return JVMRamMax; }
 
-    public void setJVMRamMax(long jVMRamMax) { JVMRamMax = jVMRamMax; }
+    public void setJVMRamMax(Long jVMRamMax) { JVMRamMax = jVMRamMax; }
 
     //JVMRamUsage
     public Long getJVMRamUsage() { return JVMRamUsage; }

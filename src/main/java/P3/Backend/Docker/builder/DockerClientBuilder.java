@@ -1,11 +1,13 @@
 package P3.Backend.Docker.builder;
 
+import static P3.Backend.Docker.Persistent.WINDOWS_DOCKER_SOCKET;
+import static P3.Backend.Docker.Persistent.LINUX_MAC_DOCKER_SOCKET;
+import P3.Backend.Docker.manager.DockerClientManager;
+
 import java.time.Duration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-// import P3.Backend.Docker.manager.DockerClientManager;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -13,10 +15,6 @@ import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 
-import static P3.Backend.Docker.Persistent.WINDOWS_DOCKER_SOCKET;
-import static P3.Backend.Docker.Persistent.LINUX_MAC_DOCKER_SOCKET;
-
-import P3.Backend.Docker.manager.DockerClientManager;
 
 @Configuration
 public class DockerClientBuilder {

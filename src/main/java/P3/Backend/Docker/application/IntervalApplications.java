@@ -1,43 +1,29 @@
 package P3.Backend.Docker.application;
 
-import java.io.File;
-import java.net.http.HttpClient;
-
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.fasterxml.jackson.databind.ObjectMapper; 
-import com.fasterxml.jackson.databind.ObjectWriter; 
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.HealthStateLog;
-import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.command.StatsCmd;
-import com.github.dockerjava.api.model.Container;
-
-import reactor.core.publisher.Mono;
-
+import static P3.Backend.Docker.Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT;
+import static P3.Backend.Docker.Persistent.INTERNAL_SERVER_URL;
 import P3.Backend.Docker.classes.IntervalClass;
 import P3.Backend.Docker.manager.DockerStatsService;
 import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
 import P3.Backend.Docker.manager.WebClientPost;
 import P3.Backend.Docker.classes.ContainerClass;
 
-import P3.Backend.Docker.Persistent;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.json.JSONObject;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.InspectContainerResponse;
 
 @Component
 public class IntervalApplications {
@@ -85,8 +71,17 @@ public class IntervalApplications {
             // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
     
-            // Create the length for the array based on the JSON file.
-            containerArr = new ContainerClass[JSONFileObj.length()];
+            // Get the amount of active containers within the JSON file, that is not "inactive" or "unconfigured".
+            int activeContainerCount = 0;
+            for (String key : JSONFileObj.keySet()) {
+                JSONObject tempContainer = JSONFileObj.getJSONObject(key);
+                if (tempContainer.getString("state").equals("inactive")) continue;
+                if (tempContainer.getString("state").equals("unconfigured")) continue;
+                activeContainerCount++;
+            }
+
+            // Create the length for the array based on the active container count.
+            containerArr = new ContainerClass[activeContainerCount];
     
             int index = 0;
             for (String key : JSONFileObj.keySet()) { // Go through each of the keys in the JSON file.
@@ -94,12 +89,7 @@ public class IntervalApplications {
                 
                 // If the current container's state is inactive, it should not get set up (or sent with HTTP).
                 if (tempContainer.getString("state").equals("inactive")) continue;
-
-
-
-                // Check that the container is up an running in Docker
-                // ####################################################### //
-
+                if (tempContainer.getString("state").equals("unconfigured")) continue;
 
                 // Set variables; name, id & interval based on data from JSON file.
                 String name = tempContainer.getString("name");
@@ -207,39 +197,25 @@ public class IntervalApplications {
                         //       HTTP FUNCTION HERE       //
                         ////////////////////////////////////
                         containerArr[i].setTimestamp(new Date().getTime());
-                        if (containerArr[i].getContainerRunning().equals(true)) { // maybe deletus?
-
                             ObjectMapper mapper = new ObjectMapper();
                             mapper.writeValue(new File("containerData.json"), containerArr[i]);
 
                             try {
                                 // Example: http://localhost:9000/api/containers
                                 // TODO: sendDataBlocking creates an object and sends it as JSON to the given URI, but test sendFileContentBlocking as it should just send the raw json.
-                                String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], Persistent.INTERNAL_SERVER_URL);
+                                String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], INTERNAL_SERVER_URL);
                                 // String resp = WebClientPost.sendFileContentBlocking(webClient, Persistent.CONTAINER_DATA_PATH, Persistent.INTERNAL_SERVER_URL);
                                 System.out.println("POST response: " + resp);
                             } catch (Exception e) {
                                 System.err.println("Failed to POST container data: " + e.getMessage());
                             }
-                            
-
-                             // If the server is running - then send all data
-                                // Remember to set the timestamp
-
-                            // Temp for printing all container stats (Actuator + Stats)
-                        } else { // Maybe deletus?
-                            // Temp for printing all container stats (Actuator + Stats)
-                            // If the server is closed - then only send docker information
-                                // Can we get the error codes? (if the docker container is not running)
-                                // Properly not, so send that that container is not running.
-                        }
                         
                     } else {
                         intervalArr[i].setTempInterval(newInterval); // Set the new tempInterval.
                     }
-                    // Wait 1 second.
-                    Thread.sleep(1000);
                 }
+                // Wait 1 second.
+                Thread.sleep(1000);
                 
             } catch (Exception e) {
                 // If anything goes wrong, it is printed.
@@ -254,23 +230,26 @@ public class IntervalApplications {
         fetchDockerStats(container, dockerClient);
         
         
-        // GET ALL OF THE DATA FROM THE SPRING ACTUATOR:
+        // Fetch the data from the Spring Actuator endpoint if the container is running.
         if (container.getContainerRunning().equals(true)) {
 
-            // Check that the Spring Actuator endpoint is reachable.
-                // If the endpoint is not reachable, then skip fetching the data.
-                    // Set the JVMRunning to false.
-                // Else if the endpoint is reachable, then proceed.
-                    // Set JVMRunning to true.
-            // ####################################################### //
+            String actuatorUrl = SPRING_ACTUATOR_DEFAULT_ENDPOINT + ":" + container.getPublicPort();
+            String actuatorStatus = getActuatorRunningStatus(callActuator(webClient, actuatorUrl, "/actuator/health"));
+            
+            // See if the actuator is reachable.
+            if (actuatorStatus != null && actuatorStatus.equals("UP")) {
+                fetchSpringActuatorStats(container, webClient, actuatorUrl);
+            } else {
 
+                // Set JVMRunning to false if the actuator is not reachable.
+                container.setJVMRunning(false);
 
-            fetchSpringActuatorStats(container, webClient, Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT);
+                System.out.println("Spring Actuator endpoint not reachable for " + container.getContainerName());
+
+            }
         } else {
-            System.out.println("Couldn't fetch data from " + container.getContainerName());
+            System.out.println("Container " + container.getContainerName() + " is not running, skipping Spring Actuator stats fetch.");
         }
-
-        // GO BACK TO FUNCTION BEFORE AND SEND DATA VIA HTTP TO OTHER SERVER
     }
 
 
@@ -309,8 +288,7 @@ public class IntervalApplications {
     }
 
     
-    private static void fetchSpringActuatorStats(ContainerClass container, WebClient webClient, String actuatorUrl) {
-        String url = actuatorUrl + ":" + container.getPublicPort();
+    private static void fetchSpringActuatorStats(ContainerClass container, WebClient webClient, String url) {
 
         container.setJVMRamMax(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.max")));
         container.setJVMRamUsage(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.used")));
@@ -370,6 +348,16 @@ public class IntervalApplications {
                 .getJSONArray("measurements")
                 .getJSONObject(0)
                 .getInt("value");
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String getActuatorRunningStatus(JSONObject json) {
+        try {
+            return json
+                .getString("status");
 
         } catch (Exception e) {
             return null;

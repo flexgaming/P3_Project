@@ -1,41 +1,31 @@
 package P3.Backend.Docker;
 
-import org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi.ecCVCDSA224;
-import org.json.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
-
+import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import P3.Backend.Docker.application.IntervalApplications;
 import P3.Backend.Docker.application.SetupApplications;
 import P3.Backend.Docker.builder.DockerClientBuilder;
-import P3.Backend.Docker.classes.ContainerClass;
-import P3.Backend.Docker.manager.DockerClientManager;
-import P3.Backend.Docker.manager.DockerStatsService;
-import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
-import reactor.core.publisher.Mono;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.Container;
-
-import java.util.List;
-import java.util.Scanner;
-
-import org.json.JSONObject;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
+import java.util.Scanner;
 
-import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
+import org.json.JSONObject;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import com.github.dockerjava.api.DockerClient;
+
 
 @SpringBootApplication
 public class DemoApplication {
+
+    // Name for JSON file containing all of the containers:
+    private static final String containerFilename = CURRENT_CONTAINER_PATH;
+
+    // The path for where the JSON file is stored.
+    private static final Path containerListPath = Path.of("" + containerFilename); // Replace "" with desired path. Should be the same in SetupApplications.java and IntervalApplications.java
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
@@ -46,48 +36,87 @@ public class DemoApplication {
         // Get WebClient from Spring context
         WebClient webClient = context.getBean(WebClient.class);
 
-/*         public Mono<String> sendData(MyRequest request) {
-            return 
-            webClient
-            .post()
-            .uri("")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            //.body(Mono.just(data, "idk"))
-            .retrieve()
-            .bodyToMono(String.class)
-            .block(); 
-        } */
-
-         DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
-
-        // Get the Spring-managed bean
-        // IntervalApplications intervalApp = context.getBean(IntervalApplications.class);
-        // intervalApp.fetchSpringActuatorStats("http://localhost");
-
-        // String containerId = "4a32465d120ec154152b061db52ce9a31ba83e92e8a8c8515d6fa6e8f3be0400";
-        // try {
-        // 	ContainerStats stats = dockerStatsService.getContainerStats(containerId);
-
-        //     System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        //     System.out.println(dockerClient.inspectContainerCmd(containerId).exec().toString());
-        //     System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        // 	// Print stats only when successfully retrieved (stats is in-scope here)
-        // 	System.out.println("CPU Total Usage: " + stats.getCpuTotalUsage()); // Total accumulated CPU time (in nanosec) used by the container since startup.
-        // 	System.out.println("Memory Usage: " + stats.getMemoryUsage()); // Current RAM usage of the container
-        // 	System.out.println("Memory Limit: " + stats.getMemoryLimit()); // Maximum amount of RAM the container can use.
-        // 	System.out.println("PIDs: " + stats.getPids()); // The number of active processes currently running (processes and threads)
-        // } catch (InterruptedException e) {
-        // 	System.err.println("Failed to get container stats: " + e.getMessage());
-        // 	Thread.currentThread().interrupt();
-        // }
-
         // Decide what part of the application user want to use:
-        SetupApplications.Initiation(dockerClient);
-        IntervalApplications.Initiation(dockerClient, webClient);
-		
-		
+        checkFileCreated();
+        try {
+            // Get all of the content within the file.
+            String content = Files.readString(containerListPath);
+            
+            // Convert all of the content back into a JSON format.
+            JSONObject JSONFileObj = new JSONObject(content);
+
+            if (JSONFileObj.length() == 0) {
+                System.out.println("The container JSON file is empty. Proceeding to Setup Applications.");
+                SetupApplications.Initiation(dockerClient);
+            }
+        } catch (Exception e) {
+            // If anything goes wrong, it is printed.
+            e.printStackTrace();
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+        outer: while (true) {
+            System.out.println("Select application mode:");
+            System.out.println("1. Setup Applications");
+            System.out.println("2. Interval Applications");
+            System.out.println("3. Exit");
+            System.out.print("Enter choice (1, 2 or 3): ");
+            while (true) {
+                String choice = scanner.nextLine();
+                if (choice.equals("1")) {
+                    System.out.println("You selected option " + choice);
+                    
+                    // If user selects Setup Applications, then proceed.
+                    SetupApplications.Initiation(dockerClient);
+                    break;
+                } else if (choice.equals("2")) {
+                    System.out.println("You selected option " + choice);
+                    
+                    // If user selects Interval Applications, then proceed.
+                    IntervalApplications.Initiation(dockerClient, webClient);
+                    break;
+                } else if (choice.equals("3")) {
+                    System.out.println("You selected option " + choice);
+                    
+                    // If user selects exit, then proceed.
+                    break outer;
+                } else {
+                    System.out.print("Invalid choice. Please enter 1, 2 or 3: ");
+                }
+            }
+        }
+            
+        // Close the scanner after use.
+        scanner.close(); 
+            
+        //####################################//
+        //####################################//
+        
+        // We have to send the region, company and container to the backend.
+        // So remember to add the region and company parameters in the SetupApplications.
+
+        //####################################//
+        //####################################//
+
+        //SetupApplications.Initiation(dockerClient);
 	}
 
+    /**
+     * This function is used to check if the JSON file that contains all of the containers exists, 
+     * if it does not exist then create one.
+     */
+    public static void checkFileCreated() {
+        if (!Files.exists(containerListPath)) {
+            // If the file does not exist, then it has to be created.
+            try {
+                // In order for it to be considered a JSON file, it has to contain {}.
+                Files.writeString(containerListPath, "{}");
+            } catch (Exception e) {
+                // If anything goes wrong, it is printed.
+                e.printStackTrace();
+            }
+        } 
+    }
 
 }

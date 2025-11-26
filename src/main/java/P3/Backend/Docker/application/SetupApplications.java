@@ -236,31 +236,6 @@ public class SetupApplications {
         }
     }
 
-    /** This function is used to set all of the state of all of the inactive containers.
-     * 
-     * @param existingIdArr Is used to find the inactive containers within the JSON file.
-     * @param oldContainersArr Is used to store all of the inactive containers.
-     * @param JSONFileObj Is used to edit the state of each of the containers.
-     */
-    private static void setInactiveContainers(JSONArray existingIdArr, JSONArray oldContainersArr,
-                                                        JSONObject JSONFileObj) {
-        // Go through each of the containers in olContainersArr and compare them with each container in existingIdArr.
-        for (int i = 0; i < oldContainersArr.length(); i++) {
-            if (!oldContainersArr.getString(i).isEmpty()) {
-                for (int j = 0; j < existingIdArr.length(); j++) {
-                    if (existingIdArr.getString(j).equals(oldContainersArr.getString(i))) {
-                        // Set the state of the container to be inactive.
-                        String name = JSONFileObj.names().getString(j);
-                        JSONFileObj.getJSONObject(name).put("state", "inactive");
-
-                        updateJSONFile(JSONFileObj); // Inactive containers get the inactive state.
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     /** This function is used to delete every inactive containers.
      * 
      * @param existingIdArr Is used to make sure that the inactive container exists in the JSON file.
@@ -340,6 +315,31 @@ public class SetupApplications {
         } catch (Exception e) {
             // If anything goes wrong, it will be printed.
             e.printStackTrace();
+        }
+    }
+
+     /** This function is used to set all of the state of all of the inactive containers.
+     * 
+     * @param existingIdArr Is used to find the inactive containers within the JSON file.
+     * @param oldContainersArr Is used to store all of the inactive containers.
+     * @param JSONFileObj Is used to edit the state of each of the containers.
+     */
+    private static void setInactiveContainers(JSONArray existingIdArr, JSONArray oldContainersArr,
+                                                        JSONObject JSONFileObj) {
+        // Go through each of the containers in olContainersArr and compare them with each container in existingIdArr.
+        for (int i = 0; i < oldContainersArr.length(); i++) {
+            if (!oldContainersArr.getString(i).isEmpty()) {
+                for (int j = 0; j < existingIdArr.length(); j++) {
+                    if (existingIdArr.getString(j).equals(oldContainersArr.getString(i))) {
+                        // Set the state of the container to be inactive.
+                        String name = JSONFileObj.names().getString(j);
+                        JSONFileObj.getJSONObject(name).put("state", "inactive");
+
+                        updateJSONFile(JSONFileObj); // Inactive containers get the inactive state.
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -465,10 +465,10 @@ public class SetupApplications {
                     if (e instanceof NumberFormatException) {
                         continue;
                     } else {
+                        // If anything goes wrong, it is printed.
                         e.printStackTrace();
                     }
                 }
-
             }
 
             // Make a JSON object that contains all of the relevant information.
@@ -491,6 +491,35 @@ public class SetupApplications {
                 // Put the ports in the newContainer.
                 newContainer.put("privatePort", privatePort);
                 newContainer.put("publicPort", publicPort);
+            } else {
+                // The container is not running, so we have to find the ports from the JSON file.
+                for (String key : JSONFileObj.keySet()) {
+                    JSONObject tempContainer = JSONFileObj.getJSONObject(key);
+                    String tempId = tempContainer.getString("id");
+
+                    // We compare the id's to find the correct container.
+                    if (newContainer.getString("id").equals(tempId)) {
+
+                        if (!tempContainer.has("privatePort") || !tempContainer.has("publicPort")) {
+                            // If this is implemented, the container has been set up incorrectly, 
+                            // and you should reconfigure / use the setup application again. (Make sure that every container is running).
+                            newContainer.put("state", "unconfigured");
+
+                            // Give the user a clear warning that the container has not been set up correctly.
+                            System.out.println("Warning: The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.");
+                        } else {
+                            // We get both public and private port.
+                            Integer privatePort = tempContainer.getInt("privatePort");
+                            Integer publicPort = tempContainer.getInt("publicPort");
+    
+                            // Put the ports in the newContainer.
+                            newContainer.put("privatePort", privatePort);
+                            newContainer.put("publicPort", publicPort);
+                        }
+                        // Stop the for loop when correct container has been found.
+                        break;
+                    }
+                }
             }
             
             // Add the new container to the existing content.
