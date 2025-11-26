@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class WebClientPost {
 
-    // Send arbitrary object as JSON to the given URI (relative or absolute).
+    // Sends an object as JSON to the given URI (asynchronous).
     public static Mono<String> sendData(WebClient webClient, Object requestBody, String uri) {
         return webClient.post()
                 .uri(uri)
@@ -23,12 +23,12 @@ public class WebClientPost {
                 .bodyToMono(String.class);
     }
 
-    // Blocking convenience wrapper
+    // Blocking version of sendData (synchronous).
     public static String sendDataBlocking(WebClient webClient, Object requestBody, String uri) {
         return sendData(webClient, requestBody, uri).block();
     }
 
-    // Read file as UTF-8 and send raw JSON text (useful when you already have containerData.json)
+    // Read containerData.json and send raw JSON text to the given URI (asynchronous).
     public static Mono<String> sendFileContent(WebClient webClient, Path filePath, String uri) throws Exception {
         String json = Files.readString(filePath, StandardCharsets.UTF_8);
         return webClient.post()
@@ -39,6 +39,7 @@ public class WebClientPost {
                 .bodyToMono(String.class);
     }
 
+    // Blocking version of sendFileContent (synchronous).
     public static String sendFileContentBlocking(WebClient webClient, Path filePath, String uri) throws Exception {
         return sendFileContent(webClient, filePath, uri).block();
     }

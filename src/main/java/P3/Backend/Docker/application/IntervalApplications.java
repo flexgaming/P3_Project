@@ -214,7 +214,9 @@ public class IntervalApplications {
 
                             try {
                                 // Example: http://localhost:9000/api/containers
+                                // TODO: sendDataBlocking creates an object and sends it as JSON to the given URI, but test sendFileContentBlocking as it should just send the raw json.
                                 String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], Persistent.INTERNAL_SERVER_URL);
+                                // String resp = WebClientPost.sendFileContentBlocking(webClient, Persistent.CONTAINER_DATA_PATH, Persistent.INTERNAL_SERVER_URL);
                                 System.out.println("POST response: " + resp);
                             } catch (Exception e) {
                                 System.err.println("Failed to POST container data: " + e.getMessage());
