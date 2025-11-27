@@ -89,6 +89,7 @@ public class DemoApplication {
             
         // Close the scanner after use.
         scanner.close(); 
+        System.exit(0);
             
         //####################################//
         //####################################//

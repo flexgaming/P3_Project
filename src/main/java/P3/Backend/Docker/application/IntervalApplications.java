@@ -9,14 +9,11 @@ import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
 import P3.Backend.Docker.manager.WebClientPost;
 import P3.Backend.Docker.classes.ContainerClass;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -24,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+
 
 @Component
 public class IntervalApplications {
@@ -197,18 +195,12 @@ public class IntervalApplications {
                         //       HTTP FUNCTION HERE       //
                         ////////////////////////////////////
                         containerArr[i].setTimestamp(new Date().getTime());
-                            ObjectMapper mapper = new ObjectMapper();
-                            mapper.writeValue(new File("containerData.json"), containerArr[i]);
-
-                            try {
-                                // Example: http://localhost:9000/api/containers
-                                // TODO: sendDataBlocking creates an object and sends it as JSON to the given URI, but test sendFileContentBlocking as it should just send the raw json.
-                                String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], INTERNAL_SERVER_URL);
-                                // String resp = WebClientPost.sendFileContentBlocking(webClient, Persistent.CONTAINER_DATA_PATH, Persistent.INTERNAL_SERVER_URL);
-                                System.out.println("POST response: " + resp);
-                            } catch (Exception e) {
-                                System.err.println("Failed to POST container data: " + e.getMessage());
-                            }
+                        try {
+                            String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], INTERNAL_SERVER_URL);
+                            System.out.println("POST response: " + resp);
+                        } catch (Exception e) {
+                            System.err.println("Failed to POST container data: " + e.getMessage());
+                        }
                         
                     } else {
                         intervalArr[i].setTempInterval(newInterval); // Set the new tempInterval.
