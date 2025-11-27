@@ -1,6 +1,8 @@
 package P3.Backend.Docker.application;
 
-import static P3.Backend.Docker.Persistent.*;
+import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
+import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
+import static P3.Backend.Docker.Persistent.DEFAULT_INTERVAL_TIME;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,14 +21,8 @@ import com.github.dockerjava.api.DockerClient;
 @Component
 public class SetupApplications {
 
-    // The default interval (in seconds) for the new containers.
-    private static final Integer defaultIntervalTime = DEFAULT_INTERVAL_TIME;
-
-    // Name for JSON file containing all of the containers:
-    private static final String containerFilename = CURRENT_CONTAINER_PATH;
-
     // The path for where the JSON file is stored.
-    private static final Path containerListPath = Path.of("" + containerFilename); // Replace "" with desired path.
+    private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
     /** 
      * This function is used for setting up the containers and its intervals. 
@@ -34,20 +30,14 @@ public class SetupApplications {
      * You are able to see if there are inactive container in the JSON file as well as configuring both newly 
      * dicovered and already existing containers.
      * 
-     * @param dockerClient Used for sending and receiving data from the docker.
+     * @param dockerClient Is used for sending and receiving data from the docker.
+     * @param scanner Is used is used to scan all of the input from the user.
      */
-    public static void Initiation(DockerClient dockerClient) {
+    public static void Initiation(DockerClient dockerClient, Scanner scanner) {
         // Gets all of the containers that is in the system and puts it into an array (containers).
         List<Container> containersTemp = dockerClient.listContainersCmd().withShowAll(true).exec();
         JSONArray fetchedContainersArr = new JSONArray(containersTemp);
-
-        // Scans all of the input from the user.
-        Scanner scanner = new Scanner(System.in); 
         
-        // Check if the JSON file that contains all of the containers exists, 
-        // if it does not exist then create one.
-        checkFileCreated();
-
         // In order to use the library Files, you need to have a try and catch.
         try {
             // Get all of the content within the file.
@@ -71,29 +61,10 @@ public class SetupApplications {
             // Asks if user want to see the updated JSON file, printed out. 
             printAllContainers(JSONFileObj, scanner);
 
-            // Close the input scanner.
-            scanner.close();
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
             e.printStackTrace();
         }
-    }
-
-    /**
-     * This function is used to check if the JSON file that contains all of the containers exists, 
-     * if it does not exist then create one.
-     */
-    public static void checkFileCreated() {
-        if (!Files.exists(containerListPath)) {
-            // If the file does not exist, then it has to be created.
-            try {
-                // In order for it to be considered a JSON file, it has to contain {}.
-                Files.writeString(containerListPath, "{}");
-            } catch (Exception e) {
-                // If anything goes wrong, it is printed.
-                e.printStackTrace();
-            }
-        } 
     }
 
     /** This function is used to filter the containers into inactive and new container, as well as 
@@ -440,7 +411,7 @@ public class SetupApplications {
                 // then the interval is set to the default interval
                 interval = findContainerInterval(container, existingIdArr, JSONFileObj);
             } else {
-                interval = defaultIntervalTime;
+                interval = DEFAULT_INTERVAL_TIME;
             }
             
             // Gets the new interval for sending data from the user.
@@ -558,11 +529,11 @@ public class SetupApplications {
                 count++;
                 // If the id does not exist within the JSON file, then it will return the default interval.
                 if (count == existingIdArr.length()) {
-                    return defaultIntervalTime; // Returns the default seconds if it is a new container.
+                    return DEFAULT_INTERVAL_TIME; // Returns the default seconds if it is a new container.
                 }
             }
         }
-        return defaultIntervalTime; // To please the complier, we return something where.
+        return DEFAULT_INTERVAL_TIME; // To please the complier, we return something where.
     }
 
     /** This function is used for setting the JSON file with new input.

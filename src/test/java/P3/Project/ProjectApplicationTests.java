@@ -26,6 +26,8 @@ import com.github.dockerjava.api.model.Container;
 import P3.Project.util.TestResult;
 import P3.Backend.Docker.DemoApplication;
 import P3.Backend.Docker.manager.DockerClientManager;
+
+import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.application.SetupApplications.updateJSONFile;
 
@@ -73,13 +75,12 @@ class ProjectApplicationTests {
 	} */
 
 	
+    // The path for where the JSON file is stored.
+    private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 	
 	// TODO Check if containers are put in the currentContainers file.
 	@Test 
 	void ensureAddedContainersTest() {
-    	final String containerFilename = CURRENT_CONTAINER_PATH;
-   		// The path for where the JSON file is stored.
-   		final Path containerListPath = Path.of("" + containerFilename); // Replace "" with desired path.
 
 		try {
 			String content = Files.readString(containerListPath);

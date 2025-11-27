@@ -1,5 +1,6 @@
 package P3.Backend.Docker.application;
 
+import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT;
 import static P3.Backend.Docker.Persistent.INTERNAL_SERVER_URL;
@@ -22,27 +23,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 
-
 @Component
 public class IntervalApplications {
     
     // The path for where the JSON file is stored.
-    private static final Path containerListPath = Path.of("" + CURRENT_CONTAINER_PATH); // Replace "" with desired path.
+    private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
     public static ContainerClass[] containerArr;
     public static IntervalClass[] intervalArr;
 
-
+    /** This function is used for initiating the interval application.
+     * 
+     * @param dockerClient Is used for sending and receiving data from the docker.
+     * @param webClient Is used for sending and getting HTTP requests.
+     */
     public static void Initiation(DockerClient dockerClient, WebClient webClient) {
-        
-        //////////////////////////////////
-        //      Maintenance HTTP        // 
-        //////////////////////////////////
 
-
-        // Set up array of container classes (get data from JSON file)
+        // Set up array of container classes (get data from JSON file).
         SetupContainerArray();
-
         
         // Set up interval array (with id, interval, tempInterval)
         SetupIntervalArray(containerArr);
@@ -50,12 +48,11 @@ public class IntervalApplications {
         // Create an AtomicBoolean to be used in different threads.
         AtomicBoolean userInputDetected = new AtomicBoolean(false);
 
-        // Start thread to check for user input
+        // Start thread to check for user input.
         checkUserInputThread(userInputDetected);
 
-        // Start interval scheduler to fetch data based on intervals
+        // Start interval scheduler to fetch data based on intervals.
         checkIntervalScheduler(userInputDetected, dockerClient, webClient);
-        
     }
 
     /**
@@ -148,57 +145,70 @@ public class IntervalApplications {
         }
     }
 
+    /**
+     * This function is used to check for user input in a separate thread.
+     * If user input is detected, the AtomicBoolean is set to true and the main thread can stop.
+     */
     private static void checkUserInputThread(AtomicBoolean bool) {
 
+        // Create a new thread to monitor user input.
         Thread thread = new Thread(() -> {
             try {
-                Scanner scanner = new Scanner(System.in);
+                Scanner scanner = new Scanner(System.in); // Scanner for user input.
                 while (true) {
                     if (scanner.hasNextLine()) {
                         scanner.nextLine(); // Go past this if there is user input.
                         bool.set(true); // Set the userInputDetected to be true.
                         break;
                     }
-                    Thread.sleep(100); // Avoid tight loop
+                    Thread.sleep(100); // Avoid tight loop.
                 }
+                // Close the scanner after use.
                 scanner.close();
-                // Don't close scanner - System.in may be needed elsewhere
+
             } catch (Exception e) {
-                // Silently handle if System.in is already closed
+                // Silently handle if System.in is already closed.
             }
         });
 
         // Make sure that the thread will not prevent JVM shutdown if the process exits.
         thread.setDaemon(true);
 
-        // Start the input watcher thread
+        // Start the input watcher thread.
         thread.start();
     }
 
+    /** This function is used to check the intervals for each of the containers within containerArr, 
+     * and then sending all data after fetching the newest information.
+     * 
+     * @param bool Is used to check if user input has been detected.
+     * @param dockerClient Is used for sending and receiving data from the docker.
+     * @param webClient Is used for sending and getting HTTP requests.
+     */
     private static void checkIntervalScheduler(AtomicBoolean bool, DockerClient dockerClient, WebClient webClient) {
         while (!bool.get()) {
             try {
                 // Go through each index in intervalArr and remove 1 second from tempInterval.
                 // Fetch container data and put it into containerArr if index's tempInterval is 0.
                 for (int i = 0; i < intervalArr.length; i++) {
-
-                    Integer newInterval = intervalArr[i].getTempInterval() - 1;
+                    Integer newInterval = intervalArr[i].getTempInterval() - 1; 
                     
                     if (newInterval == 0) {
-                        newInterval = intervalArr[i].getInterval(); // Reset the interval.
+                        newInterval = intervalArr[i].getInterval(); // Reset the newInterval to the original interval.
                         intervalArr[i].setTempInterval(newInterval);
 
                         // Fetch all of the container information and put it into containerArr at current index.
                         fetchAllContainerInformation(containerArr[i], dockerClient, webClient);
                         
-                        ////////////////////////////////////
-                        //       HTTP FUNCTION HERE       //
-                        ////////////////////////////////////
+                        // Set the timestamp for when the data was fetched.
                         containerArr[i].setTimestamp(new Date().getTime());
+
+                        // Try to send the container data to the backend server.
                         try {
                             String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], INTERNAL_SERVER_URL);
                             System.out.println("POST response: " + resp);
                         } catch (Exception e) {
+                            // Print the error if the POST request fails.
                             System.err.println("Failed to POST container data: " + e.getMessage());
                         }
                         
@@ -216,19 +226,27 @@ public class IntervalApplications {
         }
     }
 
+    /** This function is used to fetch all of the container information from both Docker and Spring Actuator.
+     * 
+     * @param container Is used to store all of the container information.
+     * @param dockerClient Is used for sending and receiving data from the docker.
+     * @param webClient Is used for getting data from the Spring Actuator endpoint.
+     */
     private static void fetchAllContainerInformation(ContainerClass container, DockerClient dockerClient, WebClient webClient) {
         
         // Get data from docker container.
         fetchDockerStats(container, dockerClient);
         
-        
         // Fetch the data from the Spring Actuator endpoint if the container is running.
         if (container.getContainerRunning().equals(true)) {
 
+            // Build the container's actuator URL.
             String actuatorUrl = SPRING_ACTUATOR_DEFAULT_ENDPOINT + ":" + container.getPublicPort();
+
+            // Get the status of the actuator.
             String actuatorStatus = getActuatorRunningStatus(callActuator(webClient, actuatorUrl, "/actuator/health"));
             
-            // See if the actuator is reachable.
+            // See if the actuator is up and running.
             if (actuatorStatus != null && actuatorStatus.equals("UP")) {
                 fetchSpringActuatorStats(container, webClient, actuatorUrl);
             } else {
@@ -236,52 +254,68 @@ public class IntervalApplications {
                 // Set JVMRunning to false if the actuator is not reachable.
                 container.setJVMRunning(false);
 
+                // Print that the actuator endpoint is not reachable.
                 System.out.println("Spring Actuator endpoint not reachable for " + container.getContainerName());
-
             }
         } else {
+            // If the container is not running, skip fetching Spring Actuator stats.
             System.out.println("Container " + container.getContainerName() + " is not running, skipping Spring Actuator stats fetch.");
         }
     }
 
-
+    /** This function is used for fetching the Docker stats for a specific container.
+     * 
+     * @param container Is used to store all of the container information.
+     * @param dockerClient Is used for getting data from the docker.
+     */
     private static void fetchDockerStats(ContainerClass container, DockerClient dockerClient) {
         
-        
+        // Create a DockerStatsService to fetch stats.
         DockerStatsService dockerStatsService = new DockerStatsService(dockerClient);
         
+        // Get the container ID.
         String containerId = container.getContainerId();
         
+        // Fetch the stats from Docker.
         try {
             ContainerStats stats = dockerStatsService.getContainerStats(containerId);
             InspectContainerResponse response = dockerClient
                     .inspectContainerCmd(containerId)
                     .withSize(true)
                     .exec();
-
                     
-
+            // Set the container stats in the ContainerClass.
             container.setContainerRamUsage(stats.getMemoryUsage()); // Current RAM usage of the container.
             container.setContainerCpuUsage(stats.getCpuTotalUsage()); // Current CPU total usage of the container.
-            container.setContainerDiskUsage(response.getSizeRootFs());  // Total size (image + writable layer)
+            container.setContainerDiskUsage(response.getSizeRootFs());  // Total size (image + writable layer).
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
-            container.setContainerExitCode(response.getState().getExitCodeLong()); // Exit Code for the container
             
+            // Get the exit code only if the container is not running.
+            if (container.getContainerRunning().equals(false))
+                container.setContainerExitCode(response.getState().getExitCodeLong()); // Exit Code for the container.
+            else 
+                container.setContainerExitCode(null); // No exit code if the container is running.
             
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
             // e.printStackTrace();
             container.setContainerRunning(false); // Is the container running or not.
             container.setContainerStatus("exited"); // Current status of the container (running or exited).
-            //throw new RuntimeException(containerId + " - Error fetching Docker stats.");
         }
     }
 
-    
+    /** This function is used for fetching the Spring Actuator stats for a specific container.
+     * 
+     * @param container Is used to store all of the container information.
+     * @param webClient Is used for getting data from the Spring Actuator endpoint.
+     * @param url Is the URL for the Spring Actuator endpoint.
+     */
     private static void fetchSpringActuatorStats(ContainerClass container, WebClient webClient, String url) {
 
+        // Set all of the data recheved from the Spring Actuator endpoint.
+        // JVM stats
         container.setJVMRamMax(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.max")));
         container.setJVMRamUsage(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.used")));
         container.setJVMCpuUsageStart(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.start.time")));
@@ -291,22 +325,31 @@ public class IntervalApplications {
         container.setJVMThreadQueued(getIntSafe(callActuator(webClient, url, "/actuator/metrics/executor.queued")));
         container.setJVMUptime(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.uptime")));
 
+        // DISK / STORAGE
         container.setSystemDiskFree(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.free")));
         container.setSystemDiskTotal(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.total")));
         
+        // CPU
         container.setSystemCpuCores(getIntSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.count")));
         container.setSystemCpuUsagePerc(getLongSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.usage")));
 
+        // ERROR LOGS & MISC
         container.setPoolCore(getIntSafe(callActuator(webClient, url, "/actuator/metrics/executor.pool.core")));
         container.setLogbackEvents(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events")));
         container.setLogbackEventsError(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events?tag=level:error")));
         container.setLogbackEventsWarn(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events?tag=level:warn")));
         container.setGarbageCollectSize(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.gc.overhead")));
-
     }
-    //ENDPOINT = "/actuator/metrics/jvm.memory.used"
+
+    /** This function is used to call the Spring Actuator endpoint and get the JSON response.
+     * 
+     * @param webClient Is used for getting data from the Spring Actuator endpoint.
+     * @param url Is the URL for the Spring Actuator endpoint.
+     * @param endpoint Is the specific endpoint to call.
+     * @return The JSON response from the Spring Actuator endpoint.
+     */
     private static JSONObject callActuator(WebClient webClient, String url, String endpoint) {
-        // Get the raw JSON response as a string
+        // Get the raw JSON response as a string.
         try {
             String jsonString = webClient.get()
                     .uri(url + endpoint)
@@ -314,7 +357,7 @@ public class IntervalApplications {
                     .bodyToMono(String.class)
                     .block();
     
-            // Convert and return the value as a JSON object
+            // Convert and return the value as a JSON object.
             return new JSONObject(jsonString);
             
         } catch (Exception e) {
@@ -322,6 +365,11 @@ public class IntervalApplications {
         }
     }
 
+    /** This function is used to safely get a Long value from a JSON object.
+     * 
+     * @param json Is the JSON object to get the value from.
+     * @return The Long value from the JSON object, or null if not found.
+     */
     private static Long getLongSafe(JSONObject json) {
         try {
             return json
@@ -334,6 +382,11 @@ public class IntervalApplications {
         }
     }
 
+    /** This function is used to safely get an Integer value from a JSON object.
+     * 
+     * @param json Is the JSON object to get the value from.
+     * @return The Integer value from the JSON object, or null if not found.
+     */
     private static Integer getIntSafe(JSONObject json) {
         try {
             return json
@@ -346,6 +399,11 @@ public class IntervalApplications {
         }
     }
 
+    /** This function is used to get the running status from the actuator health JSON.
+     * 
+     * @param json Is the JSON object to get the value from.
+     * @return The running status from the JSON object, or null if not found.
+     */
     private static String getActuatorRunningStatus(JSONObject json) {
         try {
             return json
@@ -356,87 +414,4 @@ public class IntervalApplications {
         }
     }
 
-
-    /* private static void jsonPut(JSONObject json, String name, String getStr, Integer getInt, Long getLong, Boolean getBool) {
-        try {
-            if (getStr != null) {
-                json.put(name, getStr);
-            }
-            if (getInt != null) {
-                json.put(name, getInt);
-            }
-            if (getLong != null) {
-                json.put(name, getLong);
-            }
-            if (getBool != null) {
-                json.put(name, getBool);
-            }    
-        } catch (Exception e) {
-            json.put(name, "Failure to put value into JSON.");    
-        }
-    }
-
-
-    // For now: pretty-print the payload that would be sent
-    private static void printContainerData(ContainerClass c) {
-        JSONObject root = new JSONObject();
-        root.put("name", c.getContainerName());
-        root.put("id", c.getContainerId());
-        root.put("timestamp", c.getTimestamp());
-
-        JSONObject meta = new JSONObject();
-        jsonPut(meta, "name", c.getContainerName(), null, null, null);
-        jsonPut(meta, "id", c.getContainerId(), null, null, null);
-        jsonPut(meta, "publicPort", null, c.getPublicPort(), null, null);
-        jsonPut(meta, "interval", null, c.getContainerInterval(), null, null);
-        if (c.getTimestamp() != null) {
-            jsonPut(meta, "timestamp", null, null, c.getTimestamp(), null);
-        }
-        root.put("metadata", meta);
-
-        JSONObject docker = new JSONObject();
-
-        jsonPut(docker, "running", null, null, null, c.getContainerRunning());
-        jsonPut(docker, "ramUsage", null, null, c.getContainerRamUsage(), null);
-        jsonPut(docker, "cpuUsage", null, null, c.getContainerCpuUsage(), null);
-        jsonPut(docker, "diskUsage", null, null, c.getContainerDiskUsage(), null);
-        jsonPut(docker, "status", c.getContainerStatus(), null, null, null);
-        jsonPut(docker, "pid", null, null, c.getContainerPid(), null);
-        jsonPut(docker, "exitCode", null, null, c.getContainerExitCode(), null);
-        root.put("docker", docker);
-
-        JSONObject actuator = new JSONObject();
-            JSONObject jvm = new JSONObject();
-            jsonPut(jvm, "jvmRunning", null, null, null, c.getJVMRunning());
-            jsonPut(jvm, "jvmRamMax", null, null, c.getJVMRamMax(), null);
-            jsonPut(jvm, "jvmRamUsage", null, null, c.getJVMRamUsage(), null);
-            jsonPut(jvm, "jvmCpuUsagePerc", null, null, c.getJVMCpuUsagePerc(), null);
-            jsonPut(jvm, "jvmThreads", null, c.getJVMThreads(), null, null);
-            jsonPut(jvm, "jvmThreadsStates", null, c.getJVMThreadsStates(), null, null);
-            jsonPut(jvm, "jvmThreadQueued", null, c.getJVMThreadQueued(), null, null);
-            jsonPut(jvm, "jvmCpuUsageStart", null, null, c.getJVMCpuUsageStart(), null);
-            jsonPut(jvm, "jvmUptime", null, null, c.getJVMUptime(), null);
-            actuator.put("jvm", jvm);
-
-            JSONObject system = new JSONObject();
-            jsonPut(system, "systemRamUsage", null, null, c.getSystemRamUsage(), null);
-            jsonPut(system, "systemCpuUsagePerc", null, null, c.getSystemCpuUsagePerc(), null);
-            jsonPut(system, "systemCpuCores", null, c.getSystemCpuCores(), null, null);
-            jsonPut(system, "systemDiskUsage", null, null, c.getSystemDiskUsage(), null);
-            jsonPut(system, "systemDiskTotal", null, null, c.getSystemDiskTotal(), null);
-            jsonPut(system, "systemDiskFree", null, null, c.getSystemDiskFree(), null);
-            actuator.put("system", system);
-
-            JSONObject misc = new JSONObject();
-            jsonPut(misc, "poolCore", null, c.getPoolCore(), null, null);
-            jsonPut(misc, "logbackEvents", null, c.getLogbackEvents(), null, null);
-            jsonPut(misc, "logbackEventsError", null, c.getLogbackEventsError(), null, null);
-            jsonPut(misc, "logbackEventsWarn", null, c.getLogbackEventsWarn(), null, null);
-            jsonPut(misc, "garbageCollectSize", null, null, c.getGarbageCollectSize(), null);
-            actuator.put("misc", misc);
-
-        root.put("actuator", actuator);
-
-        System.out.println(root.toString(2));
-    } */
 }

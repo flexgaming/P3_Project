@@ -12,16 +12,13 @@ public final class Persistent {
     // -------------------------------
     // File Paths
     // -------------------------------
-    public static final String CURRENT_CONTAINER_PATH = "currentContainers.json";
-    public static final String CONTAINER_DATA_PATH = "containerData.json";
-    // public static final String BACKUP_PATH = "/data/backups/";
-    // public static final String TEMP_PATH = "/tmp/myapp/";
-    // public static final String LOGS_PATH = "/var/log/myapp/";
+    public static final String CONTAINER_NAME = "currentContainers.json";
+    public static final String CURRENT_CONTAINER_PATH = ""; // Replace "" with desired path. 
 
     // -------------------------------
     // Application Settings
     // -------------------------------
-    public static final Integer DEFAULT_INTERVAL_TIME = 60;
+    public static final Integer DEFAULT_INTERVAL_TIME = 60; // Default interval time in seconds.
     // -------------------------------
     // Example URLs or endpoints
     // -------------------------------

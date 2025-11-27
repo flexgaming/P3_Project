@@ -5,8 +5,6 @@ public class ContainerClass {
     // All of the variables that we want to store from each container.
     // That is also sent to the database.
     
-    private Long timestamp;                 // Is the time when data is fetched.
-    
     // Data from JSON:
     private String containerName;           // Is the name of the docker container.
     private String containerId;             // Is the id of the docker container.
@@ -22,7 +20,6 @@ public class ContainerClass {
     private Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
     private Long containerExitCode;         // Is the exit code received from the program (CHROOT EXIT CODES - https://stackoverflow.com/questions/31297616/what-is-the-authoritative-list-of-docker-run-exit-codes).
     
-
     // Data from actuator:
     //JVM Data
     private Boolean JVMRunning;             // Is internally java application on or off.
@@ -44,24 +41,18 @@ public class ContainerClass {
     private Long systemDiskFree;          // Is the free disk space on the system.
 
     // Misc Data
+    private Long timestamp;                 // Is the time when data is fetched.
     private Integer poolCore;             // Is the core number of threads allocated for the pool of the java application.
     private Integer logbackEvents;        // Is the number of logback events on the java application.
     private Integer logbackEventsError;   // Is the number of logback error events on the java application.
     private Integer logbackEventsWarn;    // Is the number of logback warn events on the java application.  
-    private Long garbageCollectSize;   // Is the size of garbage collection on the java application.
-    
+    private Long garbageCollectSize;   // Is the size of garbage collection on the java application. 
     
     //String JVMStatus;               // Is the status of the java application.
-    
-    
-    
-    
-    
-    
-    
-    /////////////////////////
-    //      ERROR HERE     //
-    /////////////////////////
+
+    ////////////////////////////////
+    //      CLASS CONSTRUCTOR     //
+    ////////////////////////////////
     
     public ContainerClass(String name, String id, Integer interval, Integer publicPort) {
         this.containerName = name;
@@ -93,8 +84,6 @@ public class ContainerClass {
     public Integer getContainerInterval() { return containerInterval; }
     
     public void setContainerInterval(Integer interval) { this.containerInterval = interval; }
-    
-    
     
     //////////////////////////////////////
     //  CONTAINER GETTERS AND SETTERS   //
@@ -136,7 +125,7 @@ public class ContainerClass {
     public void setContainerExitCode(Long containerExitCode) { this.containerExitCode = containerExitCode; }
 
     //////////////////////////////////////
-    //  ACTUATOR GETTERS AND SETTERS    //
+    //   ACTUATOR GETTERS AND SETTERS   //
     //////////////////////////////////////
 
     //=================================//
@@ -188,7 +177,6 @@ public class ContainerClass {
 
     public void setJVMUptime(Long jVMUptime) { JVMUptime = jVMUptime; }
 
-
     //=================================//
     //   SYSTEM GETTERS AND SETTERS    //
     //=================================//
@@ -223,6 +211,10 @@ public class ContainerClass {
 
     public void setSystemDiskFree(Long systemDiskFree) { this.systemDiskFree = systemDiskFree; }
 
+    ////////////////////////////////
+    //      MISC GET/SET HERE     //
+    ////////////////////////////////
+
 //PoolCore
     public Integer getPoolCore() { return poolCore; }
 
@@ -248,25 +240,9 @@ public class ContainerClass {
 
     public void setGarbageCollectSize(Long garbageCollectSize) { this.garbageCollectSize = garbageCollectSize; }
 
-
 //Timestamp
     public Long getTimestamp() { return timestamp; }
 
     public void setTimestamp(Long timestamp) { this.timestamp = timestamp; }
-
-
-
-
-
-
-
-
-
-
-    
-    /////////////////////////////////
-    //      ERROR GET/SET HERE     //
-    /////////////////////////////////
-
 
 }
