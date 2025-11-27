@@ -17,6 +17,17 @@ export default function Dashboard() {
     // control the Stack direction responsively using React state
     const [direction, setDirection] = useState(() => (typeof window !== "undefined" && window.innerWidth < 1105) ? "vertical" : "horizontal");
 
+    // If the windows becomes smaller than 500px wide, make the stack direction of Region-Cards-Dashboard vertical
+    window.addEventListener("resize", () => {
+        if (window.innerWidth < 750) {
+            document.getElementById("Region-Cards-Dashboard").direction = "vertical";
+            console.log("Window resized to less than 750px wide, changing Region-Cards-Dashboard to vertical");
+        } else {
+            document.getElementById("Region-Cards-Dashboard").direction = "horizontal";
+            console.log("Window resized to more than 750px wide, changing Region-Cards-Dashboard to horizontal");
+        }
+    });
+
     // Update direction on window resize
     useEffect(() => {
         function handleResize() {

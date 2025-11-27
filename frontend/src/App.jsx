@@ -11,16 +11,7 @@ import ManagePage from "./pages/Manage.jsx";
 // The main application component
 const App = () => {
 
-    // If the windows becomes smaller than 500px wide, make the stack direction of Region-Cards-Dashboard vertical
-    window.addEventListener("resize", () => {
-        if (window.innerWidth < 750) {
-            document.getElementById("Region-Cards-Dashboard").direction = "vertical";
-            console.log("Window resized to less than 750px wide, changing Region-Cards-Dashboard to vertical");
-        } else {
-            document.getElementById("Region-Cards-Dashboard").direction = "horizontal";
-            console.log("Window resized to more than 750px wide, changing Region-Cards-Dashboard to horizontal");
-        }
-    });
+    
 
     return (
         <div className="App">

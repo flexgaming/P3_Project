@@ -39,4 +39,12 @@
     color: #ffffff;
 }
 
+#overview-dropdown{
+    position: static !important;
+    z-index: 9999 !important;
+    border: none;
+}
 
+#overview-dropdown .btn {
+    color: #ffffff;
+}

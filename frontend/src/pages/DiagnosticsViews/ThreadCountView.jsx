@@ -14,9 +14,15 @@ import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
-export default function ThreadCountView({ containerData, serverData, timeAgo }) {
+export default function ThreadCountView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [threadCountChart, setThreadCountChart] = useState(null);
     const [noData, setNoData] = useState(false);
+    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+
+    useEffect(() => {
+        if (!isActive) return;
+        if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
+    }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
@@ -75,18 +81,18 @@ export default function ThreadCountView({ containerData, serverData, timeAgo }) 
                 }
             }
         });
-    }, [containerData, serverData]);
+    }, [containerData, serverData, timeAgo]);
 
     return (
         <>
             {noData ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="thread-count-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
                 </div>
             ) : threadCountChart ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="thread-count-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={threadCountChart?.data} options={threadCountChart?.options}/>
                 </div>
             ) : (

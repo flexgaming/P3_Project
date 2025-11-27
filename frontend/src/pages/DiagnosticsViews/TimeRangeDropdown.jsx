@@ -1,59 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 
+// Helpers for converting between readable titles and internal timeframe keys
+export function readableTimeFrame(tf) {
+    switch (tf) {
+        case "10minutes": return "Last 10 Minutes";
+        case "1hour": return "Last 1 Hour";
+        case "6hours": return "Last 6 Hours";
+        case "12hours": return "Last 12 Hours";
+        case "24hours": return "Last 24 Hours";
+        case "1week": return "Last Week";
+        case "1month": return "Last Month";
+        case "1year": return "Last Year";
+        default:
+            return undefined;
+    }
+}
+
+export function reverseReadableTimeFrame(readable) {
+    switch (readable) {
+        case "Last 10 Minutes": return "10minutes";
+        case "Last 1 Hour": return "1hour";
+        case "Last 6 Hours": return "6hours";
+        case "Last 12 Hours": return "12hours";
+        case "Last 24 Hours": return "24hours";
+        case "Last Week": return "1week";
+        case "Last Month": return "1month";
+        case "Last Year": return "1year";
+        default:
+            return undefined;
+    }
+}
+
 // TimeRangeDropdown component
 // Props:
-// - initial: default title
 // - timeFrame: current selected timeframe (controlled)
 // - onChange: function(newTimeFrame) called when the user picks a new value
-function TimeRangeDropdown({ timeFrame, onChange }) {
+function TimeRangeDropdown({ timeFrame, onChange, id }) {
     const current = timeFrame;
     const [title = "Last 10 Minutes", setTitle] = useState(current);
 
-    function translateTimeFrame(tf) {
-        switch (tf) {
-            case "10minutes":
-                return "Last 10 Minutes";
-            case "1hour":
-                return "Last 1 Hour";
-            case "6hours":
-                return "Last 6 Hours";
-            case "12hours":
-                return "Last 12 Hours";
-            case "24hours":
-                return "Last 24 Hours";
-            case "1week":
-                return "Last Week";
-            case "1month":
-                return "Last Month";
-            case "1year":
-                return "Last Year";
-            default:
-                break;
-        }
-    }
-
     // Keep local title in sync if parent changes timeFrame
     useEffect(() => {
-        setTitle(translateTimeFrame(timeFrame));
+        setTitle(readableTimeFrame(timeFrame));
     }, [timeFrame]);
 
     const handleSelect = (eventKey) => {
         if (!eventKey) return;
-        setTitle(translateTimeFrame(eventKey));
+        setTitle(readableTimeFrame(eventKey));
         if (typeof onChange === "function") onChange(eventKey);
-
-        // Broadcast a global timeframe change so other components (including
-        // the DiagnosticsView) can react even if they use their own dropdown.
-        try {
-            const ev = new CustomEvent("p3:timeFrameChanged", { detail: eventKey });
-            window.dispatchEvent(ev);
-        } catch (err) {
-            console.debug("TimeRangeDropdown: falling back to older CustomEvent API", err);
-            const ev = document.createEvent("CustomEvent");
-            ev.initCustomEvent("p3:timeFrameChanged", true, true, eventKey);
-            window.dispatchEvent(ev);
-        }
+        // Do NOT broadcast a global timeframe change; each view should own
+        // its own timeframe and call the fetch function provided to it.
     };
 
     return (
@@ -62,6 +59,7 @@ function TimeRangeDropdown({ timeFrame, onChange }) {
             <DropdownButton
                 className="time-interval-dropdown"
                 title={title}
+                id={id}
                 variant="secondary"
                 drop="start"
                 onSelect={handleSelect}

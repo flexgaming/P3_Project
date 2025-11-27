@@ -61,9 +61,15 @@ const dashedLegendPlugin = {
     },
 };
 
-export default function RamView({ containerData, serverData, timeAgo }) {
+export default function RamView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [ramChart, setRamChart] = useState(null);
     const [noData, setNoData] = useState(false);
+    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+
+    useEffect(() => {
+        if (!isActive) return;
+        if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
+    }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
@@ -157,12 +163,12 @@ export default function RamView({ containerData, serverData, timeAgo }) {
         <>
             {noData ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="ram-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
                 </div>
             ) : ramChart ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="ram-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={ramChart?.data} options={ramChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>
             ) : (

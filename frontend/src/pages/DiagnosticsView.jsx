@@ -1,5 +1,5 @@
 import "./css/DiagnosticsView.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Tab, Row, Col, Nav, Dropdown, DropdownButton} from "react-bootstrap";
 import Overview from "./DiagnosticsViews/Overview.jsx";
 import RunningView from "./DiagnosticsViews/RunningView.jsx";
@@ -7,16 +7,15 @@ import CpuView from "./DiagnosticsViews/CpuView.jsx";
 import RamView from "./DiagnosticsViews/RamView.jsx";
 import DiskUsageView from "./DiagnosticsViews/DiskUsageView.jsx";
 import ThreadCountView from "./DiagnosticsViews/ThreadCountView.jsx";
-import TimeRangeDropdown from "./DiagnosticsViews/TimeRangeDropdown.jsx";
 import { useParams } from "react-router-dom";
 
 export default function DiagnosticsView() {
     const { containerID } = useParams();
-
-    const [timeFrame, setTimeFrame] = useState("10minutes"); // Default to last 10 minutes
+    // No global timeframe — each view manages its own timeframe.
     const [containerData, setContainerData] = useState([]);
     const [serverData, setServerData] = useState([]);
     const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState("overview");
 
     // --- Helper: Convert timestamp -> "x minutes ago" ---
     const timeAgo = (timestamp) => {
@@ -35,39 +34,45 @@ export default function DiagnosticsView() {
         return `${diffDay}d ago`;
     };
 
-    useEffect(() => {
-        // Send the selected timeFrame as JSON in the request body. Use POST
-        // because GET requests should not include a body. The endpoint should
-        // accept POST with JSON { timeFrame } and return diagnostics for that range.
-        async function fetchDiagnosticsData() {
-            try {
-                const res = await fetch(`/api/data/diagnosticsdata/${containerID}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ timeFrame }),
-                });
-                console.log(res);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                setContainerData(await res.json());
-            } catch (err) {
-                setError(err.message || String(err));
-            }
+    // Keep track of the last (containerID,timeFrame) we requested to avoid
+    // sending duplicate identical requests when parent re-renders.
+    const lastFetchRef = useRef(null);
+
+    // Fetch diagnostics for a given timeframe. Views will call this when they
+    // become active and whenever their local timeframe changes while active.
+    const fetchDiagnosticsFor = useCallback(async (timeFrame) => {
+        if (!containerID || !timeFrame) return;
+        const key = `${containerID}|${timeFrame}`;
+        if (lastFetchRef.current === key) return; // already fetched this exact range
+        lastFetchRef.current = key;
+
+        try {
+            const res = await fetch(`/api/data/diagnosticsdata/${containerID}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ timeFrame }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            setContainerData(await res.json());
+        } catch (err) {
+            setError(err.message || String(err));
         }
+    }, [containerID]);
 
-        // Fetch when component mounts and whenever containerID or timeFrame changes
-        fetchDiagnosticsData();
-    }, [containerID, timeFrame]);
-
-    // Listen for global timeframe changes dispatched by standalone dropdowns
+    // Clear dedupe state when container changes so we will fetch fresh data.
     useEffect(() => {
-        function onGlobalTimeFrame(e) {
-            const tf = e && e.detail ? e.detail : null;
-            if (tf && tf !== timeFrame) setTimeFrame(tf);
-        }
+        lastFetchRef.current = null;
+    }, [containerID]);
 
-        window.addEventListener("p3:timeFrameChanged", onGlobalTimeFrame);
-        return () => window.removeEventListener("p3:timeFrameChanged", onGlobalTimeFrame);
-    }, [timeFrame]);
+    // On initial load (or when user navigates back to Overview), fetch the
+    // diagnostics for the Overview tab so it doesn't stay in a perpetual
+    // "Loading chart…" state. Use the default timeframe of 10 minutes for
+    // overview initial load.
+    useEffect(() => {
+        if (activeTab === "overview") {
+            fetchDiagnosticsFor("10minutes");
+        }
+    }, [activeTab, fetchDiagnosticsFor]);
 
     useEffect(() => {
         if (!containerData ||!containerData.containerData) return;
@@ -94,7 +99,7 @@ export default function DiagnosticsView() {
                 <b>Diagnostics View</b>
             </h2>
 
-            <Tab.Container defaultActiveKey="overview">
+            <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
                 <Row>
                     <Col sm={3}>
                         <Nav variant="pills" className="flex-column" id="DiagnosticsView-tabs">
@@ -111,22 +116,22 @@ export default function DiagnosticsView() {
                     <Col sm={9}>
                         <Tab.Content>
                             <Tab.Pane eventKey="overview">
-                                <Overview containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                                <Overview containerData={containerData} serverData={serverData} timeAgo={timeAgo} isActive={activeTab === "overview"} fetchDiagnostics={fetchDiagnosticsFor} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="running">
-                                <RunningView diagnosticsData={containerData.diagnosticsData} timeAgo={timeAgo}/>
+                                <RunningView diagnosticsData={containerData.diagnosticsData} timeAgo={timeAgo} isActive={activeTab === "running"} fetchDiagnostics={fetchDiagnosticsFor} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="cpuUsage">
-                                <CpuView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                                <CpuView containerData={containerData} serverData={serverData} timeAgo={timeAgo} isActive={activeTab === "cpuUsage"} fetchDiagnostics={fetchDiagnosticsFor} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="ramUsage">
-                                <RamView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                                <RamView containerData={containerData} serverData={serverData} timeAgo={timeAgo} isActive={activeTab === "ramUsage"} fetchDiagnostics={fetchDiagnosticsFor} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="diskUsage">
-                                <DiskUsageView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                                <DiskUsageView containerData={containerData} serverData={serverData} timeAgo={timeAgo} isActive={activeTab === "diskUsage"} fetchDiagnostics={fetchDiagnosticsFor} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="threadCount">
-                                <ThreadCountView containerData={containerData} serverData={serverData} timeAgo={timeAgo}/>
+                                <ThreadCountView containerData={containerData} serverData={serverData} timeAgo={timeAgo} isActive={activeTab === "threadCount"} fetchDiagnostics={fetchDiagnosticsFor} />
                             </Tab.Pane>
                         </Tab.Content>
                     </Col>

@@ -9,7 +9,7 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
-import pattern from "patternomaly";
+// pattern not required in this view
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
@@ -18,8 +18,7 @@ const dashedLegendPlugin = {
     id: "dashedLegendPlugin",
 
     afterUpdate(chart) {
-        const legend = chart.legend;
-        const ctx = chart.ctx;
+    const legend = chart.legend;
 
         legend.legendItems.forEach((item) => {
             const dataset = chart.data.datasets[item.datasetIndex];
@@ -62,9 +61,18 @@ const dashedLegendPlugin = {
     },
 };
 
-export default function CpuView({ containerData, serverData, timeAgo }) {
+export default function CpuView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [cpuChart, setCpuChart] = useState(null);
     const [noData, setNoData] = useState(false);
+    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+
+    // When the view becomes active, or when the local timeframe changes while
+    // active, request diagnostics for our local timeframe.
+    useEffect(() => {
+        if (!isActive) return;
+        if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
+    }, [isActive, localTimeFrame, fetchDiagnostics]);
+
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.cpuTotal) {
@@ -154,18 +162,18 @@ export default function CpuView({ containerData, serverData, timeAgo }) {
     return (
         <>
             {noData ? (
-                <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
-                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
-                </div>
-            ) : cpuChart ? (
-                <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
-                    <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>
-                </div>
-            ) : (
-                <p>Loading chart…</p>
-            )}
+                    <div className="chart-container shadow rounded-4">
+                        <TimeRangeDropdown id="cpu-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
+                        <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                    </div>
+                ) : cpuChart ? (
+                    <div className="chart-container shadow rounded-4">
+                        <TimeRangeDropdown id="cpu-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
+                        <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>
+                    </div>
+                ) : (
+                    <p>Loading chart…</p>
+                )}
         </>
     )
 }

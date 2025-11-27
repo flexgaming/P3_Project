@@ -13,9 +13,15 @@ import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
 
-export default function RunningView({ diagnosticsData, timeAgo }) {
+export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchDiagnostics }) {
     const [runningChart, setRunningChart] = useState(null);
     const [noData, setNoData] = useState(false);
+    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+
+    useEffect(() => {
+        if (!isActive) return;
+        if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
+    }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
         if (!diagnosticsData) {
@@ -136,18 +142,18 @@ export default function RunningView({ diagnosticsData, timeAgo }) {
                 }
             }
         });
-    }, [diagnosticsData]);
+    }, [diagnosticsData, timeAgo]);
 
     return (
         <>
             {noData ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
                 </div>
             ) : runningChart ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Bar data={runningChart?.data} options={runningChart?.options}/>
                 </div>
             ) : (

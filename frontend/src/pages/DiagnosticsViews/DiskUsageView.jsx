@@ -61,9 +61,15 @@ const dashedLegendPlugin = {
     },
 };
 
-export default function DiskUsageView({ containerData, serverData, timeAgo }) {
+export default function DiskUsageView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [diskUsageChart, setDiskUsageChart] = useState(null);
     const [noData, setNoData] = useState(false);
+    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+
+    useEffect(() => {
+        if (!isActive) return;
+        if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
+    }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.diskUsageTotal) {
@@ -153,12 +159,12 @@ export default function DiskUsageView({ containerData, serverData, timeAgo }) {
         <>
             {noData ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
                 </div>
             ) : diskUsageChart ? (
                 <div className="chart-container shadow rounded-4">
-                    <TimeRangeDropdown />
+                    <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={diskUsageChart?.data} options={diskUsageChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>
             ) : (
