@@ -13,6 +13,7 @@ import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
+// Plugin to render dashed lines in legend
 const dashedLegendPlugin = {
     id: "dashedLegendPlugin",
 
@@ -61,6 +62,23 @@ const dashedLegendPlugin = {
     },
 };
 
+/**
+ * DiskUsageView
+ *
+ * Props:
+ * - containerData: object containing container diagnostics and container metadata
+ * - serverData: object containing server totals (diskUsageTotal, ramTotal, etc.)
+ * - timeAgo: function(timestamp) -> string used to render human-friendly labels
+ * - isActive: boolean indicating whether this view is currently visible/active
+ * - fetchDiagnostics: function(timeFrameKey) -> triggers a diagnostics fetch for this view
+ *
+ * Renders a line chart comparing container and server disk usage. When the view
+ * becomes active or the local timeframe changes, it calls `fetchDiagnostics`
+ * with the selected timeframe.
+ *
+ * @param {{containerData: object, serverData: object, timeAgo: function, isActive: boolean, fetchDiagnostics: function}} param0
+ * @returns {JSX.Element}
+ */
 export default function DiskUsageView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [diskUsageChart, setDiskUsageChart] = useState(null);
     const [noData, setNoData] = useState(false);
@@ -152,17 +170,20 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
                     }
                 }
             }
-        });
-    }, [containerData, serverData, timeAgo]);
+        }); 
+    }, [containerData, serverData, timeAgo, localTimeFrame, isActive, fetchDiagnostics]);
 
+    // Render the component 
     return (
         <>
             {noData ? (
+                // No data error message
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
-                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                    <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : diskUsageChart ? (
+                // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={diskUsageChart?.data} options={diskUsageChart?.options} plugins={[dashedLegendPlugin]}/>

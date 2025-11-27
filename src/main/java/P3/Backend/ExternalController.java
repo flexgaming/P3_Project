@@ -37,7 +37,6 @@ public class ExternalController {
             statsList.forEach(dto -> System.out.println("Container name: " + dto.getContainerName() + ", container id: " + dto.getContainerId()));
             System.out.println(data.toString(2));
             
-
             return ResponseEntity.ok("Received " + statsList.size() + " container(s). Check console for details.");
         } catch (Exception e) {
             e.printStackTrace();

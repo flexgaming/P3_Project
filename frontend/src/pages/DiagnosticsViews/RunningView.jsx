@@ -13,6 +13,22 @@ import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
 
+/**
+ * RunningView
+ *
+ * Props:
+ * - diagnosticsData: array or object of diagnostics for this container
+ * - timeAgo: function(timestamp) -> string used to render human-friendly labels
+ * - isActive: boolean indicating whether this view is currently visible/active
+ * - fetchDiagnostics: function(timeFrameKey) -> triggers a diagnostics fetch for this view
+ *
+ * Renders a stacked bar chart displaying running/stopped/error states over time.
+ * When the view becomes active or the local timeframe changes, it calls
+ * `fetchDiagnostics` with the selected timeframe.
+ *
+ * @param {{diagnosticsData: Array|Object, timeAgo: function, isActive: boolean, fetchDiagnostics: function}} param0
+ * @returns {JSX.Element}
+ */
 export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchDiagnostics }) {
     const [runningChart, setRunningChart] = useState(null);
     const [noData, setNoData] = useState(false);
@@ -142,16 +158,19 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
                 }
             }
         });
-    }, [diagnosticsData, timeAgo]);
+    }, [diagnosticsData, timeAgo, localTimeFrame, isActive, fetchDiagnostics]);
 
+    // Render the component
     return (
         <>
             {noData ? (
+                // No data error message
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
-                    <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                    <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : runningChart ? (
+                // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Bar data={runningChart?.data} options={runningChart?.options}/>
