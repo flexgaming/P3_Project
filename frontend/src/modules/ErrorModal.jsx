@@ -27,7 +27,7 @@ function ErrorModal({ error, buttonText = "View", buttonVariant = "primary" }) {
                 </Modal.Body>
                 <Modal.Footer>
                     {/* Button to close the modal */}
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button variant="secondary" onClick={handleClose} style={{ color: "#ffffff" }}>
                         Close
                     </Button>
                 </Modal.Footer>

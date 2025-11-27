@@ -563,8 +563,8 @@ public class Database {
                 String diagnosticsID = resultSet.getString("Diagnostics_ID");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 String errorLogs = resultSet.getString("Error_Logs");
-//                String date = resultSet.getString("diagnosticDate");
-//                String time = resultSet.getString("diagnosticTime");
+                String date = resultSet.getString("diagnosticDate");
+                String time = resultSet.getString("diagnosticTime");
                 diagnosticsError.put("regionID", regionID);
                 diagnosticsError.put("regionName", regionName);
                 diagnosticsError.put("companyID", companyID);
@@ -575,8 +575,8 @@ public class Database {
                 diagnosticsError.put("containerName", containerName);
                 diagnosticsError.put("timestamp", timestamp);
                 diagnosticsError.put("errorLogs", errorLogs);
-//                diagnosticsError.put("date", date);
-//                diagnosticsError.put("time", time);
+                diagnosticsError.put("date", date);
+                diagnosticsError.put("time", time);
                 diagnosticsErrors.put(diagnosticsID, diagnosticsError);
             }
 
@@ -809,34 +809,6 @@ public class Database {
 
         return regions;
     }
-
-
-
-    /* public ArrayList<Company> getCompanies(String regionName) {
-        regionName = regionName.replaceAll("-", " ");
-        String sql = "SELECT * FROM company WHERE region_id = (SELECT region.region_id FROM region WHERE region.Name ~* '" + regionName + "')";
-
-        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
-        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user input.
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql)) {
-
-            ArrayList<Company> companies = new ArrayList<>();
-            // Reads all the rows in the Company table and adds them as Company classes to the ArrayList.
-            while (resultSet.next()) {
-                int companyID = resultSet.getInt("Company_ID");
-                String name = resultSet.getString("Name");
-                Company company = new Company(companyID, name);
-                companies.add(company);
-            }
-            return companies;
-
-        } catch (SQLException error) {
-            errorHandling(error);
-            return null;
-        }
-    } */
 
     public ArrayList<String> getCompanyContents(String regionName, String companyName) {
         companyName = companyName.replaceAll("-", " ");

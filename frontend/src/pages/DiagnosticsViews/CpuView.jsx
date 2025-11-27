@@ -12,14 +12,18 @@ import {
 // pattern not required in this view
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
+// Register ChartJS components
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
+// Plugin to render dashed lines in legend
 const dashedLegendPlugin = {
     id: "dashedLegendPlugin",
 
+    // Modify legend items after chart update
     afterUpdate(chart) {
     const legend = chart.legend;
 
+        // chart.ctx is available if needed for drawing, not required here
         legend.legendItems.forEach((item) => {
             const dataset = chart.data.datasets[item.datasetIndex];
 
@@ -40,6 +44,7 @@ const dashedLegendPlugin = {
         const ctx = chart.ctx;
         const legend = chart.legend;
 
+        // Draw each legend item
         legend.legendItems.forEach((item) => {
             const dataset = chart.data.datasets[item.datasetIndex];
 
@@ -61,6 +66,23 @@ const dashedLegendPlugin = {
     },
 };
 
+/**
+ * CpuView
+ *
+ * Props:
+ * - containerData: object containing container diagnostics and container metadata
+ * - serverData: object containing server totals (cpuTotal, ramTotal, etc.)
+ * - timeAgo: function(timestamp) -> string used to render human-friendly labels
+ * - isActive: boolean indicating whether this view is currently visible/active
+ * - fetchDiagnostics: function(timeFrameKey) -> triggers a diagnostics fetch for this view
+ *
+ * Renders a line chart comparing container and server CPU usage. When the view
+ * becomes active or the local timeframe changes, it calls `fetchDiagnostics`
+ * with the selected timeframe.
+ *
+ * @param {{containerData: object, serverData: object, timeAgo: function, isActive: boolean, fetchDiagnostics: function}} param0
+ * @returns {JSX.Element}
+ */
 export default function CpuView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [cpuChart, setCpuChart] = useState(null);
     const [noData, setNoData] = useState(false);
@@ -73,20 +95,23 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
         if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
     }, [isActive, localTimeFrame, fetchDiagnostics]);
 
-
+    // When containerData or serverData changes, rebuild the chart.
     useEffect(() => {
         if (!containerData || !containerData.containerData || !serverData || !serverData.cpuTotal) {
             return;
         }
 
+        // Get diagnostics data as an array
         const diagnosticsData = containerData.diagnosticsData && !Array.isArray(containerData.diagnosticsData)
             ? Object.values(containerData.diagnosticsData)
             : Array.isArray(containerData.diagnosticsData)
                 ? containerData.diagnosticsData
                 : [];
 
+        // Sort data by timestamp ascending
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+        // Check if we have any diagnostics data
         if (diagnosticsData.length === 0) {
             // No diagnostics in selected timeframe — show friendly message instead of chart
             setNoData(true);
@@ -100,9 +125,11 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
         const cpuContainer = diagnosticsData.map(item => 1 - item.cpuFree / containerData.containerData.cpuMax);
         const cpuServer = diagnosticsData.map(item => (containerData.containerData.cpuMax - item.cpuFree) / serverData.cpuTotal);
 
+        // Define line colors for container and server
         const lineColorContainer = diagnosticsData.map(() => "blue");
         const lineColorServer = diagnosticsData.map(() => "red");
 
+        // Build the chart data and options
         setCpuChart({
             type: "line",
             data: {
@@ -157,16 +184,19 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
                 }
             }
         });
-    }, [containerData, serverData, timeAgo]);
+    }, [containerData, serverData, timeAgo, localTimeFrame, isActive, fetchDiagnostics]);
 
+    // Render the chart, no-data message, or loading state
     return (
         <>
             {noData ? (
+                    // No data error message 
                     <div className="chart-container shadow rounded-4">
                         <TimeRangeDropdown id="cpu-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
-                        <div style={{ padding: 20 }}>No data in the selected timeframe.</div>
+                        <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                     </div>
                 ) : cpuChart ? (
+                    // Chart is ready and data is available
                     <div className="chart-container shadow rounded-4">
                         <TimeRangeDropdown id="cpu-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                         <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>

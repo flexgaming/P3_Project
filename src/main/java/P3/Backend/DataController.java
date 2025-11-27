@@ -62,12 +62,11 @@ Database database = new Database();
     @PostMapping("/diagnosticsdata/{containerID}")
     public Map<String, Object> getDiagnosticsData(@PathVariable String containerID,
                                                   @RequestBody(required = false) Map<String, Object> payload) {
-        // Accept an optional JSON body (e.g. { "timeFrame": "1h" })
-        String timeFrame = "10m";
+        // Accept an optional JSON body (e.g. { "timeFrame": "1hour" })
+        String timeFrame = "10minutes";
         if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
             timeFrame = payload.get("timeFrame").toString();
-            // TODO: pass timeFrame into the database query when DB supports it.
-            System.out.println("Diagnostics request for container " + containerID + " with timeFrame: " + timeFrame);
+            System.out.println("Diagnostics request for container " + containerID + " with timeFrame: " + timeFrame); // Debug print
         }
 
         JSONObject diagnosticsData = new JSONObject();
