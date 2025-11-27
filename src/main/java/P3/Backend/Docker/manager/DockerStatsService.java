@@ -1,7 +1,5 @@
 package P3.Backend.Docker.manager;
 
-import java.io.IOException;
-
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.model.Statistics;
