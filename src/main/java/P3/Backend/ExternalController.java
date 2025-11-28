@@ -29,11 +29,11 @@ public class ExternalController {
             // Prepare the database.
             Database database = new Database();
 
-            // FILTHER THE ELEMENTS THE CONTAINER.
-            
+                // Make function for filtering all of the necessary data.
+
 
             // Send data
-
+                // make function for sending all of the data.
 
 
         } catch (Exception e) {
@@ -83,6 +83,15 @@ private ContainerClass storeContainerData(JSONObject jsonData) {
                 break;
             case "containerInterval":
                 container.setContainerInterval(Integer.parseInt(value));
+                break;
+            case "companyRegion":
+                container.setCompanyRegion(value);
+                break;
+            case "companyName":
+                container.setCompanyName(value);
+                break;
+            case "companyServer":
+                container.setCompanyServer(value);
                 break;
 
             // Data from docker:

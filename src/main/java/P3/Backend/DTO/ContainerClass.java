@@ -11,6 +11,10 @@ public class ContainerClass {
     private Integer publicPort;             // Is the port number of the docker container.    
     private Integer containerInterval;      // Is the interval for sending data to another server. 
 
+    private String companyRegion;          // Is the region of the company using the application.
+    private String companyName;            // Is the name of the company using the application.
+    private String companyServer;          // Is the server of the company using the application.
+
     // Data from docker:
     private Boolean containerRunning;       // Is docker container on or off.
     private Long containerRamUsage;         // Is ram usage on docker container.
@@ -73,6 +77,22 @@ public class ContainerClass {
     public Integer getContainerInterval() { return containerInterval; }
     
     public void setContainerInterval(Integer interval) { this.containerInterval = interval; }
+    
+
+    //CompanyRegion
+    public String getCompanyRegion() { return companyRegion; }
+
+    public void setCompanyRegion(String companyRegion) { this.companyRegion = companyRegion; }
+    
+    //CompanyName
+    public String getCompanyName() { return companyName; }
+
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+
+    //CompanyServer
+    public String getCompanyServer() { return companyServer; }
+
+    public void setCompanyServer(String companyServer) { this.companyServer = companyServer; }
     
     //////////////////////////////////////
     //  CONTAINER GETTERS AND SETTERS   //
