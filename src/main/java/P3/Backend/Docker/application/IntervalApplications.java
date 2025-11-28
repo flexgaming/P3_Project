@@ -318,6 +318,7 @@ public class IntervalApplications {
 
         // Set all of the data recheved from the Spring Actuator endpoint.
         // JVM stats
+        container.setJVMRunning(true);
         container.setJVMRamMax(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.max")));
         container.setJVMRamUsage(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.used")));
         container.setJVMCpuUsageStart(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.start.time")));

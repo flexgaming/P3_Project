@@ -60,10 +60,7 @@ public class DemoApplication {
         
         // Decide what part of the application user want to use:
         outer: while (true) {
-            System.out.println("Select application mode:");
-            System.out.println("1. Setup Applications");
-            System.out.println("2. Interval Applications");
-            System.out.println("3. Exit");
+            printApplicationChoices(); // Print the choices
             System.out.print("Enter choice (1, 2 or 3): ");
             String choice;
             while (true) {
@@ -73,11 +70,15 @@ public class DemoApplication {
                     
                     // If user selects Setup Applications, then proceed.
                     SetupApplications.Initiation(dockerClient, scanner);
+
+                    printApplicationChoices(); // Print the choices
                 } else if (choice.equals("2")) {
                     System.out.println("You selected option " + choice);
                     
                     // If user selects Interval Applications, then proceed.
                     IntervalApplications.Initiation(dockerClient, webClient);
+
+                    printApplicationChoices(); // Print the choices
                 } else if (choice.equals("3")) {
                     System.out.println("You selected option " + choice);
                     
@@ -92,17 +93,6 @@ public class DemoApplication {
         // Close the scanner after use.
         scanner.close(); 
         System.exit(0);
-            
-        //####################################//
-        //####################################//
-        
-        // We have to send the region, company and container to the backend.
-        // So remember to add the region and company parameters in the SetupApplications.
-
-        //####################################//
-        //####################################//
-
-        //SetupApplications.Initiation(dockerClient, scanner);
 	}
 
     /**
@@ -119,7 +109,8 @@ public class DemoApplication {
                 // If anything goes wrong, it is printed.
                 e.printStackTrace();
             }
-        } else if (!Files.exists(companyInfoPath)) {
+        } 
+        if (!Files.exists(companyInfoPath)) {
             // If the file does not exist, then it has to be created.
             try {
                 // In order for it to be considered a JSON file, it has to contain a template.
@@ -138,4 +129,12 @@ public class DemoApplication {
             }
         }
     }
+
+    private static void printApplicationChoices() {
+        System.out.println("Select application mode:");
+        System.out.println("1. Setup Applications");
+        System.out.println("2. Interval Applications");
+        System.out.println("3. Exit");
+    }
+
 }
