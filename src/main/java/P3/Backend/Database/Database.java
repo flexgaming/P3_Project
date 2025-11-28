@@ -545,7 +545,7 @@ public class Database {
         if (timeFrameString != null){
             // Use Helper Function to convert time frame string to minutes.
             timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
-            System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
+            // System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
         }
         JSONObject diagnosticsErrors = new JSONObject();
         // Read all data from View Diagnostics_Errors in the selected timeframe.
@@ -749,7 +749,7 @@ public class Database {
         if (timeFrameString != null){
             // Use Helper Function to convert time frame string to minutes.
             timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
-            System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
+            // System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
         }
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= "+" NOW() - make_interval(mins => ?)";
         JSONObject diagnosticsData = new JSONObject();

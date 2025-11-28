@@ -13,7 +13,7 @@ import TimeRangeDropdown from "./DiagnosticsViews/TimeRangeDropdown.jsx";
  * - Critical Errors table displaying recent critical errors
  */
 export default function Dashboard() {
-    const [localTimeFrame, setLocalTimeFrame] = useState("1month");
+    const [localTimeFrame, setLocalTimeFrame] = useState("1week");
     // Regions are handled by the DashboardRegions component which fetches on mount
     window.history.replaceState({}, "", `/dashboard/`); // set URL to /dashboard/
     // control the Stack direction responsively using React state
@@ -23,10 +23,8 @@ export default function Dashboard() {
     window.addEventListener("resize", () => {
         if (window.innerWidth < 750) {
             document.getElementById("Region-Cards-Dashboard").direction = "vertical";
-            console.log("Window resized to less than 750px wide, changing Region-Cards-Dashboard to vertical");
         } else {
             document.getElementById("Region-Cards-Dashboard").direction = "horizontal";
-            console.log("Window resized to more than 750px wide, changing Region-Cards-Dashboard to horizontal");
         }
     });
 
@@ -55,7 +53,7 @@ export default function Dashboard() {
             {/* Critical Errors Section */}
             <div id="critical-header-container">
                 <h1 id="critical-errors-header"><b>Critical Errors:</b></h1>
-                <TimeRangeDropdown id="error-dropdown-id" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} className={"error-dropdown"}/>
+                <TimeRangeDropdown id="error-dropdown-id" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} className={"error-dropdown shadow"}/>
             </div>
             
             
