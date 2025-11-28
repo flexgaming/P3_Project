@@ -35,7 +35,7 @@ public class ContainerClass {
     //System Data
     private Long systemRamUsage;          // Is all of the ram usage on the system.
     private Long systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
-    private Integer SystemCpuCores;         // Is the number of cpu cores on the system.
+    private Integer systemCpuCores;         // Is the number of cpu cores on the system.
     private Long systemDiskUsage;         // Is all of the disk usage on the system.
     private Long systemDiskTotal;         // Is the total disk space on the system.
     private Long systemDiskFree;          // Is the free disk space on the system.
@@ -192,9 +192,9 @@ public class ContainerClass {
     public void setSystemCpuUsagePerc(Long systemCpuUsagePerc) { this.systemCpuUsagePerc = systemCpuUsagePerc; }
     
 //SystemCpuCores
-    public Integer getSystemCpuCores() { return SystemCpuCores; }
+    public Integer getSystemCpuCores() { return systemCpuCores; }
 
-    public void setSystemCpuCores(Integer systemCpuCores) { SystemCpuCores = systemCpuCores; }
+    public void setSystemCpuCores(Integer systemCpuCores) { this.systemCpuCores = systemCpuCores; }
 
 //SystemDiskUsage
     public Long getSystemDiskUsage() { return systemDiskUsage; }
