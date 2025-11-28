@@ -93,10 +93,15 @@ Database database = new Database();
     }
 
     // GET Critical Errors data
-    @GetMapping("/errors") //Router continuation
-    public Map<String, Object> getCriticalErrorsData() {
+    @PostMapping("/errors") //Router continuation
+    public Map<String, Object> getCriticalErrorsData(@RequestBody Map<String, Object> payload) {
+        String timeFrame = null;
+        if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
+            timeFrame = payload.get("timeFrame").toString();
+            System.out.println("Critical errors request with timeFrame: " + timeFrame); // Debug print
+        }
         // Get critical errors data from DB
-        Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors().toMap();
+        Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors(timeFrame).toMap();
         // Create an object to asses the severity of the error messages
         SeverityCalculator severityCalculator = new SeverityCalculator();
         //Return the updated map of error messages with severities assigned
