@@ -29,7 +29,7 @@ public class HelperFunctions {
             case "1year":
                 return 365 * 24 * 60; // approx 365 days
             default:
-                System.out.println("Could not parse timeframe string: " + timeFrameString); // For error logging
+                // System.out.println("Could not parse timeframe string: " + timeFrameString); // For error logging
                 return Constants.DIAGNOSTICS_TIME_SCOPE;
         }
     }

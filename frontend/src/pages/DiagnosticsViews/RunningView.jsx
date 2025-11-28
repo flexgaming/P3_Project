@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Bar } from "react-chartjs-2";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import {
     Chart as ChartJS,
     BarElement,
     LinearScale,
     CategoryScale,
+    Title,
     Tooltip,
     Legend
 } from "chart.js";
 import pattern from "patternomaly";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
-ChartJS.register(BarElement, LinearScale, CategoryScale, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 /**
  * RunningView
@@ -33,6 +36,34 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
     const [runningChart, setRunningChart] = useState(null);
     const [noData, setNoData] = useState(false);
     const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+    const chartRef = useRef(null);
+
+    // Keep a processed diagnostics array (ordered) so clicks can map index -> diagnostics object
+    const [processedDiagnostics, setProcessedDiagnostics] = useState([]);
+    const [selectedDiagnostic, setSelectedDiagnostic] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleClick = (event)  => {
+        const chart = chartRef.current;
+        if (!chart) return;
+
+        const points = chart.getElementsAtEventForMode(
+            event.nativeEvent,
+            'nearest',
+            { intersect: true },
+            true
+        );
+
+        if (points && points.length > 0) {
+            const firstPoint = points[0];
+            const idx = firstPoint.index;
+            const diag = processedDiagnostics[idx];
+            if (diag) {
+                setSelectedDiagnostic(diag);
+                setShowModal(true);
+            }
+        }
+    };
 
     useEffect(() => {
         if (!isActive) return;
@@ -41,30 +72,48 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
 
     useEffect(() => {
         if (!diagnosticsData) {
+            setProcessedDiagnostics([]);
             return;
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        diagnosticsData = diagnosticsData && !Array.isArray(diagnosticsData)
-            ? Object.values(diagnosticsData)
-            : Array.isArray(diagnosticsData)
-                ? diagnosticsData
-                : [];
+        // If diagnosticsData is an object keyed by diagnosticsID, preserve the id on each entry.
+        let diagArray = [];
+        if (diagnosticsData && !Array.isArray(diagnosticsData)) {
+            diagArray = Object.entries(diagnosticsData).map(([id, value]) => ({ diagnosticsID: id, ...value }));
+        } else if (Array.isArray(diagnosticsData)) {
+            // If the array items lack an explicit diagnosticsID, leave as-is
+            diagArray = diagnosticsData.slice();
+        } else {
+            diagArray = [];
+        }
 
-        diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        diagArray.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        // Keep a copy so click handler can look up full diagnostic objects by index
+        setProcessedDiagnostics(diagArray);
 
-        const errors = [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1];
+        // Determine labels and datasets based on the normalized diagnostics
+        const labels = diagArray.map(item => timeAgo(item.timestamp));
+        const runningValues = diagArray.map(() => -1);
 
-        const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const runningValues = diagnosticsData.map(() => -1);
-        const errorValues = errors.map(item => item ? [0.02, 1] : [0, 0]);
+        // Detect whether each diagnostic contains non-empty error information.
+        const hasError = diagArray.map(item => {
+            const val = item.errorLogs;
+            if (Array.isArray(val)) return val.length > 0;
+            if (typeof val === "string") return val.trim().length > 0;
+            if (val && typeof val === "object") return Object.keys(val).length > 0;
+            return false;
+        });
 
-        const barColors = diagnosticsData.map(item =>
+        // Error dataset uses the same stacked layout as running/stopped; when there's
+        // no error for an index we push a transparent zero so the bar is absent.
+        const errorValues = hasError.map(h => (h ? [0.02, 1] : [0, 0]));
+
+        const barColors = diagArray.map(item =>
             item.running ? pattern.draw("dot", "green") : pattern.draw("cross-dash", "red")
         );
-        const errorColors = errors.map(() => "yellow");
+        const errorColors = hasError.map(h => (h ? "yellow" : "rgba(0,0,0,0)"));
 
-        if (diagnosticsData.length === 0) {
+        if (diagArray.length === 0) {
             setNoData(true);
             setRunningChart(null);
             return;
@@ -160,7 +209,10 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
         });
     }, [diagnosticsData, timeAgo, localTimeFrame, isActive, fetchDiagnostics]);
 
+
     // Render the component
+    // If a diagnostic is selected, prefer common error fields for conditional display
+    const selectedErrorVal = selectedDiagnostic ? (selectedDiagnostic.errorLogs ?? selectedDiagnostic.errors ?? selectedDiagnostic.error) : null;
     return (
         <>
             {noData ? (
@@ -175,7 +227,44 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
                 <div className="chart-container shadow rounded-4">
                     <br></br>
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
-                    <Bar data={runningChart?.data} options={runningChart?.options}/>
+                    <Bar data={runningChart?.data} options={runningChart?.options} ref={chartRef} onClick={handleClick} />
+
+                    {/* Modal showing full diagnostics for the clicked bar */}
+                    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Diagnostic Details</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {selectedDiagnostic ? (
+                                <div>
+                                    {selectedDiagnostic.diagnosticsID && (
+                                        <div style={{ marginBottom: 8 }}><strong>ID:</strong> {selectedDiagnostic.diagnosticsID}</div>
+                                    )}
+
+                                    {selectedErrorVal && (
+                                        <div style={{ marginBottom: 12 }}>
+                                            <h6>Error Logs</h6>
+                                            <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", background: "#f8f9fa", padding: 8 }}>{
+                                                typeof selectedErrorVal === 'string'
+                                                    ? selectedErrorVal
+                                                    : JSON.stringify(selectedErrorVal, null, 2)
+                                            }</pre>
+                                        </div>
+                                    )}
+
+                                    <h6>Full diagnostic object</h6>
+                                    <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{JSON.stringify(selectedDiagnostic, null, 2)}</pre>
+                                </div>
+                            ) : (
+                                <div>No diagnostic selected.</div>
+                            )}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowModal(false)} style={{ color: "#ffffff" }}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </div>
             ) : (
                 <p>Loading chart…</p>

@@ -66,7 +66,7 @@ Database database = new Database();
         String timeFrame = "10minutes";
         if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
             timeFrame = payload.get("timeFrame").toString();
-            System.out.println("Diagnostics request for container " + containerID + " with timeFrame: " + timeFrame); // Debug print
+            // System.out.println("Diagnostics request for container " + containerID + " with timeFrame: " + timeFrame); // Debug print
         }
 
         JSONObject diagnosticsData = new JSONObject();
@@ -98,7 +98,7 @@ Database database = new Database();
         String timeFrame = null;
         if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
             timeFrame = payload.get("timeFrame").toString();
-            System.out.println("Critical errors request with timeFrame: " + timeFrame); // Debug print
+            // System.out.println("Critical errors request with timeFrame: " + timeFrame); // Debug print
         }
         // Get critical errors data from DB
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors(timeFrame).toMap();
