@@ -9,7 +9,6 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
-// pattern not required in this view
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 
 // Register ChartJS components
@@ -192,12 +191,14 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
             {noData ? (
                     // No data error message 
                     <div className="chart-container shadow rounded-4">
+                        <br></br>
                         <TimeRangeDropdown id="cpu-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                         <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                     </div>
                 ) : cpuChart ? (
                     // Chart is ready and data is available
                     <div className="chart-container shadow rounded-4">
+                        <br></br>
                         <TimeRangeDropdown id="cpu-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                         <Line data={cpuChart?.data} options={cpuChart?.options} plugins={[dashedLegendPlugin]}/>
                     </div>

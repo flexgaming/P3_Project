@@ -106,12 +106,14 @@ export default function ThreadCountView({ containerData, serverData, timeAgo, is
             {noData ? (
                 // No data error message
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="thread-count-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : threadCountChart ? (
                 // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="thread-count-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={threadCountChart?.data} options={threadCountChart?.options}/>
                 </div>

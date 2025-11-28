@@ -166,12 +166,14 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
             {noData ? (
                 // No data error message
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : runningChart ? (
                 // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Bar data={runningChart?.data} options={runningChart?.options}/>
                 </div>

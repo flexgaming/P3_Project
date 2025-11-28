@@ -179,12 +179,14 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
             {noData ? (
                 // No data error message
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : diskUsageChart ? (
                 // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={diskUsageChart?.data} options={diskUsageChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>

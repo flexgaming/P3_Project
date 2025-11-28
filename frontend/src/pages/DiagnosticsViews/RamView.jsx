@@ -181,12 +181,14 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
             {noData ? (
                 // No data error message
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="ram-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : ramChart ? (
                 // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
+                    <br></br>
                     <TimeRangeDropdown id="ram-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Line data={ramChart?.data} options={ramChart?.options} plugins={[dashedLegendPlugin]}/>
                 </div>

@@ -540,16 +540,25 @@ public class Database {
     /**
      * Fetches all diagnostics errors saved in the database.
      */
-    public JSONObject getDiagnosticsErrors() {
+    public JSONObject getDiagnosticsErrors(String timeFrameString) {
+        int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
+        if (timeFrameString != null){
+            // Use Helper Function to convert time frame string to minutes.
+            timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
+            System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
+        }
         JSONObject diagnosticsErrors = new JSONObject();
-        // Read all data from View Diagnostics_Errors.
-        String sql = "SELECT * FROM Diagnostics_Errors";
+        // Read all data from View Diagnostics_Errors in the selected timeframe.
+        String sql = "SELECT * FROM Diagnostics_Errors WHERE diagnostics_errors.timestamp >= "+" NOW() - make_interval(mins => ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
              // Use a normal Statement. No SQL injection protection is necessary when no user input.
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setInt(1, timeFrameMinutes);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Diagnostics Errors View and adds them to the JSON object.
             while (resultSet.next()) {

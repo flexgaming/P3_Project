@@ -3,6 +3,7 @@ import "./css/Dashboard.css";
 import { Stack, Table, Form, Button } from "react-bootstrap";
 import DashboardRegions from "../modules/DashboardRegions.jsx";
 import CriticalError from "../modules/CriticalError.jsx";
+import TimeRangeDropdown from "./DiagnosticsViews/TimeRangeDropdown.jsx";
 
 
 /* * Dashboard Page
@@ -12,6 +13,7 @@ import CriticalError from "../modules/CriticalError.jsx";
  * - Critical Errors table displaying recent critical errors
  */
 export default function Dashboard() {
+    const [localTimeFrame, setLocalTimeFrame] = useState("1month");
     // Regions are handled by the DashboardRegions component which fetches on mount
     window.history.replaceState({}, "", `/dashboard/`); // set URL to /dashboard/
     // control the Stack direction responsively using React state
@@ -39,7 +41,7 @@ export default function Dashboard() {
         handleResize();
         return () => window.removeEventListener("resize", handleResize);
     }, []);
-    
+
     return (
         <main className="dashboard">
             <h2>
@@ -51,9 +53,12 @@ export default function Dashboard() {
             </Stack>
             
             {/* Critical Errors Section */}
-            <h1>
-                <b>Critical Errors:</b>
-            </h1>
+            <div id="critical-header-container">
+                <h1 id="critical-errors-header"><b>Critical Errors:</b></h1>
+                <TimeRangeDropdown id="error-dropdown-id" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} className={"error-dropdown"}/>
+            </div>
+            
+            
             <div id="error-table-container" className="shadow">
                 <Table striped bordered hover id="error-table" responsive>
                     {/* Table Headers */}
@@ -70,11 +75,10 @@ export default function Dashboard() {
                     </thead>
                     {/* Table Body function to fetch from the backend view */}
                     <tbody>
-                        <CriticalError />
+                        <CriticalError timeFrame={localTimeFrame} />
                     </tbody>
                 </Table>
             </div>
-            
         </main>
     );
 }

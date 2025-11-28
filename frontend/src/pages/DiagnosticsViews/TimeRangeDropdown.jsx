@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
+import "../css/Dashboard.css";
 
 // Helpers for converting between readable titles and internal timeframe keys
 export function readableTimeFrame(tf) {
@@ -36,7 +37,7 @@ export function reverseReadableTimeFrame(readable) {
 // Props:
 // - timeFrame: current selected timeframe (controlled)
 // - onChange: function(newTimeFrame) called when the user picks a new value
-function TimeRangeDropdown({ timeFrame, onChange, id }) {
+function TimeRangeDropdown({ timeFrame, onChange, id, className }) {
     const current = timeFrame;
     const [title = "Last 10 Minutes", setTitle] = useState(current);
 
@@ -45,19 +46,17 @@ function TimeRangeDropdown({ timeFrame, onChange, id }) {
         setTitle(readableTimeFrame(timeFrame));
     }, [timeFrame]);
 
+    // Handle user selection
     const handleSelect = (eventKey) => {
         if (!eventKey) return;
         setTitle(readableTimeFrame(eventKey));
         if (typeof onChange === "function") onChange(eventKey);
-        // Do NOT broadcast a global timeframe change; each view should own
-        // its own timeframe and call the fetch function provided to it.
     };
 
     return (
         <>
-            <br></br>
             <DropdownButton
-                className="time-interval-dropdown"
+                className={`${className || "time-interval-dropdown"}`}
                 title={title}
                 id={id}
                 variant="secondary"

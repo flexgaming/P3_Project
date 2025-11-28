@@ -2,20 +2,26 @@ import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import ErrorModal from "./ErrorModal";
 
-function CriticalError() {
+function CriticalError({ timeFrame }) {
     const [errorDetails, setErrorDetails] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [pinnedIds, setPinnedIds] = useState([]);
+    // Fetch error details on mount and whenever the selected timeframe changes
     useEffect(() => {
         fetchErrorDetails();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timeFrame]);
 
     async function fetchErrorDetails() {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`/api/data/errors`);
+            const response = await fetch(`/api/data/errors`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json",},
+                body: JSON.stringify({ timeFrame }),
+            });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
