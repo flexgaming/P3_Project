@@ -1,6 +1,7 @@
 package P3.Backend.Docker.application;
 
 import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
+import static P3.Backend.Docker.Persistent.COMPANY_INFO;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT;
 import static P3.Backend.Docker.Persistent.INTERNAL_SERVER_URL;
@@ -28,6 +29,9 @@ public class IntervalApplications {
     
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
+
+    // The path for where the company info JSON file is stored.
+    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
 
     public static ContainerClass[] containerArr;
     public static IntervalClass[] intervalArr;
@@ -60,12 +64,20 @@ public class IntervalApplications {
      */
     private static void SetupContainerArray() { 
         try {
-            // Get all of the content within the file.
+            // Get all of the content within the currentContainers JSON file.
             String content = Files.readString(containerListPath);
-
+            
             // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
-    
+
+
+            // Get all of the company info within currentCompany JSON file.
+            String info = Files.readString(companyInfoPath);
+
+            // Convert all of the content back into a JSON format.
+            JSONObject companyInfoObj = new JSONObject(info);
+
+            
             // Get the amount of active containers within the JSON file, that is not "inactive" or "unconfigured".
             int activeContainerCount = 0;
             for (String key : JSONFileObj.keySet()) {
@@ -91,35 +103,25 @@ public class IntervalApplications {
                 String id = tempContainer.getString("id");
                 Integer interval = tempContainer.getInt("interval");
                 Integer publicPort = tempContainer.getInt("publicPort");
+
+                // Get company info data.
+                String companyRegion = companyInfoObj.getString("CompanyRegion");
+                String companyName = companyInfoObj.getString("CompanyName");
+                String companyServer = companyInfoObj.getString("CompanyServer");
                 
                 // Make a new ContainerClass and add it to the containerArr.
-                ContainerClass newContainer = new ContainerClass(name, id, interval, publicPort);
+                ContainerClass newContainer = new ContainerClass(name, id, interval, publicPort, 
+                                                                    companyRegion, companyName, companyServer);
                 containerArr[index] = newContainer;
     
                 index++; // Make sure to move the index.
             }
+
             
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
             e.printStackTrace();
         }
-    }
-
-    /**
-     * This function is used to check if the JSON file that contains all of the containers exists, 
-     * if it does not exist then create one.
-     */
-    public static void checkFileCreated() {
-        if (!Files.exists(containerListPath)) {
-            // If the file does not exist, then it has to be created.
-            try {
-                // In order for it to be considered a JSON file, it has to contain {}.
-                Files.writeString(containerListPath, "{}");
-            } catch (Exception e) {
-                // If anything goes wrong, it is printed.
-                e.printStackTrace();
-            }
-        } 
     }
 
     /**

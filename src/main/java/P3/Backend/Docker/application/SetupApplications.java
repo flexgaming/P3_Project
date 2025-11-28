@@ -2,6 +2,7 @@ package P3.Backend.Docker.application;
 
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
+import static P3.Backend.Docker.Persistent.COMPANY_INFO;
 import static P3.Backend.Docker.Persistent.DEFAULT_INTERVAL_TIME;
 
 import java.io.IOException;
@@ -24,6 +25,8 @@ public class SetupApplications {
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
+    // The path for where the company info JSON file is stored.
+    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
     /** 
      * This function is used for setting up the containers and its intervals. 
      * 
@@ -40,11 +43,30 @@ public class SetupApplications {
         
         // In order to use the library Files, you need to have a try and catch.
         try {
-            // Get all of the content within the file.
+            // Get all of the content within the JSON file with all containers.
             String content = Files.readString(containerListPath);
             
             // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
+
+
+            // Get all of the company information from the JSON file with all company info.
+            String info = Files.readString(companyInfoPath);
+
+            // Convert all of the company info back into a JSON format.
+            JSONObject companyInfoObj = new JSONObject(info);
+
+            // Go through each of the company info fields and check if any of them are empty.
+            for (String key : companyInfoObj.keySet()) {
+                if (companyInfoObj.getString(key).isEmpty()) {
+
+                    // If any of the company info fields are empty, then give a warning and exit the application.
+                    System.out.println("==============================================================");
+                    System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + COMPANY_INFO + "\n\n\n");
+                    System.out.println("==============================================================");
+                    System.exit(0);
+                }
+            }
 
             // This is the id's that is already within the JSON file.
             JSONArray existingIdArr = new JSONArray(JSONFileObj.length());
@@ -389,13 +411,10 @@ public class SetupApplications {
      * @param scanner Is used is used to scan all of the input from the user.
      */
     private static void AppendJSONContainerList(JSONArray containersArr, JSONArray existingIdArr, 
-                                                        JSONObject JSONFileObj, Scanner scanner) {
+                                                JSONObject JSONFileObj, Scanner scanner) {
         // List all of the containers that is being configured.
         System.out.println("This is the setup for all of the containers.");
         System.out.println("Containers to set up: " + containersArr.length() + "\n");
-
-
-
 
         for (int i = 0; i < containersArr.length(); i++) {
             // Get the individual container from the list of containers (and extract the name and id).
@@ -403,7 +422,7 @@ public class SetupApplications {
             String name = container.getJSONArray("names").getString(0).substring(1);
             String id = container.getString("id");
             String image = container.getString("image");
-            
+
             // If there are any existing containers in the JSON file, then proceed. 
             Integer interval;
             if (existingIdArr.length() > 0) {
@@ -463,21 +482,26 @@ public class SetupApplications {
                 newContainer.put("privatePort", privatePort);
                 newContainer.put("publicPort", publicPort);
             } else {
+
+                int temp = 0;
                 // The container is not running, so we have to find the ports from the JSON file.
                 for (String key : JSONFileObj.keySet()) {
                     JSONObject tempContainer = JSONFileObj.getJSONObject(key);
                     String tempId = tempContainer.getString("id");
-
+                    
                     // We compare the id's to find the correct container.
                     if (newContainer.getString("id").equals(tempId)) {
 
                         if (!tempContainer.has("privatePort") || !tempContainer.has("publicPort")) {
                             // If this is implemented, the container has been set up incorrectly, 
-                            // and you should reconfigure / use the setup application again. (Make sure that every container is running).
+                            // and you should reconfigure / use the setup application again. 
+                            // Make sure that every container is running.
                             newContainer.put("state", "unconfigured");
 
                             // Give the user a clear warning that the container has not been set up correctly.
-                            System.out.println("Warning: The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.");
+                            System.out.println("====================================================================");
+                            System.out.println("\n\n\nWarning: The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
+                            System.out.println("====================================================================");
                         } else {
                             // We get both public and private port.
                             Integer privatePort = tempContainer.getInt("privatePort");
@@ -489,6 +513,18 @@ public class SetupApplications {
                         }
                         // Stop the for loop when correct container has been found.
                         break;
+                    }
+                    temp++;
+                    if (temp == JSONFileObj.length()) {
+                        // If this is implemented, the container has been set up incorrectly, 
+                        // and you should reconfigure / use the setup application again. 
+                        // Make sure that every container is running.
+                        newContainer.put("state", "unconfigured");
+
+                        // Give the user a clear warning that the container has not been set up correctly.
+                        System.out.println("====================================================================");
+                        System.out.println("\n\n\nWarning: The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
+                        System.out.println("====================================================================");
                     }
                 }
             }

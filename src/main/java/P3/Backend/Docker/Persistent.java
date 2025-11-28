@@ -13,6 +13,7 @@ public final class Persistent {
     // File Paths
     // -------------------------------
     public static final String CONTAINER_NAME = "currentContainers.json";
+    public static final String COMPANY_INFO = "currentCompany.json";
     public static final String CURRENT_CONTAINER_PATH = ""; // Replace "" with desired path. 
 
     // -------------------------------

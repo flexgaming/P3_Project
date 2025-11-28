@@ -1,6 +1,7 @@
 package P3.Backend.Docker;
 
 import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
+import static P3.Backend.Docker.Persistent.COMPANY_INFO;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import P3.Backend.Docker.application.IntervalApplications;
 import P3.Backend.Docker.application.SetupApplications;
@@ -23,6 +24,9 @@ public class DemoApplication {
 
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
+
+    // The path for where the company info JSON file is stored.
+    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
@@ -115,6 +119,23 @@ public class DemoApplication {
                 // If anything goes wrong, it is printed.
                 e.printStackTrace();
             }
-        } 
+        } else if (!Files.exists(companyInfoPath)) {
+            // If the file does not exist, then it has to be created.
+            try {
+                // In order for it to be considered a JSON file, it has to contain a template.
+                System.out.println("Creating company info JSON file.");
+
+                // Create a template for the company info JSON file.
+                JSONObject template = new JSONObject();
+                template.put("CompanyName", "");
+                template.put("CompanyRegion", "");
+                template.put("CompanyServer", "");
+
+                Files.writeString(companyInfoPath, template.toString(4));
+            } catch (Exception e) {
+                // If anything goes wrong, it is printed.
+                e.printStackTrace();
+            }
+        }
     }
 }
