@@ -25,8 +25,6 @@ public class SetupApplications {
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
-    // The path for where the company info JSON file is stored.
-    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
     /** 
      * This function is used for setting up the containers and its intervals. 
      * 
@@ -48,25 +46,6 @@ public class SetupApplications {
             
             // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
-
-
-            // Get all of the company information from the JSON file with all company info.
-            String info = Files.readString(companyInfoPath);
-
-            // Convert all of the company info back into a JSON format.
-            JSONObject companyInfoObj = new JSONObject(info);
-
-            // Go through each of the company info fields and check if any of them are empty.
-            for (String key : companyInfoObj.keySet()) {
-                if (companyInfoObj.getString(key).isEmpty()) {
-
-                    // If any of the company info fields are empty, then give a warning and exit the application.
-                    System.out.println("==============================================================");
-                    System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + COMPANY_INFO + "\n\n\n");
-                    System.out.println("==============================================================");
-                    System.exit(0);
-                }
-            }
 
             // This is the id's that is already within the JSON file.
             JSONArray existingIdArr = new JSONArray(JSONFileObj.length());
@@ -523,9 +502,9 @@ public class SetupApplications {
 
                         // Give the user a clear warning that the container has not been set up correctly.
                         System.out.println("====================================================================");
-                        System.out.println("\n\n\nWarning: The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
+                        System.out.println("\n\n\n\u001B[1;4;31m" +  "Warning:" + "\u001B[0;0;37m" + " The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
                         System.out.println("====================================================================");
-                    }
+                    } 
                 }
             }
             

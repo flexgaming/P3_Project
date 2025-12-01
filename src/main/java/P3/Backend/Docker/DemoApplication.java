@@ -43,6 +43,25 @@ public class DemoApplication {
         // Check if the JSON file that contains all of the containers exists, if not create one.
         checkFileCreated();
         try {
+            // Get all of the company information from the JSON file with all company info.
+            String info = Files.readString(companyInfoPath);
+
+            // Convert all of the company info back into a JSON format.
+            JSONObject companyInfoObj = new JSONObject(info);
+
+            // Go through each of the company info fields and check if any of them are empty.
+            for (String key : companyInfoObj.keySet()) {
+                if (companyInfoObj.getString(key).isEmpty()) {
+
+                    // If any of the company info fields are empty, then give a warning and exit the application.
+                    System.out.println("==============================================================");
+                    System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + COMPANY_INFO + "\n");
+                    System.out.println("It is " + "\u001B[1;4;31m" +  "VERY important" + "\u001B[0;0;37m" + " that the fields are correctly filled out!" + "\n\n\n");
+                    System.out.println("==============================================================");
+                    System.exit(0);
+                }
+            }
+
             // Get all of the content within the file.
             String content = Files.readString(containerListPath);
             
@@ -50,7 +69,7 @@ public class DemoApplication {
             JSONObject JSONFileObj = new JSONObject(content);
             
             if (JSONFileObj.length() == 0) {
-                System.out.println("The container JSON file is empty. Proceeding to Setup Applications.");
+                System.out.println("\n\nThe container JSON file is empty. Proceeding to Setup Applications.\n\n");
                 SetupApplications.Initiation(dockerClient, scanner);
             }
         } catch (Exception e) {
@@ -76,7 +95,7 @@ public class DemoApplication {
                     System.out.println("You selected option " + choice);
                     
                     // If user selects Interval Applications, then proceed.
-                    IntervalApplications.Initiation(dockerClient, webClient);
+                    IntervalApplications.Initiation(dockerClient, webClient, scanner);
 
                     printApplicationChoices(); // Print the choices
                 } else if (choice.equals("3")) {
@@ -123,6 +142,7 @@ public class DemoApplication {
                 template.put("CompanyServer", "");
 
                 Files.writeString(companyInfoPath, template.toString(4));
+
             } catch (Exception e) {
                 // If anything goes wrong, it is printed.
                 e.printStackTrace();
@@ -131,7 +151,7 @@ public class DemoApplication {
     }
 
     private static void printApplicationChoices() {
-        System.out.println("Select application mode:");
+        System.out.println("\nSelect application mode:");
         System.out.println("1. Setup Applications");
         System.out.println("2. Interval Applications");
         System.out.println("3. Exit");

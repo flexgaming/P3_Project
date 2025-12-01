@@ -41,7 +41,7 @@ public class IntervalApplications {
      * @param dockerClient Is used for sending and receiving data from the docker.
      * @param webClient Is used for sending and getting HTTP requests.
      */
-    public static void Initiation(DockerClient dockerClient, WebClient webClient) {
+    public static void Initiation(DockerClient dockerClient, WebClient webClient, Scanner scanner) {
 
         // Set up array of container classes (get data from JSON file).
         SetupContainerArray();
@@ -53,7 +53,7 @@ public class IntervalApplications {
         AtomicBoolean userInputDetected = new AtomicBoolean(false);
 
         // Start thread to check for user input.
-        checkUserInputThread(userInputDetected);
+        checkUserInputThread(userInputDetected, scanner);
 
         // Start interval scheduler to fetch data based on intervals.
         checkIntervalScheduler(userInputDetected, dockerClient, webClient);
@@ -150,13 +150,14 @@ public class IntervalApplications {
     /**
      * This function is used to check for user input in a separate thread.
      * If user input is detected, the AtomicBoolean is set to true and the main thread can stop.
+     * @param bool Is used to check if user input has been detected.
+     * @param scanner Is used to read user input.
      */
-    private static void checkUserInputThread(AtomicBoolean bool) {
+    private static void checkUserInputThread(AtomicBoolean bool, Scanner scanner) {
 
         // Create a new thread to monitor user input.
         Thread thread = new Thread(() -> {
             try {
-                Scanner scanner = new Scanner(System.in); // Scanner for user input.
                 while (true) {
                     if (scanner.hasNextLine()) {
                         scanner.nextLine(); // Go past this if there is user input.
@@ -165,8 +166,6 @@ public class IntervalApplications {
                     }
                     Thread.sleep(100); // Avoid tight loop.
                 }
-                // Close the scanner after use.
-                scanner.close();
 
             } catch (Exception e) {
                 // Silently handle if System.in is already closed.
@@ -207,8 +206,9 @@ public class IntervalApplications {
 
                         // Try to send the container data to the backend server.
                         try {
-                            String resp = WebClientPost.sendDataBlocking(webClient, containerArr[i], INTERNAL_SERVER_URL);
-                            System.out.println("POST response: " + resp);
+                            WebClientPost.sendData(webClient, containerArr[i], INTERNAL_SERVER_URL);
+                            
+                            System.out.println("JSON data has been send from: " + containerArr[i].getContainerName());
                         } catch (Exception e) {
                             // Print the error if the POST request fails.
                             System.err.println("Failed to POST container data: " + e.getMessage());
