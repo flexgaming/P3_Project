@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import DiagnosticsView from "./pages/DiagnosticsView.jsx";
 import NavRegions from "./modules/NavRegions.jsx";
 import ManagePage from "./pages/Manage.jsx";
+import ManageCompanies from "./modules/ManageCompanies.jsx"
 
 // The main application component
 const App = () => {
@@ -32,10 +33,12 @@ const App = () => {
 
             <div className="Body">
                 <Routes>
-                    <Route path="/*" element={<Dashboard />} />
+                    <Route path="/*" element={<Dashboard/>} />
                     <Route path="/diagnosticsview/:containerID" element={<DiagnosticsView/>} />
-                    <Route path="/manage" element={<ManagePage />} />
-                    <Route path="/nav/*" element={<NavRegions />} />
+                    <Route path="/manage" element={<ManagePage />}/>
+                    <Route path="/manage/:regionID" element={<ManagePage/>}/>
+                    <Route path="/manage/:regionID/:companyID" element={<ManagePage/>}/>
+                    <Route path="/nav/*" element={<NavRegions/>} />
                 </Routes>
             </div>
         </div>
