@@ -21,6 +21,9 @@ public class ExternalController {
             // Store all of the elements from the json in the ContainerClass.
             ContainerClass container  = storeContainerData(containerData);
 
+            // Choice only necessary data to send to database.
+            JSONObject finalData = storeFinalData(container);
+
             // Prepare the database.
             Database database = new Database();
 
@@ -191,5 +194,66 @@ private ContainerClass storeContainerData(JSONObject jsonData) {
     // Return the container with everything extracted.
     return container;
 }
+
+/** This function is used to store the final parameters that would go in the database.
+ * 
+ * @param container Is used to get all of the data from within the container.
+ * @return Is the json that the final data, that is going to be in the database, is stored in.
+ */
+private static JSONObject storeFinalData(ContainerClass container) { 
+    // Prepare the json for the database.
+    JSONObject json = new JSONObject();
+
+    // Meta Data
+    json.put("containerName", container.getContainerName());
+    json.put("containerId", container.getContainerId());
+    //json.put("publicPort", container.getPublicPort());
+    //json.put("containerInterval", container.getContainerInterval());
+    json.put("companyRegion", container.getCompanyRegion());
+    json.put("companyName", container.getCompanyName());
+    json.put("companyServer", container.getCompanyServer());
+
+    // Docker Data
+    json.put("containerRunning", container.getContainerRunning());
+    json.put("containerRamUsage", container.getContainerRamUsage());
+    json.put("containerCpuUsage", container.getContainerCpuUsage());
+    json.put("containerDiskUsage", container.getContainerDiskUsage());
+    json.put("containerStatus", container.getContainerStatus());
+    json.put("containerPid", container.getContainerPid());
+    json.put("containerExitCode", container.getContainerExitCode());
+    
+    // Be sure that the container and JVM are running before storing actuator data.
+    if (container.getContainerRunning().equals(true) && container.getJVMRunning().equals(true)) {
+        // Actuator Data
+        json.put("JVMRunning", container.getJVMRunning());
+        json.put("JVMRamMax", container.getJVMRamMax());
+        json.put("JVMRamUsage", container.getJVMRamUsage());
+        json.put("JVMCpuUsagePerc", container.getJVMCpuUsagePerc());
+        //json.put("JVMThreads", container.getJVMThreads());
+        //json.put("JVMThreadsStates", container.getJVMThreadsStates());
+        //json.put("JVMThreadQueued", container.getJVMThreadQueued());
+        json.put("JVMCpuUsageStart", container.getJVMCpuUsageStart());
+        json.put("JVMUptime", container.getJVMUptime());
+        
+        // System Data
+        json.put("systemRamUsage", container.getSystemRamUsage());
+        json.put("systemCpuUsagePerc", container.getSystemCpuUsagePerc());
+        json.put("systemCpuCores", container.getSystemCpuCores());
+        json.put("systemDiskUsage", container.getSystemDiskUsage());
+        json.put("systemDiskTotal", container.getSystemDiskTotal());
+        json.put("systemDiskFree", container.getSystemDiskFree());
+    
+        // Misc Data
+        json.put("timestamp", container.getTimestamp());
+        //json.put("poolCore", container.getPoolCore());
+        //json.put("logbackEvents", container.getLogbackEvents());
+        json.put("logbackEventsError", container.getLogbackEventsError());
+        json.put("logbackEventsWarn", container.getLogbackEventsWarn());
+        //json.put("garbageCollectSize", container.getGarbageCollectSize());
+    }
+    // Return the result of all of the final parameters sent to the database.
+    return json;
+}
+    
     
 }
