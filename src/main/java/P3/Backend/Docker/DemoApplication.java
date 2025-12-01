@@ -56,7 +56,7 @@ public class DemoApplication {
                     // If any of the company info fields are empty, then give a warning and exit the application.
                     System.out.println("==============================================================");
                     System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + COMPANY_INFO + "\n");
-                    System.out.println("It is " + "\u001B[1;4;31m" +  "VERY important" + "\u001B[0;0;37m" + " that the fields are correctly filled out!" + "\n\n\n");
+                    System.out.println("It is " + "\u001B[1;4;31m" +  "VERY important" + "\u001B[0;37m" + " that the fields are correctly filled out!" + "\n\n\n");
                     System.out.println("==============================================================");
                     System.exit(0);
                 }

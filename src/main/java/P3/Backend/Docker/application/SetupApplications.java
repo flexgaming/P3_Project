@@ -478,7 +478,7 @@ public class SetupApplications {
 
                             // Give the user a clear warning that the container has not been set up correctly.
                             System.out.println("====================================================================");
-                            System.out.println("\n\n\nWarning: The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
+                            System.out.println("\n\n\n\\u001B[1;4;31m\" +  \"Warning:\" + \"\\u001B[0;37m\" + \" The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
                             System.out.println("====================================================================");
                         } else {
                             // We get both public and private port.
@@ -501,7 +501,7 @@ public class SetupApplications {
 
                         // Give the user a clear warning that the container has not been set up correctly.
                         System.out.println("====================================================================");
-                        System.out.println("\n\n\n\u001B[1;4;31m" +  "Warning:" + "\u001B[0;0;37m" + " The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
+                        System.out.println("\n\n\n\u001B[1;4;31m" +  "Warning:" + "\u001B[0;37m" + " The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
                         System.out.println("====================================================================");
                     } 
                 }
