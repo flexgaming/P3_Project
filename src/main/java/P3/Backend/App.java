@@ -13,7 +13,7 @@ public class App {
         SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        // addDummyData(database);
+         addDummyData(database);
         // printData(database);
 
         // Test getting diagnostics data for a specific container
@@ -33,7 +33,7 @@ public class App {
 //        System.out.println(containers.toString(4));
         JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
 //        System.out.println(diagnosticsData.toString(4));
-        JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
+        //JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
 //        System.out.println(diagnosticsErrors.toString(4));
         JSONObject allCompanyData = database.getRecentCompanyData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
         System.out.println(allCompanyData.toString(4));
