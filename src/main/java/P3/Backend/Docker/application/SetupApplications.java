@@ -2,7 +2,6 @@ package P3.Backend.Docker.application;
 
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
-import static P3.Backend.Docker.Persistent.COMPANY_INFO;
 import static P3.Backend.Docker.Persistent.DEFAULT_INTERVAL_TIME;
 
 import java.io.IOException;
