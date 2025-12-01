@@ -1,13 +1,8 @@
 package P3.Backend;
 
-import P3.Backend.DTO.ContainerStatsDTO;
 import P3.Backend.DTO.ContainerClass;
 import P3.Backend.Database.*;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
@@ -28,9 +23,6 @@ public class ExternalController {
 
             // Prepare the database.
             Database database = new Database();
-
-                // Make function for filtering all of the necessary data.
-
 
             // Send data
                 // make function for sending all of the data.
