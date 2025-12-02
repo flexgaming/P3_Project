@@ -654,8 +654,7 @@ public class Database {
         for (String containerKey : containers.keySet()) {
             JSONObject tempContainer = containers.getJSONObject(containerKey);
             JSONArray tempContainerDiagnosticsData = new JSONArray();
-            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID").toString(),
-                                                            Constants.DIAGNOSTICS_TIME_SCOPE_LABEL).getJSONObject("diagnosticsData");
+            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID").toString(), null);
             translateDiagnosticsData(tempContainerDiagnosticsData, diagnosticsData);
             tempContainer.put("diagnosticsData", tempContainerDiagnosticsData);
             tempServerContainers.put(tempContainer.getString("containerID"), tempContainer);
