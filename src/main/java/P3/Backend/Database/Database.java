@@ -481,9 +481,7 @@ public class Database {
         return containers;
     }
 
-    /**
-     * Fetches all diagnostics data saved in the database in the requested time frame.
-     */
+    
     public JSONObject getDiagnosticsData(String containerID) {
         JSONObject containerData = new JSONObject();
         JSONObject diagnosticsData = new JSONObject();
@@ -744,6 +742,9 @@ public class Database {
     // =============================== MAKESHIFT ADDITIONS - NOT FINAL ===============================
     // ===============================================================================================
 
+    /**
+     * Fetches all diagnostics data saved in the database in the requested time frame.
+     */
     public JSONObject getDiagnosticsData(Container docker, String timeFrameString) {
         int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
         if (timeFrameString != null){

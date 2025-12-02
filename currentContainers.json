@@ -1,0 +1,20 @@
+{
+    "jolly_bartik": {
+        "image": "springcommunity/spring-petclinic:3.5.6",
+        "privatePort": 8080,
+        "name": "jolly_bartik",
+        "publicPort": 9010,
+        "interval": 6,
+        "id": "4b60167847907accb62ea076adc1110f9644a3c34bbd7c2d6419ec585415a6f2",
+        "state": "active"
+    },
+    "romantic_poincare": {
+        "image": "springcommunity/spring-petclinic:3.5.6",
+        "privatePort": 8080,
+        "name": "romantic_poincare",
+        "publicPort": 9011,
+        "interval": 5,
+        "id": "34c6ddbe41d11fc64e054ead6cd618b53abb28dec78431690ff37f4c04def9f5",
+        "state": "active"
+    }
+}
