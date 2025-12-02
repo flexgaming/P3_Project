@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Alert, Row, Col, Badge, ListGroup, Stack, Image } from "react-bootstrap";
 import warningSmall from "../assets/Warning128.png";
 import "../pages/css/Nav.css";
+import { IoCloudOfflineOutline } from "react-icons/io5";
 
 /*
  * NavServers
@@ -135,7 +136,7 @@ function NavServers({ regionID, companyID }) {
                                     <Stack direction="horizontal" gap={2}>
                                         <div>{server.serverName}</div>
                                         <div className="ms-auto">Containers:</div>
-                                        <Badge variant="primary">{server.containers?.length ?? 0}</Badge>
+                                        <Badge bg="secondary">{server.containers?.length ?? 0}</Badge>
                                     </Stack>
                                 </ListGroup.Item>
 
@@ -166,14 +167,7 @@ function NavServers({ regionID, companyID }) {
                                                     <div className="Container-Name-Container">{container.containerName}</div>
                                                     <div className="ms-auto">
                                                         {/* Warning icon if container is not running */}
-                                                        <Image
-                                                            src={warningSmall}
-                                                            id={`${container.containerID}-Warning`}
-                                                            alt="warning"
-                                                            width="28px"
-                                                            height="28px"
-                                                            hidden={showWarning}
-                                                        />
+                                                        <IoCloudOfflineOutline size={28} hidden={showWarning} />
                                                     </div>
                                                     <div className="ms-auto">Uptime:</div>
                                                     <div className="fixed-status" id={`${container.containerID}-Uptime`}>{uptime}%</div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import ErrorModal from "./ErrorModal";
+import { BsPin, BsPinAngle } from "react-icons/bs";
 
 function CriticalError({ timeFrame }) {
     const [errorDetails, setErrorDetails] = useState([]);
@@ -152,7 +153,7 @@ function CriticalError({ timeFrame }) {
                         <a href={`/diagnosticsview/${error.containerID}`}>
                             <b>
                                 <u>
-                                    {error.regionName} → {error.companyName} → {error.serverName} → {error.containerName}
+                                    {error.regionName} → {error.companyName} → <br />{error.serverName} → {error.containerName}
                                 </u>
                             </b>
                         </a>
@@ -164,7 +165,7 @@ function CriticalError({ timeFrame }) {
                     </td>
                     <td>
                         <Button id={`pin-${error.id}`} variant={pinnedIds.includes(error.id) ? "primary" : "success"} onClick={() => togglePinDiagnostic(error)}>
-                            {pinnedIds.includes(error.id) ? "Pinned" : "Pin Log"}
+                            {pinnedIds.includes(error.id) ? <>Pinned <BsPin /></> : <>Pin Log <BsPinAngle /></>}
                         </Button>
                     </td>
                 </tr>

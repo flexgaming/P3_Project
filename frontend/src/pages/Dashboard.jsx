@@ -46,7 +46,7 @@ export default function Dashboard() {
                 <b>Dashboard</b>
             </h2>
             {/* Region Cards Section */}
-            <Stack direction={direction} gap={3} id="Region-Cards-Dashboard">
+            <Stack direction={direction} gap={0.5} id="Region-Cards-Dashboard">
                 <DashboardRegions />
             </Stack>
             
