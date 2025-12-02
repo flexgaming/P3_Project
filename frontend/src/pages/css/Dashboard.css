@@ -1,0 +1,54 @@
+/* Styles for Dashboard */
+.dashboard {
+    padding: 1rem;
+}
+
+h1 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+}
+
+.region-cards {
+    margin-bottom: 30px;
+    border-radius: 10px;
+}
+
+#error-table-container {
+    margin: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#error-table-container table {
+    /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
+    margin-bottom: 0;
+}
+/* Header container: center the title and pin the dropdown to the right */
+#critical-header-container {
+    position: relative;
+    margin-bottom: 10px;
+    min-height: 48px; /* reserve vertical space for centered content */
+}
+
+/* Center the header text dead-center horizontally */
+#critical-errors-header {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}
+
+/* Pin the dropdown to the right of the header container */
+.error-dropdown {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+}
+
+/* Keep a sensible color for dropdown button text if needed */
+.error-dropdown .btn {
+    color: #ffffff;
+}
