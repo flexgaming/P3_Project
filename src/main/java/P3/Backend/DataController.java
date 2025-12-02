@@ -104,6 +104,7 @@ Database database = new Database();
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors(timeFrame).toMap();
         // Create an object to asses the severity of the error messages
         SeverityCalculator severityCalculator = new SeverityCalculator();
+        
         //Return the updated map of error messages with severities assigned
         return severityCalculator.assessSeverity(diagnosticsErrors);
     }
