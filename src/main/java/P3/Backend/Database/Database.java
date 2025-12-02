@@ -755,7 +755,7 @@ public class Database {
         String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= "+" NOW() - make_interval(mins => ?)";
         JSONObject diagnosticsData = new JSONObject();
 
-         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
             // Use Prepared Statement to help format the SQL string to prevent injections.
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
