@@ -96,7 +96,7 @@ export default function DiagnosticsView() {
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
             <h2 style={{ padding: "10px" }}>
-                <b>Diagnostics View</b>
+                <b>Diagnostics View for {containerData?.containerData?.containerName || "loading..."}</b>
             </h2>
 
             <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
