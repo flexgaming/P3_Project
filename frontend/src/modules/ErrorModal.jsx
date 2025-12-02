@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { BsEye } from "react-icons/bs";
 
 // ErrorModal component to display error details in a modal
-function ErrorModal({ error, buttonText = "View", buttonVariant = "primary" }) {
+function ErrorModal({ error, buttonVariant = "primary" }) {
     // State to control modal visibility
     const [show, setShow] = useState(false);
 
@@ -14,7 +15,7 @@ function ErrorModal({ error, buttonText = "View", buttonVariant = "primary" }) {
     return (
         <>
             <Button variant={buttonVariant} onClick={handleShow}>
-                {buttonText}
+                View <BsEye />
             </Button>
             {/* Modal to display error details */}
             <Modal show={show} onHide={handleClose} size="lg" centered>

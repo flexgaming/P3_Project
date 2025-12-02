@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ListGroup, Alert} from "react-bootstrap";
+import { Button, ButtonGroup, ListGroup, Alert} from "react-bootstrap";
 import { getRegions } from "../utils/FetchRegions";
 
 
@@ -40,9 +40,9 @@ function ManageRegions() {
     return (
         // Render ListGroup of regions fetched from the backend
         <ListGroup id="manage-regions-listgroup" className="shadow rounded-4">
-            {/* Logic for managing regions can be added here */}
+{/*             Logic for managing regions can be added here */}
             {regions.map((region) => (
-                <ListGroup.Item key={region.regionID}>{region.regionName}</ListGroup.Item>
+                <ListGroup.Item key={region.regionID} action href={`/manage/${region.regionID}`}>{region.regionName}</ListGroup.Item>
             ))}
         </ListGroup>
     );
