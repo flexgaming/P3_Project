@@ -13,7 +13,7 @@ public class App {
         SpringApplication.run(App.class, args);
 
         Database database = new Database();
-         addDummyData(database);
+         //addDummyData(database);
         // printData(database);
 
         // Test getting diagnostics data for a specific container
