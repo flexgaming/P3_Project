@@ -31,7 +31,8 @@ public class App {
 //        System.out.println(servers.toString(4));
         JSONObject containers = database.getContainers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
 //        System.out.println(containers.toString(4));
-        JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
+        JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"),
+                                                            Constants.DIAGNOSTICS_TIME_SCOPE_LABEL);
 //        System.out.println(diagnosticsData.toString(4));
         //JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
 //        System.out.println(diagnosticsErrors.toString(4));

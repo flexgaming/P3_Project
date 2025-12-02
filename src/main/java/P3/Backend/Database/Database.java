@@ -481,26 +481,26 @@ public class Database {
         return containers;
     }
 
-    /**
-     * Fetches all diagnostics data saved in the database in the requested time frame.
-     */
-    public JSONObject getDiagnosticsData(String containerID) {
-        JSONObject containerData = new JSONObject();
+    // Fetches diagnostics data for a specific container within a specified time frame.
+    public JSONObject getDiagnosticsData(String dockerID, String timeFrameString) {
+        int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
+        if (timeFrameString != null){
+            // Use Helper Function to convert time frame string to minutes.
+            timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
+            // System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
+        }
+        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= "+" NOW() - make_interval(mins => ?)";
         JSONObject diagnosticsData = new JSONObject();
-        // Read all data from View Company_Diagnostics that are within time frame.
-        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.Timestamp >= " +
-                "NOW() - make_interval(mins => ?)";
 
-        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
-        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
             // Use Prepared Statement to help format the SQL string to prevent injections.
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, containerID);
-            preparedStatement.setInt(2, Constants.DIAGNOSTICS_TIME_SCOPE); 
+            preparedStatement.setString(1, dockerID);
+            preparedStatement.setInt(2, timeFrameMinutes); 
             ResultSet resultSet = preparedStatement.executeQuery();
-
-            // Reads all the rows in the Company_Diagnostics View and adds them to the JSON object.
+            
+            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
             while (resultSet.next()) {
                 JSONObject diagnostics = new JSONObject();
                 String diagnosticsID = resultSet.getString("Diagnostics_ID");
@@ -529,12 +529,9 @@ public class Database {
 
         } catch (SQLException error) {
             errorHandling(error);
+            return null;
         }
-
-        // containerData.put("containerData", getContainerData(containerID));
-        containerData.put("diagnosticsData", diagnosticsData);
-
-        return containerData;
+        return diagnosticsData;
     }
 
     /**
@@ -657,7 +654,8 @@ public class Database {
         for (String containerKey : containers.keySet()) {
             JSONObject tempContainer = containers.getJSONObject(containerKey);
             JSONArray tempContainerDiagnosticsData = new JSONArray();
-            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID")).getJSONObject("diagnosticsData");
+            JSONObject diagnosticsData = getDiagnosticsData(containers.getJSONObject(containerKey).getString("containerID").toString(),
+                                                            Constants.DIAGNOSTICS_TIME_SCOPE_LABEL).getJSONObject("diagnosticsData");
             translateDiagnosticsData(tempContainerDiagnosticsData, diagnosticsData);
             tempContainer.put("diagnosticsData", tempContainerDiagnosticsData);
             tempServerContainers.put(tempContainer.getString("containerID"), tempContainer);
@@ -743,58 +741,6 @@ public class Database {
     // ===============================================================================================
     // =============================== MAKESHIFT ADDITIONS - NOT FINAL ===============================
     // ===============================================================================================
-
-    public JSONObject getDiagnosticsData(Container docker, String timeFrameString) {
-        int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
-        if (timeFrameString != null){
-            // Use Helper Function to convert time frame string to minutes.
-            timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
-            // System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
-        }
-        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= "+" NOW() - make_interval(mins => ?)";
-        JSONObject diagnosticsData = new JSONObject();
-
-        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-            // Use Prepared Statement to help format the SQL string to prevent injections.
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
-            preparedStatement.setString(1, docker.getContainerID());
-            preparedStatement.setInt(2, timeFrameMinutes); 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            
-            // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
-            while (resultSet.next()) {
-                JSONObject diagnostics = new JSONObject();
-                String diagnosticsID = resultSet.getString("Diagnostics_ID");
-                String containerReference = resultSet.getString("Container_Reference");
-                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
-                boolean running = resultSet.getBoolean("Running");
-                double ramFree = resultSet.getDouble("Ram_Free");
-                double cpuFree = resultSet.getDouble("CPU_Free");
-                double diskUsageFree = resultSet.getDouble("Disk_Usage_Free");
-                int threadCount = resultSet.getInt("Thread_Count");
-                String processID = resultSet.getString("Process_ID");
-                String status = resultSet.getString("Status");
-                String errorLogs = resultSet.getString("Error_Logs");
-                diagnostics.put("containerReference", containerReference);
-                diagnostics.put("timestamp", timestamp);
-                diagnostics.put("running", running);
-                diagnostics.put("ramFree", ramFree);
-                diagnostics.put("cpuFree", cpuFree);
-                diagnostics.put("diskUsageFree", diskUsageFree);
-                diagnostics.put("threadCount", threadCount);
-                diagnostics.put("processID", processID);
-                diagnostics.put("status", status);
-                diagnostics.put("errorLogs", errorLogs);
-                diagnosticsData.put(diagnosticsID, diagnostics);
-            }
-
-        } catch (SQLException error) {
-            errorHandling(error);
-            return null;
-        }
-        return diagnosticsData;
-    }
 
     public ArrayList<String> getRegionsTemp() {
         ArrayList<String> regions = new ArrayList<>();
