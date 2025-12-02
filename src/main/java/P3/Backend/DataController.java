@@ -54,7 +54,7 @@ Database database = new Database();
     @GetMapping("/container/{id}") //Router continuation
     public Map<String, Object> getContainerDiagnosticsById(@PathVariable String id) {
         // Get container diagnostics data from DB
-        JSONObject diagnostics = database.getDiagnosticsData(new Container(id), null);
+        JSONObject diagnostics = database.getDiagnosticsData(id);
         return diagnostics.toMap();
     }
 
@@ -71,7 +71,7 @@ Database database = new Database();
 
         JSONObject diagnosticsData = new JSONObject();
         diagnosticsData.put("containerData", database.getContainerData(containerID));
-        diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(new Container(containerID), timeFrame));
+        diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(containerID));
 
         return diagnosticsData.toMap();
     }
