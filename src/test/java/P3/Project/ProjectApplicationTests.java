@@ -2,11 +2,8 @@ package P3.Project;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
-import static P3.Backend.Docker.builder.DockerClientBuilder.dockerConnection;
-
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import static P3.Backend.ExternalServer.Docker.builder.DockerClientBuilder.dockerConnection;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,20 +13,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 
 import P3.Project.util.TestResult;
-import P3.Backend.Docker.DemoApplication;
-import P3.Backend.Docker.manager.DockerClientManager;
+import P3.Backend.ExternalServer.Docker.DemoApplication;
 
-import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
-import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
-import static P3.Backend.Docker.application.SetupApplications.updateJSONFile;
+import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
+import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
+import static P3.Backend.ExternalServer.Docker.application.SetupApplications.updateJSONFile;
 
 
 @SpringBootTest(classes = DemoApplication.class)
