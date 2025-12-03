@@ -9,8 +9,12 @@ import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 
-
 public class DockerClientManager {  
+    /**
+     * 
+     * @param dockerHost
+     * @return
+     */
     public static final DockerClientConfig initializeDockerClient(String dockerHost) {
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
             .withDockerHost(dockerHost)
@@ -19,6 +23,11 @@ public class DockerClientManager {
         return config;
     }
 
+    /**
+     * 
+     * @param dockerClient
+     * @return
+     */
     public static JSONArray ListAllContainers(DockerClient dockerClient) {
         List<Container> containersTemp = dockerClient.listContainersCmd().withShowAll(true).exec();
         JSONArray containers = new JSONArray(containersTemp);

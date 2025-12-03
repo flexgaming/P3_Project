@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import P3.Backend.Docker.classes.ContainerClass;
-
 public class LogFetcher {
     private final Map<String,Long> last = new HashMap<>();
 
@@ -35,6 +33,4 @@ public class LogFetcher {
         } catch (Exception ignore) {}
         return out;
     }
-
-    // TODO Add support for ContainerClass, needs last log copied timestamp.
 }

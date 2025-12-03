@@ -105,7 +105,6 @@ public class SetupApplications {
 
         // Asks if the user wants to delete inactive containers.
         manageInactiveContainers(existingIdArr, oldContainersArr, JSONFileObj, scanner);
-
     }
 
     /** This function is used to filter all of the containers into either newly dicovered or inactive containers.
@@ -120,7 +119,6 @@ public class SetupApplications {
      */
     private static void filterContainerArrays(JSONArray fetchedContainersArr, JSONArray existingIdArr, 
                                                         ArrayList<String> oldContainerList, JSONArray newContainersArr) {
-        
         // Go through all of the discovered containers.
         for (int i = 0; i < fetchedContainersArr.length(); i++) {
             JSONObject fetchedContainer = fetchedContainersArr.getJSONObject(i); // Get the i'th container from the array.
@@ -239,7 +237,7 @@ public class SetupApplications {
         }
     }
 
-    /** This function is used to individually delete each of the selected inactive containers.
+    /** This function is used to individually choose which inactive container the user want to delete.
      * 
      * @param existingIdArr Is used to make sure that the inactive container exists in the JSON file.
      * @param oldContainersArr Is used to get each of the inactive containers that can be deleted.
@@ -336,12 +334,12 @@ public class SetupApplications {
                 if (response.equals("1")) { // Only configure newly discovered containers.
 
                     // Go through only the new containers and set up the intervals.
-                    AppendJSONContainerList(newContainersArr, existingIdArr, JSONFileObj, scanner);
+                    appendJSONContainerList(newContainersArr, existingIdArr, JSONFileObj, scanner);
                     break;
                 } else if (response.equals("2")) { // Configure every single container.
                     // Go through all of the containers and set up the intervals.
 
-                    AppendJSONContainerList(fetchedContainersArr, existingIdArr, JSONFileObj, scanner);
+                    appendJSONContainerList(fetchedContainersArr, existingIdArr, JSONFileObj, scanner);
                     break; 
                 } else if (response.equals("-1")) { // Do not configure any containers.
                     return;
@@ -355,7 +353,7 @@ public class SetupApplications {
                 if (response.equals("y")) { // Configure every containers.
 
                     // Go through only the new containers and set up the intervals.
-                    AppendJSONContainerList(fetchedContainersArr, existingIdArr, JSONFileObj, scanner);
+                    appendJSONContainerList(fetchedContainersArr, existingIdArr, JSONFileObj, scanner);
                     break;
 
                 } else if (response.equals("n")) { // Do not configure any containers.
@@ -370,7 +368,7 @@ public class SetupApplications {
                 if (response.equals("y")) { // Configure every containers.
 
                     // Go through only the new containers and set up the intervals.
-                    AppendJSONContainerList(newContainersArr, existingIdArr, JSONFileObj, scanner);
+                    appendJSONContainerList(newContainersArr, existingIdArr, JSONFileObj, scanner);
                     break;
                     
                 } else if (response.equals("n")) { // Do not configure any containers.
@@ -379,7 +377,6 @@ public class SetupApplications {
             }
         }
     }
-
     
     /** This function is used for configuring the interval of containers.
      * 
@@ -388,7 +385,7 @@ public class SetupApplications {
      * @param JSONFileObj Is used for updating the JSON array and finding the intervals for the existing containers.
      * @param scanner Is used is used to scan all of the input from the user.
      */
-    private static void AppendJSONContainerList(JSONArray containersArr, JSONArray existingIdArr, 
+    private static void appendJSONContainerList(JSONArray containersArr, JSONArray existingIdArr, 
                                                 JSONObject JSONFileObj, Scanner scanner) {
         // List all of the containers that is being configured.
         System.out.println("This is the setup for all of the containers.");
@@ -438,7 +435,6 @@ public class SetupApplications {
                     }
                 }
             }
-
             // Make a JSON object that contains all of the relevant information.
             JSONObject newContainer = new JSONObject();
             newContainer.put("name", name);
@@ -506,7 +502,6 @@ public class SetupApplications {
                     } 
                 }
             }
-            
             // Add the new container to the existing content.
             JSONFileObj.put(name, newContainer);
 
@@ -520,7 +515,7 @@ public class SetupApplications {
      * @param currentContainer Is used for checking if the container already has an interval.
      * @param existingIdArr Is used for getting the intervals from the already existing containers in the JSON file.
      * @param JSONFileObj Is used to get the interval that is inside of the JSON file.
-     * @return The return is either the interval from an already existing container or the default interval (used for newly 
+     * @return Is either the interval from an already existing container or the default interval (used for newly 
      * discovered containers that is not within the JSON file).
      */
     private static int findContainerInterval(JSONObject currentContainer, JSONArray existingIdArr, JSONObject JSONFileObj) {

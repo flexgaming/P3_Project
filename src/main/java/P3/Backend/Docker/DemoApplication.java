@@ -61,7 +61,6 @@ public class DemoApplication {
                     System.exit(0);
                 }
             }
-
             // Get all of the content within the file.
             String content = Files.readString(containerListPath);
             
@@ -108,7 +107,6 @@ public class DemoApplication {
                 }
             }
         }
-            
         // Close the scanner after use.
         scanner.close(); 
         System.exit(0);
@@ -150,11 +148,13 @@ public class DemoApplication {
         }
     }
 
+    /**
+     * This function is used to print out the options for the user to navigate the program.
+     */
     private static void printApplicationChoices() {
         System.out.println("\nSelect application mode:");
         System.out.println("1. Setup Applications");
         System.out.println("2. Interval Applications");
         System.out.println("3. Exit");
     }
-
 }

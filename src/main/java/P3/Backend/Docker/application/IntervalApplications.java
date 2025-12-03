@@ -79,7 +79,6 @@ public class IntervalApplications {
             // Convert all of the content back into a JSON format.
             JSONObject companyInfoObj = new JSONObject(info);
 
-            
             // Get the amount of active containers within the JSON file, that is not "inactive" or "unconfigured".
             int activeContainerCount = 0;
             for (String key : JSONFileObj.keySet()) {
@@ -118,8 +117,6 @@ public class IntervalApplications {
     
                 index++; // Make sure to move the index.
             }
-
-            
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
             e.printStackTrace();
@@ -236,8 +233,8 @@ public class IntervalApplications {
      * @param dockerClient Is used for sending and receiving data from the docker.
      * @param webClient Is used for getting data from the Spring Actuator endpoint.
      */
-    private static void fetchAllContainerInformation(ContainerClass container, DockerClient dockerClient, WebClient webClient) {
-        
+    private static void fetchAllContainerInformation(ContainerClass container, DockerClient dockerClient, 
+                                                                                    WebClient webClient) {
         // Get data from docker container.
         fetchDockerStats(container, dockerClient);
         
@@ -426,5 +423,4 @@ public class IntervalApplications {
             return null;
         }
     }
-
 }

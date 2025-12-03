@@ -17,6 +17,7 @@ public class DockerStatsService {
         this.dockerClient = dockerClient;
     }
 
+    // Hvad er POJO Kan vi eventuelt skrive det helt ud?
     /**
      * Get a snapshot of container stats as a POJO
      */
@@ -33,6 +34,10 @@ public class DockerStatsService {
     private static class SingleStatsCallback extends ResultCallbackTemplate<SingleStatsCallback, Statistics> {
         private Statistics stats;
 
+        /**
+         * 
+         * @param statistics
+         */
         @Override
         public void onNext(Statistics statistics) {
             this.stats = statistics;
@@ -43,12 +48,15 @@ public class DockerStatsService {
             }
         }
 
-
+        /**
+         * 
+         * @return
+         */
         public Statistics getStats() {
             return stats;
         }
     }
-
+    // Hvad er POJO Kan man skrive det helt ud i stedet for?
     /**
      * Simple POJO to hold stats
      */
