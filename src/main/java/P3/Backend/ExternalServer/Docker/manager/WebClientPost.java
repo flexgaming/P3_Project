@@ -18,6 +18,9 @@ public class WebClientPost {
         webClient.post()
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody);
+                .bodyValue(requestBody)
+                .retrieve()
+                .toBodilessEntity()
+                .subscribe();
     }
 }

@@ -209,6 +209,7 @@ public class IntervalApplications {
                             WebClientPost.sendData(webClient, containerArr[i], INTERNAL_SERVER_URL);
                             
                             System.out.println("JSON data has been send from: " + containerArr[i].getContainerName());
+                            System.out.println(containerArr[i].getJVMRamUsage());
                         } catch (Exception e) {
                             // Print the error if the POST request fails.
                             System.err.println("Failed to POST container data: " + e.getMessage());

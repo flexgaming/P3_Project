@@ -17,18 +17,33 @@ public class ExternalController {
     public void uploadJson(@RequestBody String json) {
         try {
             JSONObject containerData = new JSONObject(json);
+            System.out.println("CONTAINER DATA !!!!!!!!!!!!");
+            System.out.println(containerData.toString(4));
 
-            // Store all of the elements from the json in the ContainerClass.
-            ContainerClass container  = storeContainerData(containerData);
-
-            // Choice only necessary data to send to database.
-            JSONObject finalData = storeFinalData(container);
+//            // Store all of the elements from the json in the ContainerClass.
+//            ContainerClass container  = storeContainerData(containerData);
+//
+//            // Choice only necessary data to send to database.
+//            JSONObject finalData = storeFinalData(container);
+//            System.out.println(finalData);
 
             // Prepare the database.
             Database database = new Database();
 
             // Send data
-                // make function for sending all of the data.
+            String containerReference = containerData.getString("containerId");
+            boolean running = containerData.getBoolean("containerRunning");
+            double ramUsage = containerData.getDouble("containerRamUsage");
+            double cpuUsage = containerData.getDouble("containerCpuUsage");
+            double diskUsage = containerData.getDouble("containerDiskUsage");
+            int threadCount = containerData.getInt("jvmthreads");
+            String status = containerData.getString("containerStatus");
+            String errorLogs = "";
+
+            database.addDiagnosticsBatch(containerReference, running, ramUsage, cpuUsage, diskUsage, threadCount,
+                    status, errorLogs);
+            System.out.println("ghyuidsf");
+            System.out.println(containerData.getString("containerId"));
 
 
         } catch (Exception e) {
@@ -58,7 +73,8 @@ private ContainerClass storeContainerData(JSONObject jsonData) {
     ContainerClass container = new ContainerClass();
 
     Boolean containerRunning = jsonData.getBoolean("containerRunning");
-    Boolean JVMRunning = jsonData.getBoolean("JVMRunning");
+    System.out.println(jsonData.toString(4));
+    Boolean JVMRunning = jsonData.getBoolean("jvmrunning");
 
     // Go through each of the keys within the json.
     for (String key : jsonData.keySet()) {
@@ -74,7 +90,7 @@ private ContainerClass storeContainerData(JSONObject jsonData) {
                 container.setContainerId(value);
                 break;
             case "publicPort":
-                container.setPublicPort(jsonData.getJSONArray(key).getInt(0));
+                container.setPublicPort(Integer.parseInt(value));
                 break;
             case "containerInterval":
                 container.setContainerInterval(Integer.parseInt(value));
@@ -127,7 +143,7 @@ private ContainerClass storeContainerData(JSONObject jsonData) {
                 case "JVMRamUsage":
                     container.setJVMRamUsage(Long.parseLong(value));
                     break;
-                case "JVMCpuUsagePerc":
+                case "jvmcpuUsagePerc":
                     container.setJVMCpuUsagePerc(Long.parseLong(value));
                     break;
                 case "JVMThreads":

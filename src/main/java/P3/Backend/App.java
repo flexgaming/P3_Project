@@ -77,10 +77,7 @@ public class App {
                         database.getCompanies(regions.getJSONObject("Australia").getString("regionID")).getJSONObject("AussieCompute Ltd.").getString("companyID"),
                 },
                 new String[] { "AetherCore", "NovaNode", "QuantumHub", "IronPeak", "EchoForge", "SolarisGate",
-                        "ObsidianRealm", "CrystalPulse", "VortexNet", "TitanVale" },
-                new double[] { 128.0, 64.0, 96.0, 128.0, 64.0, 96.0, 64.0, 128.0, 96.0, 64.0 },
-                new double[] { 64.0, 32.0, 48.0, 64.0, 32.0, 48.0, 32.0, 64.0, 48.0, 32.0 },
-                new double[] { 4000.0, 2000.0, 3500.0, 4200.0, 2500.0, 3000.0, 2000.0, 5000.0, 3500.0, 2500.0 }
+                        "ObsidianRealm", "CrystalPulse", "VortexNet", "TitanVale" }
         );
         database.addContainers(
                 new String[] { "ctr-001", "ctr-002", "ctr-003", "ctr-004", "ctr-005", "ctr-006", "ctr-007",
@@ -89,19 +86,7 @@ public class App {
                         "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" },
                 new String[] { "blue_whale", "iron_squid", "frosty_mongoose", "crimson_fox", "silent_panda",
                         "cosmic_turtle", "rapid_lynx", "shadow_otter", "amber_crow", "lunar_badger", "mystic_serpent",
-                        "glacial_hawk", "rusty_wombat", "silver_iguana", "electric_ferret" },
-                new double[]{
-                        16.0, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8,
-                        9.9, 10.1, 11.2, 12.3, 13.4, 14.5, 15.6
-                },
-                new double[]{
-                        10.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0,
-                        4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5
-                },
-                new double[]{
-                        1000.0, 9.8, 9.6, 9.4, 9.2, 9.0, 8.8, 8.6,
-                        8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2
-                }
+                        "glacial_hawk", "rusty_wombat", "silver_iguana", "electric_ferret" }
         );
         database.addDiagnosticsBatch(
                 new String[] {
@@ -235,28 +220,6 @@ public class App {
                         135, 138, 120,
                         160, 158, 140,
                         150, 145, 140
-                },
-                new String[] {
-                        // 15 dummy process IDs
-                        "proc-001X","proc-001Y","proc-001Z","proc-001AA","proc-001BB",
-                        "proc-001CC","proc-001DD","proc-001EE","proc-001FF","proc-001GG",
-                        "proc-001HH","proc-001II","proc-001JJ","proc-001KK","proc-001LL",
-                        // original data
-                        "proc-001A", "proc-001B", "proc-001C",
-                        "proc-002A", "proc-002B", "proc-002C",
-                        "proc-003A", "proc-003B", "proc-003C",
-                        "proc-004A", "proc-004B", "proc-004C",
-                        "proc-005A", "proc-005B", "proc-005C",
-                        "proc-006A", "proc-006B", "proc-006C",
-                        "proc-007A", "proc-007B", "proc-007C",
-                        "proc-008A", "proc-008B", "proc-008C",
-                        "proc-009A", "proc-009B", "proc-009C",
-                        "proc-010A", "proc-010B", "proc-010C",
-                        "proc-011A", "proc-011B", "proc-011C",
-                        "proc-012A", "proc-012B", "proc-012C",
-                        "proc-013A", "proc-013B", "proc-013C",
-                        "proc-014A", "proc-014B", "proc-014C",
-                        "proc-015A", "proc-015B", "proc-015C"
                 },
                 new String[] {
                         // 15 dummy statuses

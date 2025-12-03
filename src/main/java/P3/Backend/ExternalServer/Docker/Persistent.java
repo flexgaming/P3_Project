@@ -28,6 +28,6 @@ public final class Persistent {
 
     public static final String SPRING_ACTUATOR_DEFAULT_ENDPOINT = "http://localhost";
 
-    public static final String INTERNAL_SERVER_URL = "https://pulpiest-tad-unamalgamated.ngrok-free.dev/api/upload-json";
+    public static final String INTERNAL_SERVER_URL = "http://localhost:8080/api/upload-json";
             
 }
