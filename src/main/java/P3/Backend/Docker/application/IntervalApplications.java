@@ -24,6 +24,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 
+import P3.Backend.LogFetcher;
+
 @Component
 public class IntervalApplications {
     
@@ -293,13 +295,21 @@ public class IntervalApplications {
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
+            // Could the errors be added here?
+            LogFetcher logFetcher = new LogFetcher();
+            JSONObject logs = logFetcher.fetch(dockerClient, container.getContainerInterval(), container.getContainerId());
+            container.setLogs(logs);
             
+            if (logs != null) {
+                try {
+                    if (logs.has("Error")) container.setLogsError(logs.getJSONArray("Error").toString());
+                    if (logs.has("Warn"))  container.setLogsWarning(logs.getJSONArray("Warn").toString());
+                    if (logs.has("Info")) container.setLogsInfo(logs.getJSONArray("Info").toString());
+                } catch (Exception e) {
+                    // ignore any JSON parsing issues for backward compatibility
+                }
+            }
             // Get the exit code only if the container is not running.
-            if (container.getContainerRunning().equals(false))
-                container.setContainerExitCode(response.getState().getExitCodeLong()); // Exit Code for the container.
-            else 
-                container.setContainerExitCode(null); // No exit code if the container is running.
-            
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
             // e.printStackTrace();

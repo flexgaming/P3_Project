@@ -1,5 +1,7 @@
 package P3.Backend.Docker.classes;
 
+import org.json.JSONObject;
+
 public class ContainerClass {
     
     // All of the variables that we want to store from each container.
@@ -13,6 +15,11 @@ public class ContainerClass {
     private String companyRegion;          // Is the region of the company using the application.
     private String companyName;            // Is the name of the company using the application.
     private String companyServer;          // Is the server of the company using the application.
+
+    private JSONObject logs;
+    private String logsWarning;
+    private String logsError;
+    private String logsInfo;
 
     // Data from docker:
     private Boolean containerRunning;       // Is docker container on or off.
@@ -47,6 +54,7 @@ public class ContainerClass {
     private Long timestamp;                 // Is the time when data is fetched.
     private Integer poolCore;             // Is the core number of threads allocated for the pool of the java application.
     private Integer logbackEvents;        // Is the number of logback events on the java application.
+    
     private Integer logbackEventsError;   // Is the number of logback error events on the java application.
     private Integer logbackEventsWarn;    // Is the number of logback warn events on the java application.  
     private Long garbageCollectSize;   // Is the size of garbage collection on the java application. 
@@ -107,6 +115,23 @@ public class ContainerClass {
     
     public void setCompanyServer(String companyServer) { this.companyServer = companyServer; }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public String getLogsWarning() { return logsWarning; } 
+
+    public void setLogsWarning(String logsWarning) { this.logsWarning = logsWarning; }
+
+    public String getLogsError() { return logsError; }
+
+    public void setLogsError(String logsError) { this.logsError = logsError; }
+
+    public String getLogsInfo() { return logsInfo; }
+
+    public void setLogsInfo(String logsInfo) { this.logsInfo = logsInfo; }
+
+    public JSONObject getLogs() { return logs; }
+
+    public void setLogs(JSONObject logs) { this.logs = logs; }
     //////////////////////////////////////
     //  CONTAINER GETTERS AND SETTERS   //
     //////////////////////////////////////
@@ -260,7 +285,7 @@ public class ContainerClass {
 //GarbageCollectSize
     public Long getGarbageCollectSize() { return garbageCollectSize; }
 
-    public void setGarbageCollectSize(Long garbageCollectSize) { this.garbageCollectSize = garbageCollectSize; }
+    public void setGarbageCollectSize(Long garbageCollectSize) { this.garbageCollectSize = garbageCollectSize; } 
 
 //Timestamp
     public Long getTimestamp() { return timestamp; }
