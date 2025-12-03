@@ -4,7 +4,7 @@ import "../pages/css/Dashboard.css";
 
 /**
  * AddRegions component
- * - Fetches region names from /api/data/dashboard on mount
+ * - Fetches region names from /data/dashboard on mount
  * - Renders one ListGroup block per region name
  */
 function DashboardRegions() {
@@ -20,7 +20,7 @@ function DashboardRegions() {
         // Fetch regions and dashboard data on mount
         async function fetchDashboardData() {
             try {
-                const res = await fetch("/api/data/dashboard");
+                const res = await fetch("/data/dashboard");
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
 

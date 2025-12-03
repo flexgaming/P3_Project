@@ -3,7 +3,7 @@
 // an object with a `regions` property). This helper returns a
 // normalized array of region objects.
 export async function getRegions() {
-    const res = await fetch("/api/data/regions");
+    const res = await fetch("/data/regions");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 

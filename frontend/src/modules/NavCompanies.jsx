@@ -6,7 +6,7 @@ import { getCompanies } from "../utils/FetchCompanies";
 
 /**
  * NavCompanies component
- * - Fetches company names from /api/data/{regionID}/companies on mount
+ * - Fetches company names from /data/{regionID}/companies on mount
  * - Renders one ListGroup block per company name
  */
 function NavCompanies({ regionID, regionName}) {

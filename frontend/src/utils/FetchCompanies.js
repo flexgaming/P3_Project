@@ -4,7 +4,7 @@
 // normalized array of company objects.
 export async function getCompanies(regionID) {
     if (!regionID) return [];
-    const res = await fetch(`/api/data/${regionID}/companies`);
+    const res = await fetch(`/data/${regionID}/companies`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 

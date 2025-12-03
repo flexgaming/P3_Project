@@ -9,7 +9,7 @@ import { IoCloudOfflineOutline } from "react-icons/io5";
  * -----------------
  * This component displays a company's servers and their containers as a grid of
  * Bootstrap ListGroup cards. It fetches server/container data from the
- * backend endpoint `/api/data/{regionID}/{companyID}/contents` and normalizes
+ * backend endpoint `/data/{regionID}/{companyID}/contents` and normalizes
  * the response into an array of server objects with a `containers` array.
  *
  * Props:
@@ -45,7 +45,7 @@ function NavServers({ regionID, companyID }) {
         async function fetchServers() {
             try {
                 // Fetch server+container data for the given region/company.
-                const res = await fetch(`/api/data/${regionID}/${companyID}/contents`);
+                const res = await fetch(`/data/${regionID}/${companyID}/contents`);
                 // If the response is not OK, throw to be caught below.
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
