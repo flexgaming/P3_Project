@@ -47,7 +47,7 @@ export default function DiagnosticsView() {
         lastFetchRef.current = key;
 
         try {
-            const res = await fetch(`/api/data/diagnosticsdata/${containerID}`, {
+            const res = await fetch(`/data/diagnosticsdata/${containerID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ timeFrame }),
@@ -79,7 +79,7 @@ export default function DiagnosticsView() {
 
         async function fetchServerData() {
             try {
-                const res = await fetch(`/api/data/serverdata/${containerData.containerData.serverReference}`);
+                const res = await fetch(`/data/serverdata/${containerData.containerData.serverReference}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 setServerData(await res.json());

@@ -4,7 +4,7 @@ import { getRegions } from "../utils/FetchRegions";
 
 
 /** * ManageRegions component
- * - Fetches region names from /api/data/regions on mount
+ * - Fetches region names from /data/regions on mount
  * - Renders one ListGroup block per region name
  * - Additional logic for managing regions can be added
  */
