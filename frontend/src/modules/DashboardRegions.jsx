@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Badge, Alert } from "react-bootstrap";
 import "../pages/css/Dashboard.css";
+import { RegionThresholds } from "../config/ConfigurationConstants.js";
 
 /**
  * AddRegions component
@@ -57,11 +58,11 @@ function DashboardRegions() {
                 // Determine health badge variant based on uptime
                 const healthBg =
                     parseFloat(currentDashboardData.uptime) === "N/A" ? "secondary" :
-                    parseFloat(currentDashboardData.uptime) >= 75 ? "success" :
-                    parseFloat(currentDashboardData.uptime) >= 50 ? "warning" :
+                    parseFloat(currentDashboardData.uptime) >= RegionThresholds.uptimeThresholdGreen ? "success" :
+                    parseFloat(currentDashboardData.uptime) >= RegionThresholds.uptimeThresholdYellow ? "warning" :
                     "danger";
                 // If the bg color is yellow (warning), use dark text for readability
-                const textColor = (healthBg === "warning") ? "dark" : "light";
+                const textColorHealth = (healthBg === "warning") ? "dark" : "light";
                 // Render active containers in two different badges: active / total
                 const activeContainersParts = currentDashboardData.activeContainers.split("/");
                 const activeContainers = activeContainersParts[0] || "N/A";
@@ -71,9 +72,15 @@ function DashboardRegions() {
                     ? (parseInt(activeContainers) / parseInt(totalContainers)) * 100
                     : 0;
                 const runningBg =
-                    runningPercentage >= 75 ? "success" :
-                    runningPercentage >= 50 ? "warning" :
+                    runningPercentage >= RegionThresholds.activeContainersPercentageThresholdGreen ? "success" :
+                    runningPercentage >= RegionThresholds.activeContainersPercentageThresholdYellow ? "warning" :
                     "danger";
+                const textColorRunning = (runningBg === "warning") ? "dark" : "light";
+                const errorLastHourBg =
+                    parseInt(currentDashboardData.errors) === RegionThresholds.errorCountThresholdGreen ? "success" :
+                    parseInt(currentDashboardData.errors) <= RegionThresholds.errorCountThresholdYellow ? "warning" :
+                    "danger";
+                const textColorErrors = (errorLastHourBg === "warning") ? "dark" : "light";
                 return (
                     // Each region card
                     <div className="region-cards p-2 w-100" id={`${currentDashboardData.regionID}`} key={currentDashboardData.regionID}>
@@ -82,16 +89,16 @@ function DashboardRegions() {
                                 <h4><b>{currentDashboardData.regionName}</b></h4>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Active containers: <Badge bg={runningBg}>{activeContainers}</Badge> / <Badge bg={runningBg}>{totalContainers}</Badge>
+                                Active containers: <Badge bg={runningBg} text={textColorRunning} className="fs-6">{activeContainers}</Badge> / <Badge bg={runningBg} text={textColorRunning} className="fs-6">{totalContainers}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Companies: <Badge bg="secondary" >{currentDashboardData.companies}</Badge>
+                                Companies: <Badge bg="secondary" className="fs-6">{currentDashboardData.companies}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Total uptime: <Badge bg={healthBg} text={textColor}>{currentDashboardData.uptime}</Badge>
+                                Total uptime: <Badge bg={healthBg} text={textColorHealth} className="fs-6">{currentDashboardData.uptime}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Errors past hour: <Badge bg="secondary">{currentDashboardData.errors}</Badge>
+                                Errors past hour: <Badge bg={errorLastHourBg} text={textColorErrors} className="fs-6">{currentDashboardData.errors}</Badge>
                             </ListGroup.Item>
                         </ListGroup>
                     </div>

@@ -10,6 +10,7 @@ import {
     Legend
 } from "chart.js";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 // Register ChartJS components
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
@@ -85,7 +86,7 @@ const dashedLegendPlugin = {
 export default function CpuView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [cpuChart, setCpuChart] = useState(null);
     const [noData, setNoData] = useState(false);
-    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.CpuViewTimeFrame);
 
     // When the view becomes active, or when the local timeframe changes while
     // active, request diagnostics for our local timeframe.

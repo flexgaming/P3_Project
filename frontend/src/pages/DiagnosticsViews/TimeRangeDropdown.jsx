@@ -39,7 +39,7 @@ export function reverseReadableTimeFrame(readable) {
 // - onChange: function(newTimeFrame) called when the user picks a new value
 function TimeRangeDropdown({ timeFrame, onChange, id, className }) {
     const current = timeFrame;
-    const [title = "Last 10 Minutes", setTitle] = useState(current);
+    const [title, setTitle] = useState(current);
 
     // Keep local title in sync if parent changes timeFrame
     useEffect(() => {

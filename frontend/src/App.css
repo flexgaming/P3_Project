@@ -64,4 +64,7 @@
     opacity: 0.9;
 }
 
-
+.badge {
+    font-size: 100px;
+    line-height: 100px;
+}

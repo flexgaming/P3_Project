@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import pattern from "patternomaly";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -35,7 +36,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchDiagnostics }) {
     const [runningChart, setRunningChart] = useState(null);
     const [noData, setNoData] = useState(false);
-    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.runningViewTimeFrame);
     const chartRef = useRef(null);
 
     // Keep a processed diagnostics array (ordered) so clicks can map index -> diagnostics object
