@@ -13,7 +13,7 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
     }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.serverName) {
+        if (!containerData || !containerData.containerData || !Object.keys(containerData.diagnosticsData).length || !serverData || !serverData.serverName) {
             return;
         }
 
@@ -51,8 +51,6 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
             rows.push(["Disk Usage:", containerData.containerData && latest.diskUsage != null ? String(containerData.containerData.diskUsage) + "B" : "N/A"]);
             rows.push(["Thread Count:", typeof latest.threadCount !== 'undefined' ? String(latest.threadCount) : "Unknown"]);
         }
-
-        console.log(rows);
 
     // update local UI state only via dataTable
         setDataTable(

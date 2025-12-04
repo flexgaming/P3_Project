@@ -73,6 +73,9 @@ Database database = new Database();
         diagnosticsData.put("containerData", database.getContainerData(containerID));
         diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(containerID, timeFrame));
 
+        System.out.println(timeFrame);
+        System.out.println(diagnosticsData.toString(4));
+
         return diagnosticsData.toMap();
     }
 
