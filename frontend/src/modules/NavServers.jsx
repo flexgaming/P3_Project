@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Row, Col, Badge, ListGroup, Stack, Image } from "react-bootstrap";
-import warningSmall from "../assets/Warning128.png";
 import "../pages/css/Nav.css";
 import { IoCloudOfflineOutline } from "react-icons/io5";
 
@@ -136,7 +135,7 @@ function NavServers({ regionID, companyID }) {
                                     <Stack direction="horizontal" gap={2}>
                                         <div>{server.serverName}</div>
                                         <div className="ms-auto">Containers:</div>
-                                        <Badge bg="secondary">{server.containers?.length ?? 0}</Badge>
+                                        <Badge bg="secondary" className="fs-6">{server.containers?.length ?? 0}</Badge>
                                     </Stack>
                                 </ListGroup.Item>
 

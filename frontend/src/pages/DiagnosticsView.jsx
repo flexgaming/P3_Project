@@ -8,6 +8,7 @@ import RamView from "./DiagnosticsViews/RamView.jsx";
 import DiskUsageView from "./DiagnosticsViews/DiskUsageView.jsx";
 import ThreadCountView from "./DiagnosticsViews/ThreadCountView.jsx";
 import { useParams } from "react-router-dom";
+import { defaultTimeFrames } from "../config/ConfigurationConstants.js";
 
 export default function DiagnosticsView() {
     const { containerID } = useParams();
@@ -70,7 +71,7 @@ export default function DiagnosticsView() {
     // overview initial load.
     useEffect(() => {
         if (activeTab === "overview") {
-            fetchDiagnosticsFor("10minutes");
+            fetchDiagnosticsFor(defaultTimeFrames.overviewTimeFrame);
         }
     }, [activeTab, fetchDiagnosticsFor]);
 
