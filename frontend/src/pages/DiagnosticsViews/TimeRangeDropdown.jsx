@@ -5,14 +5,14 @@ import "../css/Dashboard.css";
 // Helpers for converting between readable titles and internal timeframe keys
 export function readableTimeFrame(tf) {
     switch (tf) {
-        case "10minutes": return "Last 10 Minutes";
-        case "1hour": return "Last 1 Hour";
-        case "6hours": return "Last 6 Hours";
-        case "12hours": return "Last 12 Hours";
-        case "24hours": return "Last 24 Hours";
-        case "1week": return "Last Week";
-        case "1month": return "Last Month";
-        case "1year": return "Last Year";
+        case "10minutes": return "Past 10 Minutes";
+        case "1hour": return "Past 1 Hour";
+        case "6hours": return "Past 6 Hours";
+        case "12hours": return "Past 12 Hours";
+        case "24hours": return "Past 24 Hours";
+        case "1week": return "Past Week";
+        case "1month": return "Past Month";
+        case "1year": return "Past Year";
         default:
             return undefined;
     }
@@ -20,14 +20,14 @@ export function readableTimeFrame(tf) {
 
 export function reverseReadableTimeFrame(readable) {
     switch (readable) {
-        case "Last 10 Minutes": return "10minutes";
-        case "Last 1 Hour": return "1hour";
-        case "Last 6 Hours": return "6hours";
-        case "Last 12 Hours": return "12hours";
-        case "Last 24 Hours": return "24hours";
-        case "Last Week": return "1week";
-        case "Last Month": return "1month";
-        case "Last Year": return "1year";
+        case "Past 10 Minutes": return "10minutes";
+        case "Past 1 Hour": return "1hour";
+        case "Past 6 Hours": return "6hours";
+        case "Past 12 Hours": return "12hours";
+        case "Past 24 Hours": return "24hours";
+        case "Past Week": return "1week";
+        case "Past Month": return "1month";
+        case "Past Year": return "1year";
         default:
             return undefined;
     }
@@ -60,17 +60,17 @@ function TimeRangeDropdown({ timeFrame, onChange, id, className }) {
                 title={title}
                 id={id}
                 variant="secondary"
-                drop="start"
+                drop="down"
                 onSelect={handleSelect}
             >
-                <Dropdown.Item eventKey="10minutes">Last 10 Minutes</Dropdown.Item>
-                <Dropdown.Item eventKey="1hour">Last 1 Hour</Dropdown.Item>
-                <Dropdown.Item eventKey="6hours">Last 6 Hours</Dropdown.Item>
-                <Dropdown.Item eventKey="12hours">Last 12 Hours</Dropdown.Item>
-                <Dropdown.Item eventKey="24hours">Last 24 Hours</Dropdown.Item>
-                <Dropdown.Item eventKey="1week">Last Week</Dropdown.Item>
-                <Dropdown.Item eventKey="1month">Last Month</Dropdown.Item>
-                <Dropdown.Item eventKey="1year">Last Year</Dropdown.Item>
+                <Dropdown.Item eventKey="10minutes">Past 10 Minutes</Dropdown.Item>
+                <Dropdown.Item eventKey="1hour">Past 1 Hour</Dropdown.Item>
+                <Dropdown.Item eventKey="6hours">Past 6 Hours</Dropdown.Item>
+                <Dropdown.Item eventKey="12hours">Past 12 Hours</Dropdown.Item>
+                <Dropdown.Item eventKey="24hours">Past 24 Hours</Dropdown.Item>
+                <Dropdown.Item eventKey="1week">Past Week</Dropdown.Item>
+                <Dropdown.Item eventKey="1month">Past Month</Dropdown.Item>
+                <Dropdown.Item eventKey="1year">Past Year</Dropdown.Item>
             </DropdownButton>
         </>
     );
