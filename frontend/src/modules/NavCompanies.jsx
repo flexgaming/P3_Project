@@ -3,16 +3,18 @@ import { Alert, Tab, Row, Col, Nav} from "react-bootstrap";
 import NavServers from "./NavServers";
 import "../pages/css/Nav.css";
 import { getCompanies } from "../utils/FetchCompanies";
+import { useNavigate } from "react-router-dom";
 
 /**
  * NavCompanies component
  * - Fetches company names from /data/{regionID}/companies on mount
  * - Renders one ListGroup block per company name
  */
-function NavCompanies({ regionID, regionName}) {
+function NavCompanies({ regionID, regionName, selectedCompanyName }) {
     const [companies, setCompanies] = useState([]);
     const [activeKey, setActiveKey] = useState(null);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
     // companies: array of company objects for this region
     // activeKey: currently selected Tab eventKey (companyName)
     // error: error message when fetching fails
@@ -26,7 +28,18 @@ function NavCompanies({ regionID, regionName}) {
                 const companyList = await getCompanies(regionID);
                 if (mounted) {
                     setCompanies(companyList);
-                    setActiveKey(companyList.length ? String(companyList[0].companyName) : null);
+                    // If a company name was provided via route, try to select it (support slug or case-insensitive match)
+                    if (selectedCompanyName) {
+                        const requested = String(selectedCompanyName).toLowerCase();
+                        const match = companyList.find(c => {
+                            const name = String(c.companyName || "").toLowerCase();
+                            const slug = name.replace(/\s+/g, "-");
+                            return name === requested || slug === requested;
+                        });
+                        setActiveKey(match ? String(match.companyName) : (companyList.length ? String(companyList[0].companyName) : null));
+                    } else {
+                        setActiveKey(companyList.length ? String(companyList[0].companyName) : null);
+                    }
                 }
             } catch (err) {
                 if (mounted) setError(err.message || String(err));
@@ -35,7 +48,7 @@ function NavCompanies({ regionID, regionName}) {
 
         loadCompanies();
         return () => { mounted = false; };
-    }, [regionID]);
+    }, [regionID, selectedCompanyName]);
 
     // Render error if fetch failed
     if (error)
@@ -62,7 +75,18 @@ function NavCompanies({ regionID, regionName}) {
                         {/* Render Nav.Items for each company */}
                         {companies.map(company => (
                             <Nav.Item key={company.companyID}>
-                                <Nav.Link eventKey={`${company.companyName}`}>{`${company.companyName}`}</Nav.Link>
+                                <Nav.Link
+                                    eventKey={`${company.companyName}`}
+                                    onClick={() => {
+                                        const companySlug = String(company.companyName || "").toLowerCase().replace(/\s+/g, "-");
+                                        const regionSlug = String(regionName || "").toLowerCase().replace(/\s+/g, "-");
+                                        // Update the URL to /nav/<regionSlug>/<companySlug>
+                                        navigate(`/nav/${regionSlug}/${companySlug}`);
+                                        setActiveKey(company.companyName);
+                                    }}
+                                >
+                                    {`${company.companyName}`}
+                                </Nav.Link>
                             </Nav.Item>
                         ))}
                     </Nav>

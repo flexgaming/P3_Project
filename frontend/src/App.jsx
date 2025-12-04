@@ -22,7 +22,7 @@ const App = () => {
                     <Navbar.Brand href="/dashboard">Container Diagnostics Platform</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto">
+                        <Nav className="me-auto" style={{marginLeft: "10px"}}>
                             <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
                             <Nav.Link as={Link} to="/nav">Navigate</Nav.Link>
                             <Nav.Link as={Link} to="/manage">Manage</Nav.Link>
@@ -38,7 +38,9 @@ const App = () => {
                     <Route path="/manage" element={<ManagePage />}/>
                     <Route path="/manage/:regionID" element={<ManagePage/>}/>
                     <Route path="/manage/:regionID/:companyID" element={<ManagePage/>}/>
-                    <Route path="/nav/*" element={<NavRegions/>} />
+                    <Route path="/nav" element={<NavRegions/>} />
+                    <Route path="/nav/:regionName" element={<NavRegions/>} />
+                    <Route path="/nav/:regionName/:companyName" element={<NavRegions/>} />
                 </Routes>
             </div>
         </div>
