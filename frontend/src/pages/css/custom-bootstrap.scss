@@ -1,8 +1,8 @@
-// custom-bootstrap.scss
-//$danger:    #9f1239;
+// Change the colors of the badges and other components by overriding Bootstrap variables
+$danger:    rgb(220, 53, 69);
 $secondary: #5C7C89;
-//$success:   #166534;
-//$warning:   #854d0e;
+$success:   rgb(25, 135, 84);
+$warning:   rgb(255, 193, 7);
 //$info:      #087990;
 //$primary:   #6366f1;
 
