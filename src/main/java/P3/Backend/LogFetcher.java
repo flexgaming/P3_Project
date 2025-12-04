@@ -6,6 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+/** This function is used in order to get all of the "warn" and "error" in the log.
+ * 
+ * @param dockerClient Is used in order to get a connection to the docker server.
+ * @param id Is used in order to find the logs from the specific container.
+ * @param interval Is used in order to see what have happened since last check ( This have to be in miliseconds: 1s = 1000 ).
+ * @return 
+ * @throws InterruptedException Is used if the thread is interrupted while waiting for log retrieval to complete.
+ */
 
 public class LogFetcher {
     private final Map<String,Long> last = new HashMap<>();
@@ -14,23 +22,18 @@ public class LogFetcher {
       FilteredLogCallback cb = new FilteredLogCallback();
       long nowMillis = System.currentTimeMillis();
       long sinceMillis = nowMillis - (interval * 1000L);
-      int sinceSeconds = (int) (sinceMillis / 1000L); // Docker expects UNIX epoch seconds
+      int sinceSeconds = (int) (sinceMillis / 1000L);
 
         dc.logContainerCmd(id)
           .withStdOut(true)
           .withStdErr(true)
-          .withSince(sinceSeconds)
+          .withSince(sinceSeconds) // How far back it looks for logs
           .exec(cb)
           .awaitCompletion();
 
         last.put(id, System.currentTimeMillis());
         JSONObject out = cb.get();
-        try {
-          int e = out.has("Error") ? out.getJSONArray("Error").length() : 0;
-          int w = out.has("Warn") ? out.getJSONArray("Warn").length() : 0;
-          int i = out.has("Info") ? out.getJSONArray("Info").length() : 0;
-          System.out.println("\n\n[LogFetcher] id=" + id + " counts -> Error=" + e + ", Warn=" + w + ", Info=" + i + "\n\n");
-        } catch (Exception ignore) {}
+
         return out;
     }
 }

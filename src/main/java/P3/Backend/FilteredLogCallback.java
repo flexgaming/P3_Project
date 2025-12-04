@@ -13,13 +13,15 @@ public class FilteredLogCallback extends ResultCallback.Adapter<Frame> {
 
     @Override
     public void onNext(Frame frame) {
+        // Gets the raw bytes from the frame payload.
         String payload = new String(frame.getPayload(), StandardCharsets.UTF_8);
         if (payload.isEmpty()) return;
 
+        // Split payload into separate lines to handle batched frames
         String[] lines = payload.split("\\r?\\n");
         for (String line : lines) {
             if (line == null) continue;
-            String trimmed = line.trim();
+            String trimmed = line.trim(); // Trim whitespace and skip empty lines
             if (trimmed.isEmpty()) continue;
 
             String up = trimmed.toUpperCase();
@@ -27,9 +29,9 @@ public class FilteredLogCallback extends ResultCallback.Adapter<Frame> {
                 errors.put(trimmed);
             } else if (up.contains("WARN")) {
                 warns.put(trimmed);
-            } else if (up.contains("INFO")) {
+            } /* else if (up.contains("INFO")) {
                 infos.put(trimmed);
-            }
+            } */
         }
     }
 
@@ -37,7 +39,7 @@ public class FilteredLogCallback extends ResultCallback.Adapter<Frame> {
         JSONObject result = new JSONObject();
         result.put("Error", errors);
         result.put("Warn", warns);
-        result.put("Info", infos);
+        //result.put("Info", infos);
         return result;
     }
 }

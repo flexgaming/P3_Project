@@ -10,6 +10,8 @@ import P3.Backend.Docker.manager.DockerStatsService;
 import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
 import P3.Backend.Docker.manager.WebClientPost;
 import P3.Backend.Docker.classes.ContainerClass;
+import P3.Backend.Docker.classes.LogsClass;
+
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,8 +20,12 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
@@ -292,20 +298,13 @@ public class IntervalApplications {
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
+            
             // Could the errors be added here?
             LogFetcher logFetcher = new LogFetcher();
-            JSONObject logs = logFetcher.fetch(dockerClient, container.getContainerInterval(), container.getContainerId());
-            container.setLogs(logs);
-            
-            if (logs != null) {
-                try {
-                    if (logs.has("Error")) container.setLogsError(logs.getJSONArray("Error").toString());
-                    if (logs.has("Warn"))  container.setLogsWarning(logs.getJSONArray("Warn").toString());
-                    if (logs.has("Info")) container.setLogsInfo(logs.getJSONArray("Info").toString());
-                } catch (Exception e) {
-                    // ignore any JSON parsing issues for backward compatibility
-                }
-            }
+            JSONObject logsJson = logFetcher.fetch(dockerClient, container.getContainerInterval(), container.getContainerId());
+            LogsClass logsInfo = toLogsInfo(logsJson);
+            container.setLogs(logsInfo);
+
             // Get the exit code only if the container is not running.
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
@@ -423,4 +422,42 @@ public class IntervalApplications {
             return null;
         }
     }
+
+        /** Converts a JSONObject containing log information into a LogsClass object.
+     * 
+     * @param json the JSONObject containing log arrays ("Error", "Warn", "Info")
+     * @return a LogsClass object populated with lists of log messages.
+     */
+
+    private static LogsClass toLogsInfo(JSONObject json) {
+        LogsClass info = new LogsClass();
+        // If logs JSON is null returns empty object.
+        if (json == null) return info;
+        info.setError(jsonArrayToList(json.optJSONArray("Error")));
+        info.setWarn(jsonArrayToList(json.optJSONArray("Warn")));
+        // info.setInfo(jsonArrayToList(json.optJSONArray("Info")));
+        return info;
+    }
+
+    /** Converts a JSONArray into a List of Strings.
+     * 
+     * @param arr the JSONArray to convert
+     * @return a List<string> containing all valid string entries from the array.
+     */
+
+    private static List<String> jsonArrayToList(JSONArray arr) {
+        List<String> list = new ArrayList<>();
+        // Produce empty list if array is null
+        if (arr == null) return list;
+        for (int i = 0; i < arr.length(); i++) {
+            try {
+                // Collect string entries, non-strings will throw and be skipped
+                list.add(arr.getString(i));
+            } catch (Exception ignore) {
+                // Intentionally ignore malformed/non-string entries
+            }
+        }
+        return list;
+    }
+
 }

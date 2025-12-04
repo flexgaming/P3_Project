@@ -1,7 +1,5 @@
 package P3.Backend.Docker.classes;
 
-import org.json.JSONObject;
-
 public class ContainerClass {
     
     // All of the variables that we want to store from each container.
@@ -16,10 +14,7 @@ public class ContainerClass {
     private String companyName;            // Is the name of the company using the application.
     private String companyServer;          // Is the server of the company using the application.
 
-    private JSONObject logs;
-    private String logsWarning;
-    private String logsError;
-    private String logsInfo;
+    private LogsClass logs;
 
     // Data from docker:
     private Boolean containerRunning;       // Is docker container on or off.
@@ -117,21 +112,9 @@ public class ContainerClass {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     
-    public String getLogsWarning() { return logsWarning; } 
+    public LogsClass getLogs() { return logs; }
 
-    public void setLogsWarning(String logsWarning) { this.logsWarning = logsWarning; }
-
-    public String getLogsError() { return logsError; }
-
-    public void setLogsError(String logsError) { this.logsError = logsError; }
-
-    public String getLogsInfo() { return logsInfo; }
-
-    public void setLogsInfo(String logsInfo) { this.logsInfo = logsInfo; }
-
-    public JSONObject getLogs() { return logs; }
-
-    public void setLogs(JSONObject logs) { this.logs = logs; }
+    public void setLogs(LogsClass logs) { this.logs = logs; }
     //////////////////////////////////////
     //  CONTAINER GETTERS AND SETTERS   //
     //////////////////////////////////////
