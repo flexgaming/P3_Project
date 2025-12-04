@@ -423,7 +423,7 @@ public class IntervalApplications {
         }
     }
 
-        /** Converts a JSONObject containing log information into a LogsClass object.
+     /** Converts a JSONObject containing log information into a LogsClass object.
      * 
      * @param json the JSONObject containing log arrays ("Error", "Warn", "Info")
      * @return a LogsClass object populated with lists of log messages.
@@ -459,5 +459,4 @@ public class IntervalApplications {
         }
         return list;
     }
-
 }
