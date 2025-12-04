@@ -38,7 +38,11 @@ public class ExternalController {
             double diskUsage = containerData.getDouble("containerDiskUsage");
             int threadCount = containerData.getInt("jvmthreads");
             String status = containerData.getString("containerStatus");
-            String errorLogs = "";
+            JSONObject errorLogs = null;
+
+//            String containerReference, boolean running, double ramFree, double cpuFree,
+//            double diskUsageFree, int threadCount, String processID, String status,
+//                    String errorLogs
 
             database.addDiagnosticsBatch(containerReference, running, ramUsage, cpuUsage, diskUsage, threadCount,
                     status, errorLogs);

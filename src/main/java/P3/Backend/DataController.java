@@ -102,7 +102,7 @@ Database database = new Database();
         }
         // Get critical errors data from DB
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors(timeFrame).toMap();
-        // Create an object to asses the severity of the error messages
+        // Create an object to assess the severity of the error messages
         SeverityCalculator severityCalculator = new SeverityCalculator();
         
         //Return the updated map of error messages with severities assigned

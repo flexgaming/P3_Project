@@ -17,7 +17,7 @@ public class App {
         // printData(database);
 
         // Test getting diagnostics data for a specific container
-        /* Container dockerTst = new Container("ctr-001");
+        /* Container dockerTst = new Container("40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c");
         Container testData = database.getDiagnosticsData(dockerTst);
         System.out.println(testData.getDiagnosticsData()); */
     }
@@ -81,7 +81,7 @@ public class App {
                         "ObsidianRealm", "CrystalPulse", "VortexNet", "TitanVale" }
         );
         database.addContainers(
-                new String[] { "ctr-001", "ctr-002", "ctr-003", "ctr-004", "ctr-005", "ctr-006", "ctr-007",
+                new String[] { "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c", "ctr-002", "ctr-003", "ctr-004", "ctr-005", "ctr-006", "ctr-007",
                         "ctr-008", "ctr-009", "ctr-010", "ctr-011", "ctr-012", "ctr-013", "ctr-014", "ctr-015" },
                 new String[] { "srv-101", "srv-101", "srv-102", "srv-201", "srv-301", "srv-301", "srv-302",
                         "srv-401", "srv-501", "srv-601", "srv-601", "srv-701", "srv-701", "srv-801", "srv-801" },
@@ -91,12 +91,12 @@ public class App {
         );
         database.addDiagnosticsBatch(
                 new String[] {
-                        // 15 dummy entries for ctr-001
-                        "ctr-001","ctr-001","ctr-001","ctr-001","ctr-001",
-                        "ctr-001","ctr-001","ctr-001","ctr-001","ctr-001",
-                        "ctr-001","ctr-001","ctr-001","ctr-001","ctr-001",
+                        // 15 dummy entries for 40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c
+                        "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
+                        "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
+                        "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
                         // original data follows
-                        "ctr-001", "ctr-001", "ctr-001",
+                        "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c", "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c", "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
                         "ctr-002", "ctr-002", "ctr-002",
                         "ctr-003", "ctr-003", "ctr-003",
                         "ctr-004", "ctr-004", "ctr-004",
@@ -244,27 +244,87 @@ public class App {
                         "Healthy", "Healthy", "Healthy",
                         "Crashed", "Recovered", "Healthy"
                 },
-                new String[] {
+                new JSONObject[] {
                         // 15 dummy notes
-                        "Small pp",null,"Chicken",null,null,
-                        null,"Butter",null,"No maidens",null,
-                        null,"Deep Depression","France",null,null,
+                        new JSONObject().put("value", "Small pp"),
+                        null,
+                        new JSONObject().put("value", "Chicken"),
+                        null,
+                        null,
+
+                        null,
+                        new JSONObject().put("value", "Butter"),
+                        null,
+                        new JSONObject().put("value", "No maidens"),
+                        null,
+
+                        null,
+                        new JSONObject().put("value", "Deep Depression"),
+                        new JSONObject().put("value", "France"),
+                        null,
+                        null,
+
                         // original data
-                        null,null,"High memory usage",
-                        "NullPointerException at line 42",null,null,
-                        null,null,"CPU spike detected",
-                        null,null,"Disk IO error",
-                        "High CPU usage",null,null,
-                        "OOMKilled",null,null,
-                        null,null,"CPU spike detected",
-                        null,null,null,
-                        "Disk full",null,null,
-                        null,null,null,
-                        "Timeout error",null,null,
-                        null,null,"Disk read latency",
-                        null,null,"Network instability",
-                        null,null,"CPU usage exceeded 90%",
-                        null,null,null
+                        null,
+                        null,
+                        new JSONObject().put("value", "High memory usage"),
+
+                        new JSONObject().put("value", "NullPointerException at line 42"),
+                        null,
+                        null,
+
+                        null,
+                        null,
+                        new JSONObject().put("value", "CPU spike detected"),
+
+                        null,
+                        null,
+                        new JSONObject().put("value", "Disk IO error"),
+
+                        new JSONObject().put("value", "High CPU usage"),
+                        null,
+                        null,
+
+                        new JSONObject().put("value", "OOMKilled"),
+                        null,
+                        null,
+
+                        null,
+                        null,
+                        new JSONObject().put("value", "CPU spike detected"),
+
+                        null,
+                        null,
+                        null,
+
+                        new JSONObject().put("value", "Disk full"),
+                        null,
+                        null,
+
+                        null,
+                        null,
+                        null,
+
+                        new JSONObject().put("value", "Timeout error"),
+                        null,
+                        null,
+
+                        null,
+                        null,
+                        new JSONObject().put("value", "Disk read latency"),
+
+                        null,
+                        null,
+                        new JSONObject().put("value", "Network instability"),
+
+                        null,
+                        null,
+                        new JSONObject().put("value", "CPU usage exceeded 90%"),
+
+                        null,
+                        null,
+                        null,
+
                 }
         );
     }
