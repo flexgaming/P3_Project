@@ -68,7 +68,7 @@ export default function Dashboard() {
                             <th>Container Name</th>
                             <th>Error Message</th>
                             <th>Error Code</th>
-                            <th>Pinned logs</th>
+                            <th>Pinned Logs</th>
                         </tr>
                     </thead>
                     {/* Table Body function to fetch from the backend view */}

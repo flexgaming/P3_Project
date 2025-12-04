@@ -82,7 +82,7 @@ function DashboardRegions() {
                                 <h4><b>{currentDashboardData.regionName}</b></h4>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Active Containers: <Badge bg={runningBg}>{activeContainers}</Badge> / <Badge bg={runningBg}>{totalContainers}</Badge>
+                                Active containers: <Badge bg={runningBg}>{activeContainers}</Badge> / <Badge bg={runningBg}>{totalContainers}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 Companies: <Badge bg="secondary" >{currentDashboardData.companies}</Badge>
@@ -91,7 +91,7 @@ function DashboardRegions() {
                                 Total uptime: <Badge bg={healthBg} text={textColor}>{currentDashboardData.uptime}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Errors last hour: <Badge bg="secondary">{currentDashboardData.errors}</Badge>
+                                Errors past hour: <Badge bg="secondary">{currentDashboardData.errors}</Badge>
                             </ListGroup.Item>
                         </ListGroup>
                     </div>
