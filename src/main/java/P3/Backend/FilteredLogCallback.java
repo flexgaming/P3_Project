@@ -35,6 +35,7 @@ public class FilteredLogCallback extends ResultCallback.Adapter<Frame> {
         }
     }
 
+    // Get all of the data put into an JSONObject.
     public JSONObject get() {
         JSONObject result = new JSONObject();
         result.put("Error", errors);
