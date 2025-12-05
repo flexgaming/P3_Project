@@ -33,8 +33,9 @@ public class IntervalApplications {
     // The path for where the company info JSON file is stored.
     private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
 
-    public static ContainerClass[] containerArr;
-    public static IntervalClass[] intervalArr;
+    private static ContainerClass[] containerArr;
+    private static ContainerClass[] containerArrTemp;
+    private static IntervalClass[] intervalArr;
 
     /** This function is used for initiating the interval application.
      * 
@@ -70,13 +71,11 @@ public class IntervalApplications {
             // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
 
-
             // Get all of the company info within currentCompany JSON file.
             String info = Files.readString(companyInfoPath);
 
             // Convert all of the content back into a JSON format.
             JSONObject companyInfoObj = new JSONObject(info);
-
             
             // Get the amount of active containers within the JSON file, that is not "inactive" or "unconfigured".
             int activeContainerCount = 0;
@@ -89,6 +88,7 @@ public class IntervalApplications {
 
             // Create the length for the array based on the active container count.
             containerArr = new ContainerClass[activeContainerCount];
+            containerArrTemp = new ContainerClass[activeContainerCount];
     
             int index = 0;
             for (String key : JSONFileObj.keySet()) { // Go through each of the keys in the JSON file.
@@ -206,8 +206,10 @@ public class IntervalApplications {
 
                         // Try to send the container data to the backend server.
                         try {
+                            containerArr[i].setContainerCpuPercent(containerArrTemp[i]);
                             WebClientPost.sendData(webClient, containerArr[i], INTERNAL_SERVER_URL);
-                            
+                            containerArrTemp[i] = (ContainerClass) containerArr[i].clone();
+
                             System.out.println("JSON data has been send from: " + containerArr[i].getContainerName());
                             System.out.println(containerArr[i].getJVMRamUsage());
                         } catch (Exception e) {
@@ -290,10 +292,12 @@ public class IntervalApplications {
             // Set the container stats in the ContainerClass.
             container.setContainerRamUsage(stats.getMemoryUsage()); // Current RAM usage of the container.
             container.setContainerCpuUsage(stats.getCpuTotalUsage()); // Current CPU total usage of the container.
-            container.setContainerDiskUsage(response.getSizeRootFs());  // Total size (image + writable layer).
+            container.setSystemCpuUsage(stats.getSystemCpuTotalUsage()); // Current CPU total usage of the system.
+            container.setContainerDiskUsage(response.getSizeRootFs().doubleValue());  // Total size (image + writable layer).
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
+            container.setContainerCpuCount(stats.getCpuCount());
             
             // Get the exit code only if the container is not running.
             if (container.getContainerRunning().equals(false))
@@ -320,22 +324,22 @@ public class IntervalApplications {
         // Set all of the data recheved from the Spring Actuator endpoint.
         // JVM stats
         container.setJVMRunning(true);
-        container.setJVMRamMax(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.max")));
-        container.setJVMRamUsage(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.used")));
-        container.setJVMCpuUsageStart(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.start.time")));
-        container.setJVMCpuUsagePerc(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.cpu.usage")));
+        container.setJVMRamMax(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.max")));
+        container.setJVMRamUsage(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/jvm.memory.used")));
+        container.setJVMCpuUsageStart(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/process.start.time")));
+        container.setJVMCpuUsagePerc(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/process.cpu.usage")));
         container.setJVMThreads(getIntSafe(callActuator(webClient, url, "/actuator/metrics/jvm.threads.live")));
         container.setJVMThreadsStates(getIntSafe(callActuator(webClient, url, "/actuator/metrics/jvm.threads.states")));
         container.setJVMThreadQueued(getIntSafe(callActuator(webClient, url, "/actuator/metrics/executor.queued")));
-        container.setJVMUptime(getLongSafe(callActuator(webClient, url, "/actuator/metrics/process.uptime")));
+        container.setJVMUptime(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/process.uptime")));
 
         // DISK / STORAGE
-        container.setSystemDiskFree(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.free")));
-        container.setSystemDiskTotal(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.total")));
+        container.setSystemDiskFree(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/disk.free")));
+        container.setSystemDiskTotal(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/disk.total")));
         
         // CPU
         container.setSystemCpuCores(getIntSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.count")));
-        container.setSystemCpuUsagePerc(getLongSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.usage")));
+        container.setSystemCpuUsagePerc(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.usage")));
 
         // ERROR LOGS & MISC
         container.setPoolCore(getIntSafe(callActuator(webClient, url, "/actuator/metrics/executor.pool.core")));
@@ -380,6 +384,23 @@ public class IntervalApplications {
                 .getJSONArray("measurements")
                 .getJSONObject(0)
                 .getLong("value");
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** This function is used to safely get a Double value from a JSON object.
+     *
+     * @param json Is the JSON object to get the value from.
+     * @return The Double value from the JSON object, or null if not found.
+     */
+    private static Double getDoubleSafe(JSONObject json) {
+        try {
+            return json
+                    .getJSONArray("measurements")
+                    .getJSONObject(0)
+                    .getDouble("value");
 
         } catch (Exception e) {
             return null;

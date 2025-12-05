@@ -53,22 +53,31 @@ public class DockerStatsService {
      * Simple POJO to hold stats
      */
     public static class ContainerStats {
-        private final long cpuTotalUsage;
-        private final long memoryUsage;
-        private final long memoryLimit;
+        private final Double cpuTotalUsage;
+        private final Double systemCpuTotalUsage;
+        private final int cpuCount;
+        private final Double memoryUsage;
+        private final Double memoryLimit;
         private final int pids;
 
         public ContainerStats(Statistics stats) {
-            this.cpuTotalUsage = stats.getCpuStats().getCpuUsage().getTotalUsage();
-            this.memoryUsage = stats.getMemoryStats().getUsage();
-            this.memoryLimit = stats.getMemoryStats().getLimit();
+            this.cpuTotalUsage = stats.getCpuStats().getCpuUsage().getTotalUsage().doubleValue();
+            this.systemCpuTotalUsage = stats.getCpuStats().getSystemCpuUsage().doubleValue();
+            // Docker can return cpu count in two different ways.
+            this.cpuCount = stats.getCpuStats().getOnlineCpus() != null
+                    ? stats.getCpuStats().getOnlineCpus().intValue()
+                    : stats.getCpuStats().getCpuUsage().getPercpuUsage().size();
+            this.memoryUsage = stats.getMemoryStats().getUsage().doubleValue();
+            this.memoryLimit = stats.getMemoryStats().getLimit().doubleValue();
             this.pids = stats.getPidsStats().getCurrent().intValue();
         }
 
         // Getters
-        public long getCpuTotalUsage() { return cpuTotalUsage; }
-        public long getMemoryUsage() { return memoryUsage; }
-        public long getMemoryLimit() { return memoryLimit; }
+        public Double getCpuTotalUsage() { return cpuTotalUsage; }
+        public Double getSystemCpuTotalUsage() { return systemCpuTotalUsage; }
+        public Double getMemoryUsage() { return memoryUsage; }
+        public Double getMemoryLimit() { return memoryLimit; }
         public int getPids() { return pids; }
+        public int getCpuCount() { return cpuCount; }
     }
 }

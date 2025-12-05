@@ -1,14 +1,8 @@
 package P3.Backend;
 
-import P3.Backend.Database.*;
-
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Map;
-
-import javax.xml.crypto.Data;
 
 import org.json.JSONObject;
 
@@ -72,9 +66,6 @@ Database database = new Database();
         JSONObject diagnosticsData = new JSONObject();
         diagnosticsData.put("containerData", database.getContainerData(containerID));
         diagnosticsData.put("diagnosticsData", database.getDiagnosticsData(containerID, timeFrame));
-
-        System.out.println(timeFrame);
-        System.out.println(diagnosticsData.toString(4));
 
         return diagnosticsData.toMap();
     }

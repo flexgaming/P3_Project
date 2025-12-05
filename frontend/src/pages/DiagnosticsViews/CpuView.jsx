@@ -97,7 +97,7 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
 
     // When containerData or serverData changes, rebuild the chart.
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.cpuTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.serverName) {
             return;
         }
 
@@ -110,6 +110,7 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
 
         // Sort data by timestamp ascending
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        console.log(diagnosticsData);
 
         // Check if we have any diagnostics data
         if (diagnosticsData.length === 0) {
@@ -122,8 +123,8 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
         // We have data — ensure noData flag is cleared before building chart
         setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const cpuContainer = diagnosticsData.map(item => 1 - item.cpuFree / containerData.containerData.cpuMax);
-        const cpuServer = diagnosticsData.map(item => (containerData.containerData.cpuMax - item.cpuFree) / serverData.cpuTotal);
+        const cpuContainer = diagnosticsData.map(item => item.cpuUsage);
+        const cpuServer = diagnosticsData.map(item => item.systemCpuUsage);
 
         // Define line colors for container and server
         const lineColorContainer = diagnosticsData.map(() => "blue");
@@ -146,7 +147,7 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
                         tension: 0.1,
                     },
                     {
-                        label: "CPU usage of the server resources",
+                        label: "Total CPU usage of the server resources",
                         data: cpuServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"
@@ -163,9 +164,15 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                        }
+                    },
                     y: {
                         min: 0,
-                        max: 1,
+                        suggestedMax: .01,
                         ticks: {
                             callback: function(values) {
                                 return (values * 100).toFixed(0) + "%";

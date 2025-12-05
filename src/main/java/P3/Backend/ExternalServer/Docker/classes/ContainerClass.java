@@ -1,6 +1,6 @@
 package P3.Backend.ExternalServer.Docker.classes;
 
-public class ContainerClass {
+public class ContainerClass implements Cloneable {
     
     // All of the variables that we want to store from each container.
     // That is also sent to the database.
@@ -16,32 +16,34 @@ public class ContainerClass {
 
     // Data from docker:
     private Boolean containerRunning;       // Is docker container on or off.
-    private Long containerRamUsage;         // Is ram usage on docker container.
-    private Long containerCpuUsage;         // Is cpu usage on docker container.
-    private Long containerDiskUsage;        // Is disk usage on docker container.
+    private Double containerRamUsage;         // Is ram usage on docker container.
+    private Double containerCpuUsage;         // Is cpu usage on docker container.
+    private Double containerDiskUsage;        // Is disk usage on docker container.
     private String containerStatus;         // Is the status of the docker container.
     private Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
     private Long containerExitCode;         // Is the exit code received from the program (CHROOT EXIT CODES - https://stackoverflow.com/questions/31297616/what-is-the-authoritative-list-of-docker-run-exit-codes).
-    
+    private int containerCpuCount;
+
     // Data from actuator:
     //JVM Data
     private Boolean JVMRunning;             // Is internally java application on or off.
-    private Long JVMRamMax;               // Is max ram usage on java application.
-    private Long JVMRamUsage;             // Is ram usage on java application.
-    private Long JVMCpuUsagePerc;         // Is cpu usage on java application in percentage.
+    private Double JVMRamMax;               // Is max ram usage on java application.
+    private Double JVMRamUsage;             // Is ram usage on java application.
+    private Double JVMCpuUsagePerc;         // Is cpu usage on java application in percentage.
     private Integer JVMThreads;             // Is the number of threads on the java application.
     private Integer JVMThreadsStates;       // Is the number of threads states on the java application.
     private Integer JVMThreadQueued;       // Is the number of threads queued on the java application.
-    private Long JVMCpuUsageStart;         // Is the start time of CPU usage on the java application.
-    private Long JVMUptime;                // Is the uptime of the java application.
+    private Double JVMCpuUsageStart;         // Is the start time of CPU usage on the java application.
+    private Double JVMUptime;                // Is the uptime of the java application.
     
     //System Data
-    private Long systemRamUsage;          // Is all of the ram usage on the system.
-    private Long systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
+    private Double systemRamUsage;          // Is all of the ram usage on the system.
+    private Double systemCpuUsage;
+    private Double systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
     private Integer systemCpuCores;         // Is the number of cpu cores on the system.
-    private Long systemDiskUsage;         // Is all of the disk usage on the system.
-    private Long systemDiskTotal;         // Is the total disk space on the system.
-    private Long systemDiskFree;          // Is the free disk space on the system.
+    private Double systemDiskUsage;         // Is all of the disk usage on the system.
+    private Double systemDiskTotal;         // Is the total disk space on the system.
+    private Double systemDiskFree;          // Is the free disk space on the system.
 
     // Misc Data
     private Long timestamp;                 // Is the time when data is fetched.
@@ -52,6 +54,9 @@ public class ContainerClass {
     private Long garbageCollectSize;   // Is the size of garbage collection on the java application. 
     
     //String JVMStatus;               // Is the status of the java application.
+
+    // Calculated Data
+    private Double containerCpuPercent;
 
     ////////////////////////////////
     //      CLASS CONSTRUCTOR     //
@@ -66,6 +71,11 @@ public class ContainerClass {
         this.companyServer = companyServer;
         this.containerInterval = interval;
         this.publicPort = publicPort;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
     
     ////////////////////////////////
@@ -117,19 +127,19 @@ public class ContainerClass {
     public void setContainerRunning(Boolean containerRunning) { this.containerRunning = containerRunning; }
     
     //ContainerRamUsage
-    public Long getContainerRamUsage() { return containerRamUsage; }
+    public Double getContainerRamUsage() { return containerRamUsage; }
     
-    public void setContainerRamUsage(Long containerRamUsage) { this.containerRamUsage = containerRamUsage; }
+    public void setContainerRamUsage(Double containerRamUsage) { this.containerRamUsage = containerRamUsage; }
     
     //ContainerCpuUsage
-    public Long getContainerCpuUsage() { return containerCpuUsage; }
+    public Double getContainerCpuUsage() { return containerCpuUsage; }
     
-    public void setContainerCpuUsage(Long containerCpuUsage) { this.containerCpuUsage = containerCpuUsage; }
+    public void setContainerCpuUsage(Double containerCpuUsage) { this.containerCpuUsage = containerCpuUsage; }
     
     //ContainerDiskUsage
-    public Long getContainerDiskUsage() { return containerDiskUsage; }
+    public Double getContainerDiskUsage() { return containerDiskUsage; }
     
-    public void setContainerDiskUsage(Long containerDiskUsage) { this.containerDiskUsage = containerDiskUsage; }
+    public void setContainerDiskUsage(Double containerDiskUsage) { this.containerDiskUsage = containerDiskUsage; }
     
     //ContainerStatus
     public String getContainerStatus() { return containerStatus; }
@@ -146,6 +156,11 @@ public class ContainerClass {
 
     public void setContainerExitCode(Long containerExitCode) { this.containerExitCode = containerExitCode; }
 
+    //containerCpuCount
+    public int getContainerCpuCount() { return containerCpuCount; }
+
+    public void setContainerCpuCount(int containerCpuCount) { this.containerCpuCount = containerCpuCount; }
+
     //////////////////////////////////////
     //   ACTUATOR GETTERS AND SETTERS   //
     //////////////////////////////////////
@@ -155,19 +170,19 @@ public class ContainerClass {
     //=================================//
 
     //JVMRamMax
-    public Long getJVMRamMax() { return JVMRamMax; }
+    public Double getJVMRamMax() { return JVMRamMax; }
 
-    public void setJVMRamMax(Long jVMRamMax) { JVMRamMax = jVMRamMax; }
+    public void setJVMRamMax(Double jVMRamMax) { JVMRamMax = jVMRamMax; }
 
     //JVMRamUsage
-    public Long getJVMRamUsage() { return JVMRamUsage; }
+    public Double getJVMRamUsage() { return JVMRamUsage; }
 
-    public void setJVMRamUsage(Long jVMRamUsage) { JVMRamUsage = jVMRamUsage; }
+    public void setJVMRamUsage(Double jVMRamUsage) { JVMRamUsage = jVMRamUsage; }
 
     //JVMCpuUsagePerc
-    public Long getJVMCpuUsagePerc() { return JVMCpuUsagePerc; }
+    public Double getJVMCpuUsagePerc() { return JVMCpuUsagePerc; }
 
-    public void setJVMCpuUsagePerc(Long jVMCpuUsagePerc) { JVMCpuUsagePerc = jVMCpuUsagePerc; }
+    public void setJVMCpuUsagePerc(Double jVMCpuUsagePerc) { JVMCpuUsagePerc = jVMCpuUsagePerc; }
 
     //JVMThreads
     public Integer getJVMThreads() { return JVMThreads; }
@@ -190,28 +205,33 @@ public class ContainerClass {
     public void setJVMThreadQueued(Integer jVMThreadQueued) { JVMThreadQueued = jVMThreadQueued; }
 
     //JVMCpuUsageStart
-    public Long getJVMCpuUsageStart() { return JVMCpuUsageStart; }
+    public Double getJVMCpuUsageStart() { return JVMCpuUsageStart; }
 
-    public void setJVMCpuUsageStart(Long jVMCpuUsageStart) { JVMCpuUsageStart = jVMCpuUsageStart; }
+    public void setJVMCpuUsageStart(Double jVMCpuUsageStart) { JVMCpuUsageStart = jVMCpuUsageStart; }
 
     //JVMUptime
-    public Long getJVMUptime() { return JVMUptime; }
+    public Double getJVMUptime() { return JVMUptime; }
 
-    public void setJVMUptime(Long jVMUptime) { JVMUptime = jVMUptime; }
+    public void setJVMUptime(Double jVMUptime) { JVMUptime = jVMUptime; }
 
     //=================================//
     //   SYSTEM GETTERS AND SETTERS    //
     //=================================//
 
 //SystemRamUsage
-    public Long getSystemRamUsage() { return systemRamUsage; }
+    public Double getSystemRamUsage() { return systemRamUsage; }
 
-    public void setSystemRamUsage(Long systemRamUsage) { this.systemRamUsage = systemRamUsage; }
+    public void setSystemRamUsage(Double systemRamUsage) { this.systemRamUsage = systemRamUsage; }
+
+//SystemCpuUsage
+    public Double getSystemCpuUsage() { return systemCpuUsage; }
+
+    public void setSystemCpuUsage(Double systemCpuUsage) { this.systemCpuUsage = systemCpuUsage; }
 
 //SystemCpuUsagePerc
-    public Long getSystemCpuUsagePerc() { return systemCpuUsagePerc; }
+    public Double getSystemCpuUsagePerc() { return systemCpuUsagePerc; }
 
-    public void setSystemCpuUsagePerc(Long systemCpuUsagePerc) { this.systemCpuUsagePerc = systemCpuUsagePerc; }
+    public void setSystemCpuUsagePerc(Double systemCpuUsagePerc) { this.systemCpuUsagePerc = systemCpuUsagePerc; }
     
 //SystemCpuCores
     public Integer getSystemCpuCores() { return systemCpuCores; }
@@ -219,19 +239,19 @@ public class ContainerClass {
     public void setSystemCpuCores(Integer systemCpuCores) { this.systemCpuCores = systemCpuCores; }
 
 //SystemDiskUsage
-    public Long getSystemDiskUsage() { return systemDiskUsage; }
+    public Double getSystemDiskUsage() { return systemDiskUsage; }
 
-    public void setSystemDiskUsage(Long systemDiskUsage) { this.systemDiskUsage = systemDiskUsage; }
+    public void setSystemDiskUsage(Double systemDiskUsage) { this.systemDiskUsage = systemDiskUsage; }
 
 //SystemDiskTotal
-    public Long getSystemDiskTotal() { return systemDiskTotal; }
+    public Double getSystemDiskTotal() { return systemDiskTotal; }
 
-    public void setSystemDiskTotal(Long systemDiskTotal) { this.systemDiskTotal = systemDiskTotal; }
+    public void setSystemDiskTotal(Double systemDiskTotal) { this.systemDiskTotal = systemDiskTotal; }
 
 //SystemDiskFree
-    public Long getSystemDiskFree() { return systemDiskFree; }
+    public Double getSystemDiskFree() { return systemDiskFree; }
 
-    public void setSystemDiskFree(Long systemDiskFree) { this.systemDiskFree = systemDiskFree; }
+    public void setSystemDiskFree(Double systemDiskFree) { this.systemDiskFree = systemDiskFree; }
 
     ////////////////////////////////
     //      MISC GET/SET HERE     //
@@ -267,4 +287,16 @@ public class ContainerClass {
 
     public void setTimestamp(Long timestamp) { this.timestamp = timestamp; }
 
+    public Double getContainerCpuPercent() { return containerCpuPercent; }
+
+    public void setContainerCpuPercent(ContainerClass previousContainer) {
+        if (previousContainer == null) {
+            this.containerCpuPercent = null;
+            return;
+        }
+        Double cpuDelta = this.containerCpuUsage - previousContainer.containerCpuUsage;
+        Double systemDelta = this.systemCpuUsage - previousContainer.systemCpuUsage;
+        if (systemDelta <= 0 || cpuDelta <= 0) this.containerCpuPercent = 0.0;
+        else this.containerCpuPercent = (cpuDelta / systemDelta) * this.containerCpuCount;
+    }
 }
