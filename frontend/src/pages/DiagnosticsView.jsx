@@ -8,6 +8,7 @@ import RamView from "./DiagnosticsViews/RamView.jsx";
 import DiskUsageView from "./DiagnosticsViews/DiskUsageView.jsx";
 import ThreadCountView from "./DiagnosticsViews/ThreadCountView.jsx";
 import { useParams } from "react-router-dom";
+import { defaultTimeFrames } from "../config/ConfigurationConstants.js";
 
 export default function DiagnosticsView() {
     const { containerID } = useParams();
@@ -47,7 +48,7 @@ export default function DiagnosticsView() {
         lastFetchRef.current = key;
 
         try {
-            const res = await fetch(`/api/data/diagnosticsdata/${containerID}`, {
+            const res = await fetch(`/data/diagnosticsdata/${containerID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ timeFrame }),
@@ -70,7 +71,7 @@ export default function DiagnosticsView() {
     // overview initial load.
     useEffect(() => {
         if (activeTab === "overview") {
-            fetchDiagnosticsFor("10minutes");
+            fetchDiagnosticsFor(defaultTimeFrames.overviewTimeFrame);
         }
     }, [activeTab, fetchDiagnosticsFor]);
 
@@ -79,7 +80,7 @@ export default function DiagnosticsView() {
 
         async function fetchServerData() {
             try {
-                const res = await fetch(`/api/data/serverdata/${containerData.containerData.serverReference}`);
+                const res = await fetch(`/data/serverdata/${containerData.containerData.serverReference}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 setServerData(await res.json());
@@ -96,7 +97,7 @@ export default function DiagnosticsView() {
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
             <h2 style={{ padding: "10px" }}>
-                <b>Diagnostics View</b>
+                <b>Diagnostics View for {containerData?.containerData?.containerName || "loading..."}</b>
             </h2>
 
             <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>

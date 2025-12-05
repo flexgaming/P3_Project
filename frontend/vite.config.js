@@ -7,11 +7,10 @@ export default defineConfig({
     server: {
         port: 5173, // React default port
         proxy: {
-            "/api": {
+            "/data": {
                 target: "http://localhost:8080", // Backend server
                 changeOrigin: true,
                 secure: false,
-                rewrite: (path) => path.replace(/^\/api/, ""), // Remove /api prefix when forwarding
             },
         },
     },

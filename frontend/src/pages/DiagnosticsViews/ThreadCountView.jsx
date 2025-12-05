@@ -11,6 +11,7 @@ import {
 } from "chart.js";
 import pattern from "patternomaly";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -34,7 +35,7 @@ ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip,
 export default function ThreadCountView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [threadCountChart, setThreadCountChart] = useState(null);
     const [noData, setNoData] = useState(false);
-    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.threadCountViewTimeFrame);
 
     useEffect(() => {
         if (!isActive) return;

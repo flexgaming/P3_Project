@@ -18,7 +18,7 @@ function CriticalError({ timeFrame }) {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`/api/data/errors`, {
+            const response = await fetch(`/data/errors`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json",},
                 body: JSON.stringify({ timeFrame }),

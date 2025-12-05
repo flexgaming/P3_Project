@@ -3,6 +3,8 @@ import { ListGroup, Badge, Spinner, Alert, Tabs, Tab} from "react-bootstrap";
 import NavCompanies from "./NavCompanies.jsx";
 import "../pages/css/Nav.css";
 import { getRegions } from "../utils/FetchRegions.js";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 /*
  * NavRegions
@@ -22,6 +24,9 @@ function NavRegions() {
     const [activeKey, setActiveKey] = useState(null);
     // error: stores fetch error message to show to the user
     const [error, setError] = useState(null);
+    // Read route params so URLs like /nav/:regionName/:companyName work
+    const { regionName: routeRegionName, companyName: routeCompanyName } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Use the shared getRegions() helper to fetch and normalize region data.
@@ -32,7 +37,19 @@ function NavRegions() {
                 const regionList = await getRegions();
                 if (mounted) {
                     setRegions(regionList);
-                    setActiveKey(regionList.length ? String(regionList[0].regionID) : null);
+                    // If a regionName is provided in the URL, try to select that region.
+                    if (routeRegionName) {
+                        const requested = String(routeRegionName).toLowerCase();
+                        // Try to match by normalized regionName (case-insensitive, spaces -> dashes)
+                        const match = regionList.find(r => {
+                            const name = String(r.regionName || "").toLowerCase();
+                            const slug = name.replace(/\s+/g, "-");
+                            return name === requested || slug === requested;
+                        });
+                        setActiveKey(match ? String(match.regionID) : (regionList.length ? String(regionList[0].regionID) : null));
+                    } else {
+                        setActiveKey(regionList.length ? String(regionList[0].regionID) : null);
+                    }
                 }
             } catch (err) {
                 if (mounted) setError(err.message || String(err));
@@ -41,7 +58,7 @@ function NavRegions() {
 
         loadRegions();
         return () => { mounted = false; };
-    }, []); // run once on mount
+    }, [routeRegionName]); // re-run if route param changes
 
     // If there was a fetching error show an Alert and don't render the tabs
     if (error)
@@ -55,8 +72,15 @@ function NavRegions() {
         <Tabs
             id="regions-tabs"
             activeKey={activeKey}
-            // update activeKey when a tab is selected
-            onSelect={(k) => setActiveKey(k)}
+            // update activeKey when a tab is selected and push the route
+            onSelect={(k) => {
+                setActiveKey(k);
+                const region = regions.find(r => String(r.regionID) === String(k));
+                if (region) {
+                    const slug = String(region.regionName || "").toLowerCase().replace(/\s+/g, "-");
+                    navigate(`/nav/${slug}`);
+                }
+            }}
             className="mb-3"
             mountOnEnter // only mount tab content when selected
             justify // make tabs stretch to full width
@@ -70,7 +94,7 @@ function NavRegions() {
                 >
                     <div className="p-3">
                         {/* Each Tab renders a NavCompanies component for that region */}
-                        <NavCompanies regionID={region.regionID} regionName={region.regionName} />
+                        <NavCompanies regionID={region.regionID} regionName={region.regionName} selectedCompanyName={routeCompanyName} />
                     </div>
                 </Tab>
             ))}

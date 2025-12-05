@@ -7,4 +7,5 @@ public class Constants {
     public static final String DATABASE_PASSWORD = "Qtv43kyc";
     public static final String ARRAY_LENGTH_ERROR = "The arrays do not have the same length.";
     public static final int DIAGNOSTICS_TIME_SCOPE = 999999999;
+    public static final String DIAGNOSTICS_TIME_SCOPE_LABEL = "1year";
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Row, Col, Badge, ListGroup, Stack, Image } from "react-bootstrap";
-import warningSmall from "../assets/Warning128.png";
 import "../pages/css/Nav.css";
 import { IoCloudOfflineOutline } from "react-icons/io5";
 
@@ -9,7 +8,7 @@ import { IoCloudOfflineOutline } from "react-icons/io5";
  * -----------------
  * This component displays a company's servers and their containers as a grid of
  * Bootstrap ListGroup cards. It fetches server/container data from the
- * backend endpoint `/api/data/{regionID}/{companyID}/contents` and normalizes
+ * backend endpoint `/data/{regionID}/{companyID}/contents` and normalizes
  * the response into an array of server objects with a `containers` array.
  *
  * Props:
@@ -45,7 +44,7 @@ function NavServers({ regionID, companyID }) {
         async function fetchServers() {
             try {
                 // Fetch server+container data for the given region/company.
-                const res = await fetch(`/api/data/${regionID}/${companyID}/contents`);
+                const res = await fetch(`/data/${regionID}/${companyID}/contents`);
                 // If the response is not OK, throw to be caught below.
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
@@ -136,7 +135,7 @@ function NavServers({ regionID, companyID }) {
                                     <Stack direction="horizontal" gap={2}>
                                         <div>{server.serverName}</div>
                                         <div className="ms-auto">Containers:</div>
-                                        <Badge bg="secondary">{server.containers?.length ?? 0}</Badge>
+                                        <Badge bg="secondary" className="fs-6">{server.containers?.length ?? 0}</Badge>
                                     </Stack>
                                 </ListGroup.Item>
 

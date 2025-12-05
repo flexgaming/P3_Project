@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Table, Stack } from "react-bootstrap";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 import "../css/DiagnosticsView.css";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 export default function Overview({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [dataTable, setDataTable] = useState(null);
-    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
-
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.overviewTimeFrame); // Change this for the timeframe of the overview table
     useEffect(() => {
         if (!isActive) return;
         if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
@@ -28,9 +28,11 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
         const rows = [];
         rows.push(["Server Name:", serverData.serverName]);
         rows.push(["Container Name:", containerData.containerData.containerName]);
+        
 
         // If there are no diagnostics in the selected timeframe show friendly placeholders
         if (safeDiagnostics.length === 0) {
+            rows.push(["Container ID:", "No data in selected timeframe"]);
             rows.push(["Latest Ping:", "No data in selected timeframe"]);
             rows.push(["Status:", "N/A"]);
             rows.push(["Running:", "N/A"]);
@@ -41,6 +43,7 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
         } else {
             const latest = safeDiagnostics[safeDiagnostics.length - 1] || {};
             const latestPing = latest.timestamp ? String(timeAgo(latest.timestamp)) : "Unknown";
+            rows.push(["Container ID:", latest.containerReference]);
             rows.push(["Latest Ping:", latestPing]);
             rows.push(["Status:", latest.status || "Unknown"]);
             rows.push(["Running:", typeof latest.running !== 'undefined' ? String(latest.running) : "Unknown"]);

@@ -4,7 +4,7 @@ import { Stack, Table, Form, Button } from "react-bootstrap";
 import DashboardRegions from "../modules/DashboardRegions.jsx";
 import CriticalError from "../modules/CriticalError.jsx";
 import TimeRangeDropdown from "./DiagnosticsViews/TimeRangeDropdown.jsx";
-
+import { defaultTimeFrames } from "../config/ConfigurationConstants.js";
 
 /* * Dashboard Page
  * -----------------
@@ -13,7 +13,7 @@ import TimeRangeDropdown from "./DiagnosticsViews/TimeRangeDropdown.jsx";
  * - Critical Errors table displaying recent critical errors
  */
 export default function Dashboard() {
-    const [localTimeFrame, setLocalTimeFrame] = useState("1week");
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.errorTableTimeFrame);
     // Regions are handled by the DashboardRegions component which fetches on mount
     window.history.replaceState({}, "", `/dashboard/`); // set URL to /dashboard/
     // control the Stack direction responsively using React state
@@ -66,9 +66,9 @@ export default function Dashboard() {
                             <th>Date</th>
                             <th>Container Location</th>
                             <th>Container Name</th>
-                            <th>Error Message</th>
-                            <th>Error Code</th>
-                            <th>Pinned logs</th>
+                            <th>Error Severity</th>
+                            <th>Error Log</th>
+                            <th>Pinned Logs</th>
                         </tr>
                     </thead>
                     {/* Table Body function to fetch from the backend view */}
