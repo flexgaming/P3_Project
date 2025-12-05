@@ -447,13 +447,10 @@ public class SetupApplications {
             if (!container.getJSONArray("ports").isEmpty()) {
                 // Get both public and private port.
                 // public port is the port that the system is using to communicate with the docker container.
-                // private port is the port that the docker container is using.
                 JSONArray ports = container.getJSONArray("ports");
-                Integer privatePort = ports.getJSONObject(0).getInt("privatePort");
                 Integer publicPort = ports.getJSONObject(0).getInt("publicPort");
     
                 // Put the ports in the newContainer.
-                newContainer.put("privatePort", privatePort);
                 newContainer.put("publicPort", publicPort);
             } else {
 
@@ -466,7 +463,7 @@ public class SetupApplications {
                     // We compare the id's to find the correct container.
                     if (newContainer.getString("id").equals(tempId)) {
 
-                        if (!tempContainer.has("privatePort") || !tempContainer.has("publicPort")) {
+                        if (!tempContainer.has("publicPort")) {
                             // If this is implemented, the container has been set up incorrectly, 
                             // and you should reconfigure / use the setup application again. 
                             // Make sure that every container is running.
@@ -477,12 +474,10 @@ public class SetupApplications {
                             System.out.println("\n\n\n\\u001B[1;4;31m\" +  \"Warning:\" + \"\\u001B[0;37m\" + \" The container " + name + " has not been set up correctly, please make sure that it is running and reconfigure it.\n\n\n");
                             System.out.println("====================================================================");
                         } else {
-                            // We get both public and private port.
-                            Integer privatePort = tempContainer.getInt("privatePort");
+                            // We get both public port.
                             Integer publicPort = tempContainer.getInt("publicPort");
     
                             // Put the ports in the newContainer.
-                            newContainer.put("privatePort", privatePort);
                             newContainer.put("publicPort", publicPort);
                         }
                         // Stop the for loop when correct container has been found.

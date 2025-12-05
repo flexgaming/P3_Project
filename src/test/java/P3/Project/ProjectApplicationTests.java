@@ -24,7 +24,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 
 import P3.Project.util.TestResult;
-import P3.Backend.Docker.DemoApplication;
+import P3.Backend.Docker.ExternalApp;
 import P3.Backend.Docker.manager.DockerClientManager;
 
 import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
@@ -32,7 +32,7 @@ import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.application.SetupApplications.updateJSONFile;
 
 
-@SpringBootTest(classes = DemoApplication.class)
+@SpringBootTest(classes = ExternalApp.class)
 @ExtendWith(TestResult.class)
 class ProjectApplicationTests {
 	@Test

@@ -4,7 +4,8 @@ import static P3.Backend.Docker.Persistent.CONTAINER_NAME;
 import static P3.Backend.Docker.Persistent.COMPANY_INFO;
 import static P3.Backend.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.Docker.Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT;
-import static P3.Backend.Docker.Persistent.INTERNAL_SERVER_URL;
+import static P3.Backend.Docker.Persistent.BACKEND_SERVER_URL;
+import static P3.Backend.Docker.Persistent.DEFAULT_HEARTBEAT_TIME;
 import P3.Backend.Docker.classes.IntervalClass;
 import P3.Backend.Docker.manager.DockerStatsService;
 import P3.Backend.Docker.manager.DockerStatsService.ContainerStats;
@@ -191,7 +192,9 @@ public class IntervalApplications {
      * @param webClient Is used for sending and getting HTTP requests.
      */
     private static void checkIntervalScheduler(AtomicBoolean bool, DockerClient dockerClient, WebClient webClient) {
+        int heartbeatTimer = DEFAULT_HEARTBEAT_TIME;
         while (!bool.get()) {
+
             try {
                 // Go through each index in intervalArr and remove 1 second from tempInterval.
                 // Fetch container data and put it into containerArr if index's tempInterval is 0.
@@ -210,7 +213,7 @@ public class IntervalApplications {
 
                         // Try to send the container data to the backend server.
                         try {
-                            WebClientPost.sendData(webClient, containerArr[i], INTERNAL_SERVER_URL);
+                            WebClientPost.sendData(webClient, containerArr[i], BACKEND_SERVER_URL + "/upload-json");
                             
                             System.out.println("JSON data has been send from: " + containerArr[i].getContainerName());
                         } catch (Exception e) {
@@ -222,6 +225,15 @@ public class IntervalApplications {
                         intervalArr[i].setTempInterval(newInterval); // Set the new tempInterval.
                     }
                 }
+
+                heartbeatTimer--;
+
+                // After the default time for heartbeat has passed, it sends a post to the backend server.
+                if (heartbeatTimer == 0) {
+                    heartbeatTimer = DEFAULT_HEARTBEAT_TIME;
+                    WebClientPost.sendHeartbeat(webClient, BACKEND_SERVER_URL + "/heartbeat");
+                }
+
                 // Wait 1 second.
                 Thread.sleep(1000);
                 

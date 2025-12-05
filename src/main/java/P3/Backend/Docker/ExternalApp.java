@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.dockerjava.api.DockerClient;
 
 @SpringBootApplication
-public class DemoApplication {
+public class ExternalApp {
 
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
@@ -29,10 +29,8 @@ public class DemoApplication {
     private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(ExternalApp.class, args);
         DockerClient dockerClient = DockerClientBuilder.dockerConnection();
-        
-        dockerClient.pingCmd().exec();
 
         // Get WebClient from Spring context
         WebClient webClient = context.getBean(WebClient.class);
