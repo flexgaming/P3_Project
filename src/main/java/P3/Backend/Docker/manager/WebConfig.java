@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebConfig {
 
     /**
-     * 
+     * This function is used to create a WebClinet config.
      */
     @Bean
     public WebClient webClient() {

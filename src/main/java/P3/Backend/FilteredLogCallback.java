@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 public class FilteredLogCallback extends ResultCallback.Adapter<Frame> {
     private final JSONArray errors = new JSONArray();
     private final JSONArray warns = new JSONArray();
-    private final JSONArray infos = new JSONArray();
+    // private final JSONArray infos = new JSONArray();
 
     @Override
     public void onNext(Frame frame) {

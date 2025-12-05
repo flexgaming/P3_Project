@@ -10,16 +10,19 @@ public class DockerStatsService {
 
     private final DockerClient dockerClient;
 
-    /**
-     * Use your existing DockerClient instance
+    /** This function is used to make a connection between the Docker backend and the application
+     * 
+     * @param dockerClient Is used to establish a connection to the existing DockerClient instance.
      */
     public DockerStatsService(DockerClient dockerClient) {
         this.dockerClient = dockerClient;
     }
 
-    // Hvad er POJO Kan vi eventuelt skrive det helt ud?
-    /**
-     * Get a snapshot of container stats as a POJO
+    /** This function is used to read container statistics.
+     * 
+     * @param containerId Is used in order to get the right container.
+     * @return Is a stats object with how much hardware the container is using (CPU, RAM, DISK, THREAD, NETWORK). 
+     * @throws InterruptedException Is used if the stats retrival is interrupted.
      */
     public ContainerStats getContainerStats(String containerId) throws InterruptedException {
         SingleStatsCallback callback = new SingleStatsCallback();
@@ -28,15 +31,18 @@ public class DockerStatsService {
         return stats != null ? new ContainerStats(stats) : null;
     }
 
-    /**
-     * Internal callback to fetch only the first snapshot
+    /** This function is used to fetch get the first snapshot of the incoming stream.
+     * 
+     * Hereby, setting the stats to be the latest statistics from the container.
      */
     private static class SingleStatsCallback extends ResultCallbackTemplate<SingleStatsCallback, Statistics> {
         private Statistics stats;
 
-        /**
+        /** This function is used to as a sort of API to get the latest stream of data.
          * 
-         * @param statistics
+         * It will stop when it has got the latest snapshot of data.
+         * 
+         * @param statistics Is used to set all of the stats that the docker container has.
          */
         @Override
         public void onNext(Statistics statistics) {
@@ -48,24 +54,23 @@ public class DockerStatsService {
             }
         }
 
-        /**
+        /** This function is used to retrieve the latest result from the onNext function.
          * 
-         * @return
+         * @return Is a statistics object with all of the container stats data.
          */
         public Statistics getStats() {
             return stats;
         }
     }
-    // Hvad er POJO Kan man skrive det helt ud i stedet for?
-    /**
-     * Simple POJO to hold stats
-     */
+
+    /** This class is made to store all of the data within a single class. */
     public static class ContainerStats {
         private final long cpuTotalUsage;
         private final long memoryUsage;
         private final long memoryLimit;
         private final int pids;
 
+        // Constructor for setting all of the stats data into the class' parameters.
         public ContainerStats(Statistics stats) {
             this.cpuTotalUsage = stats.getCpuStats().getCpuUsage().getTotalUsage();
             this.memoryUsage = stats.getMemoryStats().getUsage();
