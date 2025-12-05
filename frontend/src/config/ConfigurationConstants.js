@@ -31,9 +31,3 @@ export const defaultTimeFrames = {
     threadCountViewTimeFrame: "10minutes",
     errorTableTimeFrame: "1hour",
 };
-
-export const themeColors = {
-    appBackground: "#9ED3E8",
-    siteBackground: "#5C7C89",
-    navBackground: "#011425",
-};

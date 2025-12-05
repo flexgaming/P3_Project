@@ -46,17 +46,3 @@
 }
 
 
-
-#main-navbar {
-    background-color: #011425; /* Dark blue background */
-}
-
-#main-navbar .navbar-brand,
-#main-navbar .nav-link {
-    color: #ffffff;
-}
-
-#main-navbar .nav-link:hover {
-    color: #ffffff;
-    opacity: 0.9;
-}
