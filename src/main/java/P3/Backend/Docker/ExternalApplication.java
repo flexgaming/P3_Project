@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.dockerjava.api.DockerClient;
 
 @SpringBootApplication
-public class ExternalApp {
+public class ExternalApplication {
 
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
@@ -29,7 +29,7 @@ public class ExternalApp {
     private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(ExternalApp.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(ExternalApplication.class, args);
         DockerClient dockerClient = DockerClientBuilder.dockerConnection();
 
         // Get WebClient from Spring context
@@ -77,7 +77,6 @@ public class ExternalApp {
         // Decide what part of the application user want to use:
         outer: while (true) {
             printApplicationChoices(); // Print the choices
-            System.out.print("Enter choice (1, 2 or 3): ");
             String choice;
             while (true) {
                 choice = scanner.nextLine();
@@ -154,5 +153,6 @@ public class ExternalApp {
         System.out.println("1. Setup Applications");
         System.out.println("2. Interval Applications");
         System.out.println("3. Exit");
+        System.out.print("Enter choice (1, 2 or 3): ");
     }
 }
