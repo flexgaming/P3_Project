@@ -25,7 +25,8 @@ public class ExternalController {
             // Send data
             String containerReference = containerData.getString("containerId");
             boolean running = containerData.getBoolean("containerRunning");
-            Double ramUsage = containerData.getDouble("containerRamUsage");
+            Long ramUsage = containerData.getLong("containerRamUsage");
+            Long systemRamUsage = containerData.getLong("systemRamUsage");
             Double cpuUsage = containerData.getDouble("containerCpuPercent");
             Double systemCpuUsage = containerData.getDouble("systemCpuUsagePerc");
             Double diskUsage = containerData.getDouble("containerDiskUsage");
@@ -33,8 +34,8 @@ public class ExternalController {
             String status = containerData.getString("containerStatus");
             JSONObject errorLogs = null;
 
-            database.addDiagnosticsBatch(containerReference, running, ramUsage, cpuUsage, systemCpuUsage, diskUsage,
-                    threadCount, status, errorLogs);
+            database.addDiagnosticsBatch(containerReference, running, ramUsage, systemRamUsage, cpuUsage,
+                    systemCpuUsage, diskUsage, threadCount, status, errorLogs);
         } catch (Exception e) {
             e.printStackTrace();
 

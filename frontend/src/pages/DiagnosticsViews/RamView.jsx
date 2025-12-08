@@ -89,7 +89,7 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
     }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.serverName) {
             return;
         }
 
@@ -110,12 +110,13 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
 
         // We have data — ensure noData flag is cleared before building chart
         setNoData(false);
+        console.log(diagnosticsData);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const ramContainer = diagnosticsData.map(item => 1 - item.ramFree / containerData.containerData.ramMax);
-        const ramServer = diagnosticsData.map(item => (containerData.containerData.ramMax - item.ramFree) / serverData.ramTotal);
+        const ramContainer = diagnosticsData.map(item => (item.ramUsage / 1000000).toFixed(1));
+        const ramServer = diagnosticsData.map(item => (item.systemRamUsage / 1000000).toFixed(1));
 
-    const lineColorContainer = diagnosticsData.map(() => "blue");
-    const lineColorServer = diagnosticsData.map(() => "red");
+        const lineColorContainer = diagnosticsData.map(() => "blue");
+        const lineColorServer = diagnosticsData.map(() => "red");
 
         setRamChart({
             type: "line",
@@ -123,7 +124,7 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
                 labels,
                 datasets: [
                     {
-                        label: "RAM usage of the container resources",
+                        label: "RAM usage of the container resources (MB)",
                         data: ramContainer,
                         backgroundColor: lineColorContainer,
                         borderColor: typeof lineColorServer === "string"
@@ -133,7 +134,7 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
                         tension: 0.1
                     },
                     {
-                        label: "RAM usage of the server resources",
+                        label: "Total RAM usage of the server resources (MB)",
                         data: ramServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"
@@ -150,14 +151,14 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        min: 0,
-                        max: 1,
+                    x: {
                         ticks: {
-                            callback: function(values) {
-                                return (values * 100).toFixed(0) + "%";
-                            }
-                        },
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        min: 0
                     }
                 },
                 plugins: {

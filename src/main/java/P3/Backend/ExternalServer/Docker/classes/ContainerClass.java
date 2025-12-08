@@ -16,13 +16,14 @@ public class ContainerClass implements Cloneable {
 
     // Data from docker:
     private Boolean containerRunning;       // Is docker container on or off.
-    private Double containerRamUsage;         // Is ram usage on docker container.
+    private Long containerRamUsage;         // Is ram usage on docker container.
     private Double containerCpuUsage;         // Is cpu usage on docker container.
     private Double containerDiskUsage;        // Is disk usage on docker container.
     private String containerStatus;         // Is the status of the docker container.
     private Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
     private Long containerExitCode;         // Is the exit code received from the program (CHROOT EXIT CODES - https://stackoverflow.com/questions/31297616/what-is-the-authoritative-list-of-docker-run-exit-codes).
     private int containerCpuCount;
+    private Long containerRamLimit;
 
     // Data from actuator:
     //JVM Data
@@ -37,7 +38,8 @@ public class ContainerClass implements Cloneable {
     private Double JVMUptime;                // Is the uptime of the java application.
     
     //System Data
-    private Double systemRamUsage;          // Is all of the ram usage on the system.
+    private Long systemRamUsage;          // Is all of the ram usage on the system.
+    private Long systemRamTotal;          // Is all the ram available on the system.
     private Double systemCpuUsage;
     private Double systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
     private Integer systemCpuCores;         // Is the number of cpu cores on the system.
@@ -127,9 +129,9 @@ public class ContainerClass implements Cloneable {
     public void setContainerRunning(Boolean containerRunning) { this.containerRunning = containerRunning; }
     
     //ContainerRamUsage
-    public Double getContainerRamUsage() { return containerRamUsage; }
+    public Long getContainerRamUsage() { return containerRamUsage; }
     
-    public void setContainerRamUsage(Double containerRamUsage) { this.containerRamUsage = containerRamUsage; }
+    public void setContainerRamUsage(Long containerRamUsage) { this.containerRamUsage = containerRamUsage; }
     
     //ContainerCpuUsage
     public Double getContainerCpuUsage() { return containerCpuUsage; }
@@ -160,6 +162,11 @@ public class ContainerClass implements Cloneable {
     public int getContainerCpuCount() { return containerCpuCount; }
 
     public void setContainerCpuCount(int containerCpuCount) { this.containerCpuCount = containerCpuCount; }
+
+    //containerCpuLimit
+    public Long getContainerRamLimit() { return containerRamLimit; }
+
+    public void setContainerRamLimit(Long containerRamLimit) { this.containerRamLimit = containerRamLimit; }
 
     //////////////////////////////////////
     //   ACTUATOR GETTERS AND SETTERS   //
@@ -219,9 +226,14 @@ public class ContainerClass implements Cloneable {
     //=================================//
 
 //SystemRamUsage
-    public Double getSystemRamUsage() { return systemRamUsage; }
+    public Long getSystemRamUsage() { return systemRamUsage; }
 
-    public void setSystemRamUsage(Double systemRamUsage) { this.systemRamUsage = systemRamUsage; }
+    public void setSystemRamUsage(Long systemRamUsage) { this.systemRamUsage = systemRamUsage; }
+
+//SystemRamTotal
+    public Long getSystemRamTotal() { return systemRamTotal; }
+
+    public void setSystemRamTotal(Long systemRamTotal) { this.systemRamTotal = systemRamTotal; }
 
 //SystemCpuUsage
     public Double getSystemCpuUsage() { return systemCpuUsage; }

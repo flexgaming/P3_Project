@@ -24,6 +24,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 
+import java.lang.management.ManagementFactory;
+import com.sun.management.OperatingSystemMXBean;
+
 @Component
 public class IntervalApplications {
     
@@ -298,6 +301,7 @@ public class IntervalApplications {
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
             container.setContainerCpuCount(stats.getCpuCount());
+            container.setContainerRamLimit(stats.getMemoryLimit());
             
             // Get the exit code only if the container is not running.
             if (container.getContainerRunning().equals(false))
@@ -347,6 +351,16 @@ public class IntervalApplications {
         container.setLogbackEventsError(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events?tag=level:error")));
         container.setLogbackEventsWarn(getIntSafe(callActuator(webClient, url, "/actuator/metrics/logback.events?tag=level:warn")));
         container.setGarbageCollectSize(getLongSafe(callActuator(webClient, url, "/actuator/metrics/jvm.gc.overhead")));
+
+        // RAM
+        OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+
+        long systemTotalMemory = osBean.getTotalPhysicalMemorySize();
+        long systemFreeMemory = osBean.getFreePhysicalMemorySize();
+        long systemUsedMemory = systemTotalMemory - systemFreeMemory;
+
+        container.setSystemRamUsage(systemUsedMemory);
+        container.setSystemRamTotal(systemTotalMemory);
     }
 
     /** This function is used to call the Spring Actuator endpoint and get the JSON response.

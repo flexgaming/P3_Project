@@ -56,8 +56,8 @@ public class DockerStatsService {
         private final Double cpuTotalUsage;
         private final Double systemCpuTotalUsage;
         private final int cpuCount;
-        private final Double memoryUsage;
-        private final Double memoryLimit;
+        private final Long memoryUsage;
+        private final Long memoryLimit;
         private final int pids;
 
         public ContainerStats(Statistics stats) {
@@ -67,16 +67,16 @@ public class DockerStatsService {
             this.cpuCount = stats.getCpuStats().getOnlineCpus() != null
                     ? stats.getCpuStats().getOnlineCpus().intValue()
                     : stats.getCpuStats().getCpuUsage().getPercpuUsage().size();
-            this.memoryUsage = stats.getMemoryStats().getUsage().doubleValue();
-            this.memoryLimit = stats.getMemoryStats().getLimit().doubleValue();
+            this.memoryUsage = stats.getMemoryStats().getUsage();
+            this.memoryLimit = stats.getMemoryStats().getLimit();
             this.pids = stats.getPidsStats().getCurrent().intValue();
         }
 
         // Getters
         public Double getCpuTotalUsage() { return cpuTotalUsage; }
         public Double getSystemCpuTotalUsage() { return systemCpuTotalUsage; }
-        public Double getMemoryUsage() { return memoryUsage; }
-        public Double getMemoryLimit() { return memoryLimit; }
+        public Long getMemoryUsage() { return memoryUsage; }
+        public Long getMemoryLimit() { return memoryLimit; }
         public int getPids() { return pids; }
         public int getCpuCount() { return cpuCount; }
     }

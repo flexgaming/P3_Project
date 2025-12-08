@@ -132,7 +132,7 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
                         data: runningValues,
                         backgroundColor: barColors,
                         borderColor: "black",
-                        borderWidth: 3,
+                        borderWidth: 0,
                         borderSkipped: false,
                         tension: 0.1
                     },
@@ -141,7 +141,7 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
                         data: errorValues,
                         backgroundColor: errorColors,
                         borderColor: "black",
-                        borderWidth: 3,
+                        borderWidth: 0,
                         borderSkipped: false,
                         tension: 0.1
                     }
@@ -198,7 +198,11 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
                 },
                 scales: {
                     x: {
-                        stacked: true
+                        stacked: true,
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                        }
                     },
                     y: {
                         min: -1,

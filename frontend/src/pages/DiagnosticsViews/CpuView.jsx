@@ -110,7 +110,6 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
 
         // Sort data by timestamp ascending
         diagnosticsData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        console.log(diagnosticsData);
 
         // Check if we have any diagnostics data
         if (diagnosticsData.length === 0) {

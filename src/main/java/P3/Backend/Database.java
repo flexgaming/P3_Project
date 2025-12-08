@@ -241,13 +241,13 @@ public class Database {
      * @param status The status of the container.
      * @param errorLogs The Error Logs of the container.
      */
-    public void addDiagnosticsBatch(String containerReference, boolean running, double ramUsage, double cpuUsage,
-                                    double systemCpuUsage, double diskUsage, int threadCount, String status,
-                                    JSONObject errorLogs) {
+    public void addDiagnosticsBatch(String containerReference, boolean running, long ramUsage, long systemRamUsage,
+                                    double cpuUsage, double systemCpuUsage, double diskUsage, int threadCount,
+                                    String status, JSONObject errorLogs) {
         // Reformats the input parameters to fit the signature of the below addDiagnosticsBatch method.
-        addDiagnosticsBatch(new String[]{containerReference}, new boolean[]{running}, new double[]{ramUsage},
-                new double[]{cpuUsage}, new double[]{systemCpuUsage}, new double[]{diskUsage}, new int[]{threadCount},
-                new String[]{status}, new JSONObject[]{errorLogs});
+        addDiagnosticsBatch(new String[]{containerReference}, new boolean[]{running}, new long[]{ramUsage},
+                new long[]{systemRamUsage}, new double[]{cpuUsage}, new double[]{systemCpuUsage},
+                new double[]{diskUsage}, new int[]{threadCount}, new String[]{status}, new JSONObject[]{errorLogs});
     }
 
     /**
@@ -262,19 +262,20 @@ public class Database {
      * @param statuses       The statuses of the containers.
      * @param errorLogsList  The Error Logs of the containers.
      */
-    public void addDiagnosticsBatch(String[] containerReferences, boolean[] runningList, double[] ramUsages,
-                                    double[] cpuUsages, double[] systemCpuUsages, double[] diskUsages,
-                                    int[] threadCounts, String[] statuses, JSONObject[] errorLogsList) {
+    public void addDiagnosticsBatch(String[] containerReferences, boolean[] runningList, long[] ramUsages,
+                                    long[] systemRamUsages, double[] cpuUsages, double[] systemCpuUsages,
+                                    double[] diskUsages, int[] threadCounts, String[] statuses,
+                                    JSONObject[] errorLogsList) {
         // Check that the input parameter arrays are of same length.
-        if (notSameLength(containerReferences, runningList, ramUsages, cpuUsages, systemCpuUsages, diskUsages,
-                threadCounts, statuses, errorLogsList)) {
+        if (notSameLength(containerReferences, runningList, ramUsages, systemRamUsages, cpuUsages, systemCpuUsages,
+                diskUsages, threadCounts, statuses, errorLogsList)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Diagnostics (Container_Reference, Timestamp, Running, Ram_Usage, CPU_Usage, " +
-                "System_CPU_Usage, Disk_Usage, Thread_Count, Status, Error_Logs) VALUES" +
-                "(?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Diagnostics (Container_Reference, Timestamp, Running, Ram_Usage, System_Ram_Usage," +
+                "CPU_Usage, System_CPU_Usage, Disk_Usage, Thread_Count, Status, Error_Logs) VALUES" +
+                "(?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -285,12 +286,13 @@ public class Database {
             for (int i = 0; i < containerReferences.length; i++) {
                 preparedStatement.setString(1, containerReferences[i]);
                 preparedStatement.setBoolean(2, runningList[i]);
-                preparedStatement.setDouble(3, ramUsages[i]);
-                preparedStatement.setDouble(4, cpuUsages[i]);
-                preparedStatement.setDouble(5, systemCpuUsages[i]);
-                preparedStatement.setDouble(6, diskUsages[i]);
-                preparedStatement.setInt(7, threadCounts[i]);
-                preparedStatement.setString(8, statuses[i]);
+                preparedStatement.setLong(3, ramUsages[i]);
+                preparedStatement.setLong(4, systemRamUsages[i]);
+                preparedStatement.setDouble(5, cpuUsages[i]);
+                preparedStatement.setDouble(6, systemCpuUsages[i]);
+                preparedStatement.setDouble(7, diskUsages[i]);
+                preparedStatement.setInt(8, threadCounts[i]);
+                preparedStatement.setString(9, statuses[i]);
 
                 PGobject jsonObject;
                 if (isNull(errorLogsList[i])) {
@@ -301,7 +303,7 @@ public class Database {
                     jsonObject.setValue(errorLogsList[i].toString());
                 }
 
-                preparedStatement.setObject(9, jsonObject);
+                preparedStatement.setObject(10, jsonObject);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -477,7 +479,8 @@ public class Database {
                 String containerReference = resultSet.getString("Container_Reference");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 boolean running = resultSet.getBoolean("Running");
-                double ramUsage = resultSet.getDouble("Ram_Usage");
+                long ramUsage = resultSet.getLong("Ram_Usage");
+                long systemRamUsage = resultSet.getLong("System_Ram_Usage");
                 double cpuUsage = resultSet.getDouble("CPU_Usage");
                 double systemCpuUsage = resultSet.getDouble("System_CPU_Usage");
                 double diskUsage = resultSet.getDouble("Disk_Usage");
@@ -488,6 +491,7 @@ public class Database {
                 diagnostics.put("timestamp", timestamp);
                 diagnostics.put("running", running);
                 diagnostics.put("ramUsage", ramUsage);
+                diagnostics.put("systemRamUsage", systemRamUsage);
                 diagnostics.put("cpuUsage", cpuUsage);
                 diagnostics.put("systemCpuUsage", systemCpuUsage);
                 diagnostics.put("diskUsage", diskUsage);
