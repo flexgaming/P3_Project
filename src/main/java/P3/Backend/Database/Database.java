@@ -535,14 +535,13 @@ public class Database {
     }
 
     /**
-     * Fetches all diagnostics errors saved in the database.
+     * Fetches all diagnostics errors saved in the database within the specified time frame.
      */
     public JSONObject getDiagnosticsErrors(String timeFrameString) {
         int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
         if (timeFrameString != null){
             // Use Helper Function to convert time frame string to minutes.
             timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
-            // System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
         }
         JSONObject diagnosticsErrors = new JSONObject();
         // Read all data from View Diagnostics_Errors in the selected timeframe.
@@ -552,9 +551,7 @@ public class Database {
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
              // Use a normal Statement. No SQL injection protection is necessary when no user input.
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
             preparedStatement.setInt(1, timeFrameMinutes);
-
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Diagnostics Errors View and adds them to the JSON object.
