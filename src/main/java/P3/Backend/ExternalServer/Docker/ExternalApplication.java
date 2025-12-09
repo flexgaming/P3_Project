@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.dockerjava.api.DockerClient;
 
 @SpringBootApplication
-public class DemoApplication {
+public class ExternalApplication {
 
     // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
@@ -29,14 +29,12 @@ public class DemoApplication {
     private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(ExternalApplication.class, args);
         DockerClient dockerClient = DockerClientBuilder.dockerConnection();
-        
-        dockerClient.pingCmd().exec();
 
         // Get WebClient from Spring context
         WebClient webClient = context.getBean(WebClient.class);
-        
+
         // Get user input for selecting application mode.
         Scanner scanner = new Scanner(System.in);
 
@@ -61,13 +59,12 @@ public class DemoApplication {
                     System.exit(0);
                 }
             }
-
             // Get all of the content within the file.
             String content = Files.readString(containerListPath);
-            
+
             // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
-            
+
             if (JSONFileObj.length() == 0) {
                 System.out.println("\n\nThe container JSON file is empty. Proceeding to Setup Applications.\n\n");
                 SetupApplications.Initiation(dockerClient, scanner);
@@ -76,31 +73,30 @@ public class DemoApplication {
             // If anything goes wrong, it is printed.
             e.printStackTrace();
         }
-        
+
         // Decide what part of the application user want to use:
         outer: while (true) {
             printApplicationChoices(); // Print the choices
-            System.out.print("Enter choice (1, 2 or 3): ");
             String choice;
             while (true) {
                 choice = scanner.nextLine();
                 if (choice.equals("1")) {
                     System.out.println("You selected option " + choice);
-                    
+
                     // If user selects Setup Applications, then proceed.
                     SetupApplications.Initiation(dockerClient, scanner);
 
                     printApplicationChoices(); // Print the choices
                 } else if (choice.equals("2")) {
                     System.out.println("You selected option " + choice);
-                    
+
                     // If user selects Interval Applications, then proceed.
                     IntervalApplications.Initiation(dockerClient, webClient, scanner);
 
                     printApplicationChoices(); // Print the choices
                 } else if (choice.equals("3")) {
                     System.out.println("You selected option " + choice);
-                    
+
                     // If user selects exit, then proceed.
                     break outer;
                 } else {
@@ -108,14 +104,13 @@ public class DemoApplication {
                 }
             }
         }
-            
         // Close the scanner after use.
-        scanner.close(); 
+        scanner.close();
         System.exit(0);
-	}
+    }
 
     /**
-     * This function is used to check if the JSON file that contains all of the containers exists, 
+     * This function is used to check if the JSON file that contains all of the containers exists,
      * if it does not exist then create one.
      */
     public static void checkFileCreated() {
@@ -128,7 +123,7 @@ public class DemoApplication {
                 // If anything goes wrong, it is printed.
                 e.printStackTrace();
             }
-        } 
+        }
         if (!Files.exists(companyInfoPath)) {
             // If the file does not exist, then it has to be created.
             try {
@@ -150,11 +145,14 @@ public class DemoApplication {
         }
     }
 
+    /**
+     * This function is used to print out the options for the user to navigate the program.
+     */
     private static void printApplicationChoices() {
         System.out.println("\nSelect application mode:");
         System.out.println("1. Setup Applications");
         System.out.println("2. Interval Applications");
         System.out.println("3. Exit");
+        System.out.print("Enter choice (1, 2 or 3): ");
     }
-
 }

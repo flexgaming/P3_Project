@@ -8,6 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebConfig {
 
+    /**
+     * This function is used to create a WebClinet config.
+     */
     @Bean
     public WebClient webClient() {
         return WebClient.builder().build();

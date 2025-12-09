@@ -16,17 +16,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.json.JSONObject;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.Container;
 
 import P3.Project.util.TestResult;
-import P3.Backend.ExternalServer.Docker.DemoApplication;
+import P3.Backend.ExternalServer.Docker.ExternalApplication;
 
 import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
 import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.ExternalServer.Docker.application.SetupApplications.updateJSONFile;
 
 
-@SpringBootTest(classes = DemoApplication.class)
+@SpringBootTest(classes = ExternalApplication.class)
 @ExtendWith(TestResult.class)
 class ProjectApplicationTests {
 	@Test

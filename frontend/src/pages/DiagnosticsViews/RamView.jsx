@@ -111,7 +111,7 @@ export default function RamView({ containerData, serverData, timeAgo, isActive, 
 
         // We have data — ensure noData flag is cleared before building chart
         setNoData(false);
-        console.log(diagnosticsData);
+
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const ramContainer = diagnosticsData.map(item => (item.ramUsage / 1000000).toFixed(1));
         const ramServer = diagnosticsData.map(item => (item.systemRamUsage / 1000000).toFixed(1));

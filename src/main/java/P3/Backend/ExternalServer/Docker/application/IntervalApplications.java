@@ -1,15 +1,10 @@
 package P3.Backend.ExternalServer.Docker.application;
 
-import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
-import static P3.Backend.ExternalServer.Docker.Persistent.COMPANY_INFO;
-import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
-import static P3.Backend.ExternalServer.Docker.Persistent.SPRING_ACTUATOR_DEFAULT_ENDPOINT;
-import static P3.Backend.ExternalServer.Docker.Persistent.INTERNAL_SERVER_URL;
-import P3.Backend.ExternalServer.Docker.classes.IntervalClass;
+import static P3.Backend.ExternalServer.Docker.Persistent.*;
+import P3.Backend.ExternalServer.Docker.classes.*;
 import P3.Backend.ExternalServer.Docker.manager.DockerStatsService;
 import P3.Backend.ExternalServer.Docker.manager.DockerStatsService.ContainerStats;
 import P3.Backend.ExternalServer.Docker.manager.WebClientPost;
-import P3.Backend.ExternalServer.Docker.classes.ContainerClass;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,11 +13,16 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+
+import P3.Backend.ExternalServer.LogFetcher;
 
 import java.lang.management.ManagementFactory;
 import com.sun.management.OperatingSystemMXBean;
@@ -190,6 +190,8 @@ public class IntervalApplications {
      * @param webClient Is used for sending and getting HTTP requests.
      */
     private static void checkIntervalScheduler(AtomicBoolean bool, DockerClient dockerClient, WebClient webClient) {
+        int heartbeatTimer = DEFAULT_HEARTBEAT_TIME;
+
         while (!bool.get()) {
             try {
                 // Go through each index in intervalArr and remove 1 second from tempInterval.
@@ -210,7 +212,7 @@ public class IntervalApplications {
                         // Try to send the container data to the backend server.
                         try {
                             containerArr[i].setContainerCpuPercent(containerArrTemp[i]);
-                            WebClientPost.sendData(webClient, containerArr[i], INTERNAL_SERVER_URL);
+                            WebClientPost.sendData(webClient, containerArr[i], BACKEND_SERVER_URL + "/upload-json");
                             containerArrTemp[i] = (ContainerClass) containerArr[i].clone();
 
                             System.out.println("JSON data has been send from: " + containerArr[i].getContainerName());
@@ -224,6 +226,15 @@ public class IntervalApplications {
                         intervalArr[i].setTempInterval(newInterval); // Set the new tempInterval.
                     }
                 }
+
+                heartbeatTimer--;
+
+                // After the default time for heartbeat has passed, it sends a post to the backend server.
+                if (heartbeatTimer == 0) {
+                    heartbeatTimer = DEFAULT_HEARTBEAT_TIME;
+                    WebClientPost.sendHeartbeat(webClient, BACKEND_SERVER_URL + "/heartbeat");
+                }
+
                 // Wait 1 second.
                 Thread.sleep(1000);
                 
@@ -302,7 +313,13 @@ public class IntervalApplications {
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
             container.setContainerCpuCount(stats.getCpuCount());
             container.setContainerRamLimit(stats.getMemoryLimit());
-            
+
+            // Add logs to container class.
+            LogFetcher logFetcher = new LogFetcher();
+            JSONObject logsJson = logFetcher.fetch(dockerClient, container.getContainerInterval(), container.getContainerId());
+            LogsClass logsInfo = toLogsInfo(logsJson);
+            container.setLogs(logsInfo);
+
             // Get the exit code only if the container is not running.
             if (container.getContainerRunning().equals(false))
                 container.setContainerExitCode(response.getState().getExitCodeLong()); // Exit Code for the container.
@@ -454,4 +471,40 @@ public class IntervalApplications {
         }
     }
 
+    /** Converts a JSONObject containing log information into a LogsClass object.
+     *
+     * @param json the JSONObject containing log arrays ("Error", "Warn", "Info")
+     * @return a LogsClass object populated with lists of log messages.
+     */
+
+    private static LogsClass toLogsInfo(JSONObject json) {
+        LogsClass info = new LogsClass();
+        // If logs JSON is null returns empty object.
+        if (json == null) return info;
+        info.setError(jsonArrayToList(json.optJSONArray("Error")));
+        info.setWarn(jsonArrayToList(json.optJSONArray("Warn")));
+        // info.setInfo(jsonArrayToList(json.optJSONArray("Info")));
+        return info;
+    }
+
+    /** Converts a JSONArray into a List of Strings.
+     *
+     * @param arr the JSONArray to convert
+     * @return a List<string> containing all valid string entries from the array.
+     */
+
+    private static List<String> jsonArrayToList(JSONArray arr) {
+        List<String> list = new ArrayList<>();
+        // Produce empty list if array is null
+        if (arr == null) return list;
+        for (int i = 0; i < arr.length(); i++) {
+            try {
+                // Collect string entries, non-strings will throw and be skipped
+                list.add(arr.getString(i));
+            } catch (Exception ignore) {
+                // Intentionally ignore malformed/non-string entries
+            }
+        }
+        return list;
+    }
 }

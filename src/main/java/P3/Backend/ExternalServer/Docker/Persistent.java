@@ -14,12 +14,14 @@ public final class Persistent {
     // -------------------------------
     public static final String CONTAINER_NAME = "currentContainers.json";
     public static final String COMPANY_INFO = "currentCompany.json";
-    public static final String CURRENT_CONTAINER_PATH = ""; // Replace "" with desired path. 
+    public static final String CURRENT_CONTAINER_PATH = ""; // Replace "" with desired path.
 
     // -------------------------------
     // Application Settings
     // -------------------------------
     public static final Integer DEFAULT_INTERVAL_TIME = 60; // Default interval time in seconds.
+    public static final Integer DEFAULT_HEARTBEAT_TIME = 5; // Default interval time in seconds.
+
     // -------------------------------
     // Example URLs or endpoints
     // -------------------------------
@@ -28,6 +30,6 @@ public final class Persistent {
 
     public static final String SPRING_ACTUATOR_DEFAULT_ENDPOINT = "http://localhost";
 
-    public static final String INTERNAL_SERVER_URL = "http://localhost:8080/api/upload-json";
-            
+    // api is the endpoint that is being listening on, on the backend server.
+    public static final String BACKEND_SERVER_URL = "https://pulpiest-tad-unamalgamated.ngrok-free.dev/api";
 }

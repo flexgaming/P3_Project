@@ -14,6 +14,8 @@ public class ContainerClass implements Cloneable {
     private String companyName;            // Is the name of the company using the application.
     private String companyServer;          // Is the server of the company using the application.
 
+    private LogsClass logs;
+
     // Data from docker:
     private Boolean containerRunning;       // Is docker container on or off.
     private Long containerRamUsage;         // Is ram usage on docker container.
@@ -26,7 +28,7 @@ public class ContainerClass implements Cloneable {
     private Long containerRamLimit;
 
     // Data from actuator:
-    //JVM Data
+    // JVM Data
     private Boolean JVMRunning;             // Is internally java application on or off.
     private Double JVMRamMax;               // Is max ram usage on java application.
     private Double JVMRamUsage;             // Is ram usage on java application.
@@ -37,7 +39,7 @@ public class ContainerClass implements Cloneable {
     private Double JVMCpuUsageStart;         // Is the start time of CPU usage on the java application.
     private Double JVMUptime;                // Is the uptime of the java application.
     
-    //System Data
+    // System Data
     private Long systemRamUsage;          // Is all of the ram usage on the system.
     private Long systemRamTotal;          // Is all the ram available on the system.
     private Double systemCpuUsage;
@@ -55,16 +57,21 @@ public class ContainerClass implements Cloneable {
     private Integer logbackEventsWarn;    // Is the number of logback warn events on the java application.  
     private Long garbageCollectSize;   // Is the size of garbage collection on the java application. 
     
-    //String JVMStatus;               // Is the status of the java application.
+    // String JVMStatus;               // Is the status of the java application.
 
     // Calculated Data
     private Double containerCpuPercent;
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     ////////////////////////////////
     //      CLASS CONSTRUCTOR     //
     ////////////////////////////////
-    
-    public ContainerClass(String name, String id, Integer interval, Integer publicPort, 
+
+    public ContainerClass(String name, String id, Integer interval, Integer publicPort,
                                     String companyRegion, String companyName, String companyServer) {
         this.containerName = name;
         this.containerId = id;
@@ -75,95 +82,96 @@ public class ContainerClass implements Cloneable {
         this.publicPort = publicPort;
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-    
     ////////////////////////////////
     //  JSON GETTERS AND SETTERS  //
     ////////////////////////////////
     
-    //ContainerName
+    // ContainerName
     public String getContainerName() { return containerName; }
     
     public void setContainerName(String name) { this.containerName = name; }
     
-    //ContainerId
+    // ContainerId
     public String getContainerId() { return containerId; }
     
     public void setContainerId(String id) { this.containerId = id; }
     
-    //PublicPort
+    // PublicPort
     public Integer getPublicPort() { return publicPort; }
     
     public void setPublicPort(Integer publicPort) { this.publicPort = publicPort; }
     
-    //ContainerInterval
+    // ContainerInterval
     public Integer getContainerInterval() { return containerInterval; }
     
     public void setContainerInterval(Integer interval) { this.containerInterval = interval; }
 
-    //CompanyRegion
+    // CompanyRegion
     public String getCompanyRegion() { return companyRegion; }
 
     public void setCompanyRegion(String companyRegion) { this.companyRegion = companyRegion; }
     
-    //CompanyName
+    // CompanyName
     public String getCompanyName() { return companyName; }
 
     public void setCompanyName(String companyName) { this.companyName = companyName; }
 
-    //CompanyServer
+    // CompanyServer
     public String getCompanyServer() { return companyServer; }
     
     public void setCompanyServer(String companyServer) { this.companyServer = companyServer; }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    public LogsClass getLogs() { return logs; }
+
+    public void setLogs(LogsClass logs) { this.logs = logs; }
 
     //////////////////////////////////////
     //  CONTAINER GETTERS AND SETTERS   //
     //////////////////////////////////////
     
-    //ContainerRunning
+    // ContainerRunning
     public Boolean getContainerRunning() { return containerRunning; }
     
     public void setContainerRunning(Boolean containerRunning) { this.containerRunning = containerRunning; }
     
-    //ContainerRamUsage
+    // ContainerRamUsage
     public Long getContainerRamUsage() { return containerRamUsage; }
     
     public void setContainerRamUsage(Long containerRamUsage) { this.containerRamUsage = containerRamUsage; }
     
-    //ContainerCpuUsage
+    // ContainerCpuUsage
     public Double getContainerCpuUsage() { return containerCpuUsage; }
     
     public void setContainerCpuUsage(Double containerCpuUsage) { this.containerCpuUsage = containerCpuUsage; }
     
-    //ContainerDiskUsage
+    // ContainerDiskUsage
     public Long getContainerDiskUsage() { return containerDiskUsage; }
     
     public void setContainerDiskUsage(Long containerDiskUsage) { this.containerDiskUsage = containerDiskUsage; }
     
-    //ContainerStatus
+    // ContainerStatus
     public String getContainerStatus() { return containerStatus; }
     
     public void setContainerStatus(String containerStatus) { this.containerStatus = containerStatus; }
     
-    //ContainerPid
+    // ContainerPid
     public Long getContainerPid() { return containerPid; }
     
     public void setContainerPid(Long containerPid) { this.containerPid = containerPid; }
 
-    //ExitCode    
+    // ExitCode
     public Long getContainerExitCode() { return containerExitCode; }
 
     public void setContainerExitCode(Long containerExitCode) { this.containerExitCode = containerExitCode; }
 
-    //containerCpuCount
+    // containerCpuCount
     public int getContainerCpuCount() { return containerCpuCount; }
 
     public void setContainerCpuCount(int containerCpuCount) { this.containerCpuCount = containerCpuCount; }
 
-    //containerCpuLimit
+    // containerCpuLimit
     public Long getContainerRamLimit() { return containerRamLimit; }
 
     public void setContainerRamLimit(Long containerRamLimit) { this.containerRamLimit = containerRamLimit; }
@@ -176,47 +184,47 @@ public class ContainerClass implements Cloneable {
     // JVM GETTERS AND SETTERS         //
     //=================================//
 
-    //JVMRamMax
+    // JVMRamMax
     public Double getJVMRamMax() { return JVMRamMax; }
 
     public void setJVMRamMax(Double jVMRamMax) { JVMRamMax = jVMRamMax; }
 
-    //JVMRamUsage
+    // JVMRamUsage
     public Double getJVMRamUsage() { return JVMRamUsage; }
 
     public void setJVMRamUsage(Double jVMRamUsage) { JVMRamUsage = jVMRamUsage; }
 
-    //JVMCpuUsagePerc
+    // JVMCpuUsagePerc
     public Double getJVMCpuUsagePerc() { return JVMCpuUsagePerc; }
 
     public void setJVMCpuUsagePerc(Double jVMCpuUsagePerc) { JVMCpuUsagePerc = jVMCpuUsagePerc; }
 
-    //JVMThreads
+    // JVMThreads
     public Integer getJVMThreads() { return JVMThreads; }
 
     public void setJVMThreads(Integer jVMThreads) { JVMThreads = jVMThreads; }
 
-    //JVMRunning
+    // JVMRunning
     public Boolean getJVMRunning() { return JVMRunning; }
 
     public void setJVMRunning(Boolean JVMRunning) { this.JVMRunning = JVMRunning; }
 
-    //JVMThreadsStates
+    // JVMThreadsStates
     public Integer getJVMThreadsStates() { return JVMThreadsStates; }
 
     public void setJVMThreadsStates(Integer JVMThreadsStates) { this.JVMThreadsStates = JVMThreadsStates; }
 
-    //JVMThreadQueued
+    // JVMThreadQueued
     public Integer getJVMThreadQueued() { return JVMThreadQueued; }
 
     public void setJVMThreadQueued(Integer jVMThreadQueued) { JVMThreadQueued = jVMThreadQueued; }
 
-    //JVMCpuUsageStart
+    // JVMCpuUsageStart
     public Double getJVMCpuUsageStart() { return JVMCpuUsageStart; }
 
     public void setJVMCpuUsageStart(Double jVMCpuUsageStart) { JVMCpuUsageStart = jVMCpuUsageStart; }
 
-    //JVMUptime
+    // JVMUptime
     public Double getJVMUptime() { return JVMUptime; }
 
     public void setJVMUptime(Double jVMUptime) { JVMUptime = jVMUptime; }
@@ -225,42 +233,42 @@ public class ContainerClass implements Cloneable {
     //   SYSTEM GETTERS AND SETTERS    //
     //=================================//
 
-//SystemRamUsage
+    // SystemRamUsage
     public Long getSystemRamUsage() { return systemRamUsage; }
 
     public void setSystemRamUsage(Long systemRamUsage) { this.systemRamUsage = systemRamUsage; }
 
-//SystemRamTotal
+    // SystemRamTotal
     public Long getSystemRamTotal() { return systemRamTotal; }
 
     public void setSystemRamTotal(Long systemRamTotal) { this.systemRamTotal = systemRamTotal; }
 
-//SystemCpuUsage
+    // SystemCpuUsage
     public Double getSystemCpuUsage() { return systemCpuUsage; }
 
     public void setSystemCpuUsage(Double systemCpuUsage) { this.systemCpuUsage = systemCpuUsage; }
 
-//SystemCpuUsagePerc
+    // SystemCpuUsagePerc
     public Double getSystemCpuUsagePerc() { return systemCpuUsagePerc; }
 
     public void setSystemCpuUsagePerc(Double systemCpuUsagePerc) { this.systemCpuUsagePerc = systemCpuUsagePerc; }
     
-//SystemCpuCores
+    // SystemCpuCores
     public Integer getSystemCpuCores() { return systemCpuCores; }
 
     public void setSystemCpuCores(Integer systemCpuCores) { this.systemCpuCores = systemCpuCores; }
 
-//SystemDiskUsage
+    // SystemDiskUsage
     public Long getSystemDiskUsage() { return systemDiskUsage; }
 
     public void setSystemDiskUsage(Long systemDiskUsage) { this.systemDiskUsage = systemDiskUsage; }
 
-//SystemDiskTotal
+    // SystemDiskTotal
     public Long getSystemDiskTotal() { return systemDiskTotal; }
 
     public void setSystemDiskTotal(Long systemDiskTotal) { this.systemDiskTotal = systemDiskTotal; }
 
-//SystemDiskFree
+    // SystemDiskFree
     public Long getSystemDiskFree() { return systemDiskFree; }
 
     public void setSystemDiskFree(Long systemDiskFree) { this.systemDiskFree = systemDiskFree; }
@@ -269,36 +277,37 @@ public class ContainerClass implements Cloneable {
     //      MISC GET/SET HERE     //
     ////////////////////////////////
 
-//PoolCore
+    // PoolCore
     public Integer getPoolCore() { return poolCore; }
 
     public void setPoolCore(Integer poolCore) { this.poolCore = poolCore; }
 
-//LogbackEvents
+    // LogbackEvents
     public Integer getLogbackEvents() { return logbackEvents; }
 
     public void setLogbackEvents(Integer logbackEvents) { this.logbackEvents = logbackEvents; }
 
-//LogbackEventsError
+    // LogbackEventsError
     public Integer getLogbackEventsError() { return logbackEventsError; }
 
     public void setLogbackEventsError(Integer logbackEventsError) { this.logbackEventsError = logbackEventsError; }
 
-//LogbackEventsWarn
+    // LogbackEventsWarn
     public Integer getLogbackEventsWarn() { return logbackEventsWarn; }
 
     public void setLogbackEventsWarn(Integer logbackEventsWarn) { this.logbackEventsWarn = logbackEventsWarn; }
 
-//GarbageCollectSize
+    // GarbageCollectSize
     public Long getGarbageCollectSize() { return garbageCollectSize; }
 
     public void setGarbageCollectSize(Long garbageCollectSize) { this.garbageCollectSize = garbageCollectSize; }
 
-//Timestamp
+    // Timestamp
     public Long getTimestamp() { return timestamp; }
 
     public void setTimestamp(Long timestamp) { this.timestamp = timestamp; }
 
+    // ContainerCpuPercent
     public Double getContainerCpuPercent() { return containerCpuPercent; }
 
     public void setContainerCpuPercent(ContainerClass previousContainer) {
