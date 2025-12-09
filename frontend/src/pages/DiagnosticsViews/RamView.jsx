@@ -10,6 +10,7 @@ import {
     Legend
 } from "chart.js";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -81,7 +82,7 @@ const dashedLegendPlugin = {
 export default function RamView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [ramChart, setRamChart] = useState(null);
     const [noData, setNoData] = useState(false);
-    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.ramViewTimeFrame);
 
     useEffect(() => {
         if (!isActive) return;

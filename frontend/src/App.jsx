@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import "./pages/css/custom-bootstrap.scss";
+import "./config/ConfigurationColors.css";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard.jsx";

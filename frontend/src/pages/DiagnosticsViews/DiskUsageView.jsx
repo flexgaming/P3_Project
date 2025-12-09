@@ -10,6 +10,7 @@ import {
     Legend
 } from "chart.js";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -82,7 +83,7 @@ const dashedLegendPlugin = {
 export default function DiskUsageView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [diskUsageChart, setDiskUsageChart] = useState(null);
     const [noData, setNoData] = useState(false);
-    const [localTimeFrame, setLocalTimeFrame] = useState("10minutes");
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.diskUsageViewTimeFrame);
 
     useEffect(() => {
         if (!isActive) return;

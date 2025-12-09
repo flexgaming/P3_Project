@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Table, Stack } from "react-bootstrap";
 import TimeRangeDropdown from "./TimeRangeDropdown.jsx";
 import "../css/DiagnosticsView.css";
+import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 export default function Overview({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [dataTable, setDataTable] = useState(null);
-    const [localTimeFrame, setLocalTimeFrame] = useState("1month"); // Change this for the timeframe of the overview table
-
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.overviewTimeFrame); // Change this for the timeframe of the overview table
     useEffect(() => {
         if (!isActive) return;
         if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);

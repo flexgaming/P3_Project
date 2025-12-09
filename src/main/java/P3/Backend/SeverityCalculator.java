@@ -34,7 +34,7 @@ public final class SeverityCalculator {
     public Map<String, Object> assessSingleSeverity(Map<String, Object> errorEntry) {
         //////////////////////////////////////////////////
         //Add severity assessment logic here in future////
-        //////////////////////////////////////////////////
+        ////////////////////////////////////////////////// 
         String severity = "UNKNOWN";
 
         errorEntry.put("severity", severity);

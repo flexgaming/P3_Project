@@ -48,7 +48,3 @@ h1 {
     z-index: 50;
 }
 
-/* Keep a sensible color for dropdown button text if needed */
-.error-dropdown .btn {
-    color: #ffffff;
-}
