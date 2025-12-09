@@ -23,19 +23,30 @@ public class ExternalController {
             Database database = new Database();
 
             // Send data
-            String containerReference = containerData.getString("containerId");
-            boolean running = containerData.getBoolean("containerRunning");
-            Long ramUsage = containerData.getLong("containerRamUsage");
-            Long systemRamUsage = containerData.getLong("systemRamUsage");
-            Double cpuUsage = containerData.getDouble("containerCpuPercent");
-            Double systemCpuUsage = containerData.getDouble("systemCpuUsagePerc");
-            Double diskUsage = containerData.getDouble("containerDiskUsage");
-            int threadCount = containerData.getInt("jvmthreads");
-            String status = containerData.getString("containerStatus");
+            String containerReference = containerData.isNull("containerId")
+                    ? null : containerData.getString("containerId");
+            boolean running = containerData.isNull("containerRunning")
+                    ? null : containerData.getBoolean("containerRunning");
+            Long ramUsage = containerData.isNull("containerRamUsage")
+                    ? null : containerData.getLong("containerRamUsage");
+            Long systemRamUsage = containerData.isNull("systemRamUsage")
+                    ? null : containerData.getLong("systemRamUsage");
+            Double cpuUsage = containerData.isNull("containerCpuPercent")
+                    ? null : containerData.getDouble("containerCpuPercent");
+            Double systemCpuUsage = containerData.isNull("systemCpuUsagePerc")
+                    ? null : containerData.getDouble("systemCpuUsagePerc");
+            Long diskUsage = containerData.isNull("containerDiskUsage")
+                    ? null : containerData.getLong("containerDiskUsage");
+            Long systemDiskUsage = containerData.isNull("systemDiskUsage")
+                    ? null : containerData.getLong("systemDiskUsage");
+            int threadCount = containerData.isNull("jvmthreads")
+                    ? null : containerData.getInt("jvmthreads");
+            String status = containerData.isNull("containerStatus")
+                    ? null : containerData.getString("containerStatus");
             JSONObject errorLogs = null;
 
             database.addDiagnosticsBatch(containerReference, running, ramUsage, systemRamUsage, cpuUsage,
-                    systemCpuUsage, diskUsage, threadCount, status, errorLogs);
+                    systemCpuUsage, diskUsage, systemDiskUsage, threadCount, status, errorLogs);
         } catch (Exception e) {
             e.printStackTrace();
 

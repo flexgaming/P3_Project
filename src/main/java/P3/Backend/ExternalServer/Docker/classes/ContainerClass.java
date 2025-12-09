@@ -18,7 +18,7 @@ public class ContainerClass implements Cloneable {
     private Boolean containerRunning;       // Is docker container on or off.
     private Long containerRamUsage;         // Is ram usage on docker container.
     private Double containerCpuUsage;         // Is cpu usage on docker container.
-    private Double containerDiskUsage;        // Is disk usage on docker container.
+    private Long containerDiskUsage;        // Is disk usage on docker container.
     private String containerStatus;         // Is the status of the docker container.
     private Long containerPid;              // Is the process id of the docker container / maybe? JVM main thread 🙏🙏🙏🙏.
     private Long containerExitCode;         // Is the exit code received from the program (CHROOT EXIT CODES - https://stackoverflow.com/questions/31297616/what-is-the-authoritative-list-of-docker-run-exit-codes).
@@ -43,9 +43,9 @@ public class ContainerClass implements Cloneable {
     private Double systemCpuUsage;
     private Double systemCpuUsagePerc;      // Is all of the cpu usage on the system in percentage.
     private Integer systemCpuCores;         // Is the number of cpu cores on the system.
-    private Double systemDiskUsage;         // Is all of the disk usage on the system.
-    private Double systemDiskTotal;         // Is the total disk space on the system.
-    private Double systemDiskFree;          // Is the free disk space on the system.
+    private Long systemDiskUsage;         // Is all of the disk usage on the system.
+    private Long systemDiskTotal;         // Is the total disk space on the system.
+    private Long systemDiskFree;          // Is the free disk space on the system.
 
     // Misc Data
     private Long timestamp;                 // Is the time when data is fetched.
@@ -139,9 +139,9 @@ public class ContainerClass implements Cloneable {
     public void setContainerCpuUsage(Double containerCpuUsage) { this.containerCpuUsage = containerCpuUsage; }
     
     //ContainerDiskUsage
-    public Double getContainerDiskUsage() { return containerDiskUsage; }
+    public Long getContainerDiskUsage() { return containerDiskUsage; }
     
-    public void setContainerDiskUsage(Double containerDiskUsage) { this.containerDiskUsage = containerDiskUsage; }
+    public void setContainerDiskUsage(Long containerDiskUsage) { this.containerDiskUsage = containerDiskUsage; }
     
     //ContainerStatus
     public String getContainerStatus() { return containerStatus; }
@@ -251,19 +251,19 @@ public class ContainerClass implements Cloneable {
     public void setSystemCpuCores(Integer systemCpuCores) { this.systemCpuCores = systemCpuCores; }
 
 //SystemDiskUsage
-    public Double getSystemDiskUsage() { return systemDiskUsage; }
+    public Long getSystemDiskUsage() { return systemDiskUsage; }
 
-    public void setSystemDiskUsage(Double systemDiskUsage) { this.systemDiskUsage = systemDiskUsage; }
+    public void setSystemDiskUsage(Long systemDiskUsage) { this.systemDiskUsage = systemDiskUsage; }
 
 //SystemDiskTotal
-    public Double getSystemDiskTotal() { return systemDiskTotal; }
+    public Long getSystemDiskTotal() { return systemDiskTotal; }
 
-    public void setSystemDiskTotal(Double systemDiskTotal) { this.systemDiskTotal = systemDiskTotal; }
+    public void setSystemDiskTotal(Long systemDiskTotal) { this.systemDiskTotal = systemDiskTotal; }
 
 //SystemDiskFree
-    public Double getSystemDiskFree() { return systemDiskFree; }
+    public Long getSystemDiskFree() { return systemDiskFree; }
 
-    public void setSystemDiskFree(Double systemDiskFree) { this.systemDiskFree = systemDiskFree; }
+    public void setSystemDiskFree(Long systemDiskFree) { this.systemDiskFree = systemDiskFree; }
 
     ////////////////////////////////
     //      MISC GET/SET HERE     //

@@ -296,7 +296,7 @@ public class IntervalApplications {
             container.setContainerRamUsage(stats.getMemoryUsage()); // Current RAM usage of the container.
             container.setContainerCpuUsage(stats.getCpuTotalUsage()); // Current CPU total usage of the container.
             container.setSystemCpuUsage(stats.getSystemCpuTotalUsage()); // Current CPU total usage of the system.
-            container.setContainerDiskUsage(response.getSizeRootFs().doubleValue());  // Total size (image + writable layer).
+            container.setContainerDiskUsage(response.getSizeRootFs());  // Total size (image + writable layer).
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
@@ -338,8 +338,9 @@ public class IntervalApplications {
         container.setJVMUptime(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/process.uptime")));
 
         // DISK / STORAGE
-        container.setSystemDiskFree(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/disk.free")));
-        container.setSystemDiskTotal(getDoubleSafe(callActuator(webClient, url, "/actuator/metrics/disk.total")));
+        container.setSystemDiskFree(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.free")));
+        container.setSystemDiskTotal(getLongSafe(callActuator(webClient, url, "/actuator/metrics/disk.total")));
+        container.setSystemDiskUsage(container.getSystemDiskTotal() - container.getSystemDiskFree());
         
         // CPU
         container.setSystemCpuCores(getIntSafe(callActuator(webClient, url, "/actuator/metrics/system.cpu.count")));

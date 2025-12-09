@@ -90,7 +90,7 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
     }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.diskUsageTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.serverName) {
             return;
         }
 
@@ -111,8 +111,8 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
         // Data is present — clear the no-data state so chart can render
         setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const diskUsageContainer = diagnosticsData.map(item => 1 - item.diskUsageFree / containerData.containerData.diskUsageMax);
-        const diskUsageServer = diagnosticsData.map(item => (containerData.containerData.diskUsageMax - item.diskUsageFree) / serverData.diskUsageTotal);
+        const diskUsageContainer = diagnosticsData.map(item => item.diskUsage / 1000000);
+        const diskUsageServer = diagnosticsData.map(item => item.systemDiskUsage / 1000000);
 
     const lineColorContainer = diagnosticsData.map(() => "blue");
     const lineColorServer = diagnosticsData.map(() => "red");
@@ -133,7 +133,7 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
                         tension: 0.1
                     },
                     {
-                        label: "Disk usage of the server resources",
+                        label: "Total Disk usage of the server resources",
                         data: diskUsageServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"
@@ -150,14 +150,14 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        min: 0,
-                        max: 1,
+                    x: {
                         ticks: {
-                            callback: function(values) {
-                                return (values * 100).toFixed(0) + "%";
-                            }
-                        },
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        min: 0
                     }
                 },
                 plugins: {
