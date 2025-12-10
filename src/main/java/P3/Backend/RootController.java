@@ -8,7 +8,7 @@ public class RootController {
     
     @GetMapping("/")
     public String redirectToFrontend() {
-        // Redirect to Vite dev server on port 5173
+        
         return "redirect:http://localhost:5173";
     }
 }

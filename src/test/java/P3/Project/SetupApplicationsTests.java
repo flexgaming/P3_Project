@@ -16,5 +16,5 @@ public class SetupApplicationsTests {
     }
 }
 
-// TODO Send POST/PUT request with JSONArray of containers, Parameters: CompanyID, ContainerIDs, ContainerName, ContainerRunning.
-// TODO Send POST/PUT when JSON file is updated, send (in)active containers when removed.
+
+

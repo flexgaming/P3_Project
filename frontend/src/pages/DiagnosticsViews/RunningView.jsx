@@ -17,29 +17,14 @@ import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-/**
- * RunningView
- *
- * Props:
- * - diagnosticsData: array or object of diagnostics for this container
- * - timeAgo: function(timestamp) -> string used to render human-friendly labels
- * - isActive: boolean indicating whether this view is currently visible/active
- * - fetchDiagnostics: function(timeFrameKey) -> triggers a diagnostics fetch for this view
- *
- * Renders a stacked bar chart displaying running/stopped/error states over time.
- * When the view becomes active or the local timeframe changes, it calls
- * `fetchDiagnostics` with the selected timeframe.
- *
- * @param {{diagnosticsData: Array|Object, timeAgo: function, isActive: boolean, fetchDiagnostics: function}} param0
- * @returns {JSX.Element}
- */
+
 export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchDiagnostics }) {
     const [runningChart, setRunningChart] = useState(null);
     const [noData, setNoData] = useState(false);
     const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.runningViewTimeFrame);
     const chartRef = useRef(null);
 
-    // Keep a processed diagnostics array (ordered) so clicks can map index -> diagnostics object
+    
     const [processedDiagnostics, setProcessedDiagnostics] = useState([]);
     const [selectedDiagnostic, setSelectedDiagnostic] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -77,26 +62,26 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
             return;
         }
 
-        // If diagnosticsData is an object keyed by diagnosticsID, preserve the id on each entry.
+        
         let diagArray = [];
         if (diagnosticsData && !Array.isArray(diagnosticsData)) {
             diagArray = Object.entries(diagnosticsData).map(([id, value]) => ({ diagnosticsID: id, ...value }));
         } else if (Array.isArray(diagnosticsData)) {
-            // If the array items lack an explicit diagnosticsID, leave as-is
+            
             diagArray = diagnosticsData.slice();
         } else {
             diagArray = [];
         }
 
         diagArray.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        // Keep a copy so click handler can look up full diagnostic objects by index
+        
         setProcessedDiagnostics(diagArray);
 
-        // Determine labels and datasets based on the normalized diagnostics
+        
         const labels = diagArray.map(item => timeAgo(item.timestamp));
         const runningValues = diagArray.map(() => -1);
 
-        // Detect whether each diagnostic contains non-empty error information.
+        
         const hasError = diagArray.map(item => {
             const val = item.errorLogs;
             if (Array.isArray(val)) return val.length > 0;
@@ -105,8 +90,8 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
             return false;
         });
 
-        // Error dataset uses the same stacked layout as running/stopped; when there's
-        // no error for an index we push a transparent zero so the bar is absent.
+        
+        
         const errorValues = hasError.map(h => (h ? [0.02, 1] : [0, 0]));
 
         const barColors = diagArray.map(item =>
@@ -215,26 +200,26 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
     }, [diagnosticsData, timeAgo, localTimeFrame, isActive, fetchDiagnostics]);
 
 
-    // Render the component
-    // If a diagnostic is selected, prefer common error fields for conditional display
+    
+    
     const selectedErrorVal = selectedDiagnostic ? (selectedDiagnostic.errorLogs ?? selectedDiagnostic.errors ?? selectedDiagnostic.error) : null;
     return (
         <>
             {noData ? (
-                // No data error message
+                
                 <div className="chart-container shadow rounded-4">
                     <br></br>
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : runningChart ? (
-                // Chart is ready and data is available
+                
                 <div className="chart-container shadow rounded-4">
                     <br></br>
                     <TimeRangeDropdown id="running-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <Bar data={runningChart?.data} options={runningChart?.options} ref={chartRef} onClick={handleClick} />
 
-                    {/* Modal showing full diagnostics for the clicked bar */}
+                    {}
                     <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                         <Modal.Header closeButton>
                             <Modal.Title>Diagnostic Details</Modal.Title>

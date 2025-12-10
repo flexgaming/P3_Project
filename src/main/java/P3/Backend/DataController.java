@@ -8,59 +8,59 @@ import org.json.JSONObject;
 
 
 @RestController
-@RequestMapping("/data") //Router starting point
+@RequestMapping("/data") 
 public class DataController {
 Database database = new Database();
 
-    // Standard message endpoint
+    
     @GetMapping
     public String getMessage() {
         return "DataController is up and running!\nSpecific Docker data can be accessed via /data/container/{id}";
     }
 
-    // GET all regions
-    @GetMapping("/regions") //Router continuation
+    
+    @GetMapping("/regions") 
     public Map<String, Object> getAllRegions(){
         JSONObject regions = database.getRegions();
         return regions.toMap();
     }
 
-    // GET companies by region ID
-    @GetMapping("/{regionID}/companies") //Router continuation
+    
+    @GetMapping("/{regionID}/companies") 
     public Map<String, Object> getCompaniesByRegion(@PathVariable String regionID) {
-        // Get companies by region from DB
+        
         JSONObject companies = database.getCompanies(regionID);
-        // System.out.println(companies); // Debug print
-        // System.out.println(companies.toMap());
+        
+        
         return companies.toMap();
     }
 
-    // GET company Servers, Dockers and latest Diagnostics by company ID
-    @GetMapping("/{regionID}/{companyID}/contents") //Router continuation
+    
+    @GetMapping("/{regionID}/{companyID}/contents") 
     public Map<String, Object> getRecentCompanyData(@PathVariable String regionID, @PathVariable String companyID) {
-        // Get company contents from DB
-        // System.out.println(database.getRecentCompanyData(companyID).toString(4));
+        
+        
         JSONObject companyData = database.getRecentCompanyData(companyID);
         return companyData.toMap();
     }
 
-    // GET Container by ID
-    @GetMapping("/container/{id}") //Router continuation
+    
+    @GetMapping("/container/{id}") 
     public Map<String, Object> getContainerDiagnosticsById(@PathVariable String id) {
-        // Get container diagnostics data from DB
+        
         JSONObject diagnostics = database.getDiagnosticsData(id, null);
         return diagnostics.toMap();
     }
 
-    // POST Get Diagnostics data by container ID
+    
     @PostMapping("/diagnosticsdata/{containerID}")
     public Map<String, Object> getDiagnosticsData(@PathVariable String containerID,
                                                   @RequestBody(required = false) Map<String, Object> payload) {
-        // Accept an optional JSON body (e.g. { "timeFrame": "1hour" })
+        
         String timeFrame = "10minutes";
         if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
             timeFrame = payload.get("timeFrame").toString();
-            // System.out.println("Diagnostics request for container " + containerID + " with timeFrame: " + timeFrame); // Debug print
+            
         }
 
         JSONObject diagnosticsData = new JSONObject();
@@ -70,7 +70,7 @@ Database database = new Database();
         return diagnosticsData.toMap();
     }
 
-    // GET Server data by server ID
+    
     @GetMapping("/serverdata/{serverID}")
     public Map<String, Object> getServerData(@PathVariable String serverID) {
         JSONObject serverData = database.getServerData(serverID);
@@ -78,28 +78,28 @@ Database database = new Database();
         return serverData.toMap();
     }
 
-    // GET Dashboard data
-    @GetMapping("/dashboard") //Router continuation
+    
+    @GetMapping("/dashboard") 
     public Map<String, Object> getDashboardData() {
-        // Get dashboard region overview data from DB
+        
         Map<String, Object> dashboardData = database.getDashboardData().toMap();
         return dashboardData;
     }
 
-    // GET Critical Errors data
-    @PostMapping("/errors") //Router continuation
+    
+    @PostMapping("/errors") 
     public Map<String, Object> getCriticalErrorsData(@RequestBody Map<String, Object> payload) {
         String timeFrame = null;
         if (payload != null && payload.containsKey("timeFrame") && payload.get("timeFrame") != null) {
             timeFrame = payload.get("timeFrame").toString();
-            // System.out.println("Critical errors request with timeFrame: " + timeFrame); // Debug print
+            
         }
-        // Get critical errors data from DB
+        
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors(timeFrame).toMap();
-        // Create an object to assess the severity of the error messages
+        
         SeverityCalculator severityCalculator = new SeverityCalculator();
         
-        //Return the updated map of error messages with severities assigned
+        
         return severityCalculator.assessSeverity(diagnosticsErrors);
     }
 }

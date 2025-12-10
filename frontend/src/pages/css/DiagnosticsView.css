@@ -5,7 +5,7 @@
 }
 
 #overview-table table {
-    /* Remove default bottom spacing that tables or responsive wrappers sometimes add */
+    
     margin-bottom: 0;
 }
 

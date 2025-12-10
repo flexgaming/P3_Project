@@ -12,13 +12,13 @@ import { defaultTimeFrames } from "../config/ConfigurationConstants.js";
 
 export default function DiagnosticsView() {
     const { containerID } = useParams();
-    // No global timeframe — each view manages its own timeframe.
+    
     const [containerData, setContainerData] = useState([]);
     const [serverData, setServerData] = useState([]);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("overview");
 
-    // --- Helper: Convert timestamp -> "x minutes ago" ---
+    
     const timeAgo = (timestamp) => {
         const now = new Date();
         const then = new Date(timestamp);
@@ -35,16 +35,16 @@ export default function DiagnosticsView() {
         return `${diffDay}d ago`;
     };
 
-    // Keep track of the last (containerID,timeFrame) we requested to avoid
-    // sending duplicate identical requests when parent re-renders.
+    
+    
     const lastFetchRef = useRef(null);
 
-    // Fetch diagnostics for a given timeframe. Views will call this when they
-    // become active and whenever their local timeframe changes while active.
+    
+    
     const fetchDiagnosticsFor = useCallback(async (timeFrame) => {
         if (!containerID || !timeFrame) return;
         const key = `${containerID}|${timeFrame}`;
-        if (lastFetchRef.current === key) return; // already fetched this exact range
+        if (lastFetchRef.current === key) return; 
         lastFetchRef.current = key;
 
         try {
@@ -60,15 +60,15 @@ export default function DiagnosticsView() {
         }
     }, [containerID]);
 
-    // Clear dedupe state when container changes so we will fetch fresh data.
+    
     useEffect(() => {
         lastFetchRef.current = null;
     }, [containerID]);
 
-    // On initial load (or when user navigates back to Overview), fetch the
-    // diagnostics for the Overview tab so it doesn't stay in a perpetual
-    // "Loading chart…" state. Use the default timeframe of 10 minutes for
-    // overview initial load.
+    
+    
+    
+    
     useEffect(() => {
         if (activeTab === "overview") {
             fetchDiagnosticsFor(defaultTimeFrames.overviewTimeFrame);

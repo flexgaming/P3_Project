@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import "../css/Dashboard.css";
 
-// Helpers for converting between readable titles and internal timeframe keys
+
 export function readableTimeFrame(tf) {
     switch (tf) {
         case "10minutes": return "Past 10 Minutes";
@@ -33,20 +33,20 @@ export function reverseReadableTimeFrame(readable) {
     }
 }
 
-// TimeRangeDropdown component
-// Props:
-// - timeFrame: current selected timeframe (controlled)
-// - onChange: function(newTimeFrame) called when the user picks a new value
+
+
+
+
 function TimeRangeDropdown({ timeFrame, onChange, id, className }) {
     const current = timeFrame;
     const [title, setTitle] = useState(current);
 
-    // Keep local title in sync if parent changes timeFrame
+    
     useEffect(() => {
         setTitle(readableTimeFrame(timeFrame));
     }, [timeFrame]);
 
-    // Handle user selection
+    
     const handleSelect = (eventKey) => {
         if (!eventKey) return;
         setTitle(readableTimeFrame(eventKey));
