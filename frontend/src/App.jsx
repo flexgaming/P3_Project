@@ -14,8 +14,6 @@ import { BsArrowLeftSquare } from "react-icons/bs";
 // The main application component
 const App = () => {
 
-    
-
     const navigate = useNavigate();
 
     return (

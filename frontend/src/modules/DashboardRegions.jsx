@@ -89,7 +89,9 @@ function DashboardRegions() {
                                 <h4><b>{currentDashboardData.regionName}</b></h4>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Active containers: <Badge bg={runningBg} text={textColorRunning} className="fs-6">{activeContainers}</Badge> / <Badge bg={runningBg} text={textColorRunning} className="fs-6">{totalContainers}</Badge>
+                                Active containers: 
+                                <Badge bg={runningBg} text={textColorRunning} className="fs-6">{activeContainers}</Badge> / 
+                                <Badge bg={runningBg} text={textColorRunning} className="fs-6">{totalContainers}</Badge>
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 Companies: <Badge bg="secondary" className="fs-6">{currentDashboardData.companies}</Badge>
