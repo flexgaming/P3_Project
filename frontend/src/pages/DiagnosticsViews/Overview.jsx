@@ -25,6 +25,8 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
         const safeDiagnostics = Array.isArray(diagnosticsData) ? diagnosticsData : [];
         safeDiagnostics.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+        console.log(serverData);
+
         const rows = [];
         rows.push(["Server Name:", serverData.serverName]);
         rows.push(["Container Name:", containerData.containerData.containerName]);
@@ -32,7 +34,8 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
         // If there are no diagnostics in the selected timeframe show friendly placeholders
         if (safeDiagnostics.length === 0) {
             rows.push(["Container ID:", "No data in selected timeframe"]);
-            rows.push(["Latest Ping:", "No data in selected timeframe"]);
+            rows.push(["Latest Update:", "No data in selected timeframe"]);
+            rows.push(["Latest Server Ping:", "No data in selected timeframe"]);
             rows.push(["Status:", "N/A"]);
             rows.push(["Running:", "N/A"]);
             rows.push(["CPU Usage:", "N/A"]);
@@ -41,10 +44,12 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
             rows.push(["Thread Count:", "N/A"]);
         } else {
             const latest = safeDiagnostics[safeDiagnostics.length - 1] || {};
-            const latestPing = latest.timestamp ? String(timeAgo(latest.timestamp)) : "Unknown";
+            const latestUpdate = latest.timestamp ? String(timeAgo(latest.timestamp)) : "Unknown";
+            const latestServerPing = serverData.latestPing ? String(timeAgo(serverData.latestPing)) : "Unknown";
             console.log(latest);
             rows.push(["Container ID:", latest.containerReference]);
-            rows.push(["Latest Ping:", latestPing]);
+            rows.push(["Latest Update:", latestUpdate]);
+            rows.push(["Latest Server Ping:", latestServerPing])
             rows.push(["Status:", latest.status || "Unknown"]);
             rows.push(["Running:", typeof latest.running !== 'undefined'
                 ? String(latest.running) : "Unknown"]);
