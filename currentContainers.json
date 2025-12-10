@@ -1,0 +1,9 @@
+{"elated_sinoussi": {
+    "image": "springcommunity/spring-petclinic:3.5.6",
+    "privatePort": 8080,
+    "name": "elated_sinoussi",
+    "publicPort": 9090,
+    "interval": 3,
+    "id": "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
+    "state": "active"
+}}

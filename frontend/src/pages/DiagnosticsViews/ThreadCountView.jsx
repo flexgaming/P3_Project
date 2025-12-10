@@ -43,7 +43,7 @@ export default function ThreadCountView({ containerData, serverData, timeAgo, is
     }, [isActive, localTimeFrame, fetchDiagnostics]);
 
     useEffect(() => {
-        if (!containerData || !containerData.containerData || !serverData || !serverData.ramTotal) {
+        if (!containerData || !containerData.containerData || !serverData || !serverData.serverName) {
             return;
         }
 
@@ -73,7 +73,7 @@ export default function ThreadCountView({ containerData, serverData, timeAgo, is
                 labels,
                 datasets: [
                     {
-                        label: "Thread count",
+                        label: "Amount of threads running in the Java Virtual Machine",
                         data: threadCount,
                         backgroundColor: lineColor,
                         borderColor: typeof lineColorServer === "string"
@@ -88,6 +88,17 @@ export default function ThreadCountView({ containerData, serverData, timeAgo, is
                 animation: false,
                 responsive: true,
                 maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        min: 0
+                    }
+                },
                 plugins: {
                     legend: {
                         labels: {

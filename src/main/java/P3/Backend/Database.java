@@ -1,18 +1,14 @@
-package P3.Backend.Database;
-
-import P3.Backend.Constants;
-import P3.Backend.HelperFunctions;
+package P3.Backend;
 
 import java.lang.reflect.Array;
 import java.sql.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.UUID;
 
-import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.ArrayList;
+import org.postgresql.util.PGobject;
+
+import static java.util.Objects.isNull;
 
 public class Database {
     // The information needed to connect to the Database.
@@ -26,10 +22,10 @@ public class Database {
 
     /**
      * Checks if all the given arrays are of the same length.
-     * 
+     *
      * @param arrays Input arrays.
      * @return true if they at least one array is of different length than the
-     *         others, false otherwise.
+     * others, false otherwise.
      */
     public static boolean notSameLength(Object... arrays) {
         // If there are no arrays, return false.
@@ -46,6 +42,112 @@ public class Database {
             }
         }
         return false;
+    }
+
+    /**
+     * Checks if a region already exists in the Database.
+     *
+     * @param regionName The name of the region being checked for.
+     * @return True if the region exists. False otherwise.
+     */
+    private boolean regionExists(String regionName) {
+        String sql = "SELECT (Region_ID) FROM Region WHERE Region_Name = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, regionName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a company already exists in the Database.
+     *
+     * @param companyName The name of the company being checked for.
+     * @param regionReference The ID of the region the company resides in.
+     * @return True if the company exists. False otherwise.
+     */
+    private boolean companyExists(String companyName, String regionReference) {
+        String sql = "SELECT (Company_ID) FROM Company WHERE Company_Name = ? AND Region_Reference = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, companyName);
+            preparedStatement.setObject(2, UUID.fromString(regionReference));
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a server already exists in the Database.
+     *
+     * @param serverName The name of the server being checked for.
+     * @param companyReference The ID of the company the server resides in.
+     * @return True if the server exists. False otherwise.
+     */
+    private boolean serverExists(String serverName, String companyReference) {
+        String sql = "SELECT (Server_ID) FROM Server WHERE Server_Name = ? AND Company_Reference = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, serverName);
+            preparedStatement.setObject(2, UUID.fromString(companyReference));
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a container already exists in the Database.
+     *
+     * @param containerName The name of the container being checked for.
+     * @param serverReference The ID of the server the container resides in.
+     * @return True if the container exists. False otherwise.
+     */
+    private boolean containerExists(String containerName, String serverReference) {
+        String sql = "SELECT (Container_ID) FROM Container WHERE Container_Name = ? AND Server_Reference = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, containerName);
+            preparedStatement.setObject(2, UUID.fromString(serverReference));
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
     }
 
     /**
@@ -73,6 +175,9 @@ public class Database {
 
             // Queue all regions to be added.
             for (String regionName : regionNames) {
+                // If a region already exists with this region name, skip.
+                if (regionExists(regionName)) continue;
+
                 preparedStatement.setString(1, regionName);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
@@ -118,6 +223,9 @@ public class Database {
 
             // Queue all companies to be added.
             for (int i = 0; i < regionReferences.length; i++) {
+                // If a company already exists with this company name in this region, skip.
+                if (companyExists(companyNames[i], regionReferences[i])) continue;
+
                 preparedStatement.setObject(1, UUID.fromString(regionReferences[i]));
                 preparedStatement.setString(2, companyNames[i]);
                 // Add the prepared statement to the batch.
@@ -135,39 +243,27 @@ public class Database {
 
     /**
      * Adds a server to the database.
-     * @param serverID The ID of the server being added.
      * @param companyReference The ID of the company owning the server.
      * @param serverName The name of the server being added.
-     * @param ramTotal The total amount of RAM on the server.
-     * @param cpuTotal The total amount of CPU on the server.
-     * @param diskUsageTotal The total amount of Disk Usage on the server.
      */
-    public void addServers(String serverID, String companyReference, String serverName, double ramTotal,
-                           double cpuTotal, double diskUsageTotal) {
+    public void addServers(String companyReference, String serverName) {
         // Reformats the input parameters to fit the signature of the below addServers method.
-        addServers(new String[]{serverID}, new String[]{companyReference}, new String[]{serverName},
-                new double[]{ramTotal}, new double[]{cpuTotal}, new double[]{diskUsageTotal});
+        addServers(new String[]{companyReference}, new String[]{serverName});
     }
 
     /**
      * Adds servers to the database.
-     * @param serverIDs The IDs of the servers being added.
      * @param companyReferences The IDs of the companies owning the servers.
      * @param serverNames The names of the servers being added.
-     * @param ramTotals The total amount of RAM on the servers.
-     * @param cpuTotals The total amount of CPU on the servers.
-     * @param diskUsageTotals The total amount of Disk Usage on the servers.
      */
-    public void addServers(String[] serverIDs, String[] companyReferences, String[] serverNames, double[] ramTotals,
-                           double[] cpuTotals, double[] diskUsageTotals) {
+    public void addServers(String[] companyReferences, String[] serverNames) {
         // Check that the input parameter arrays are of same length.
-        if (notSameLength(serverIDs, companyReferences, ramTotals, cpuTotals, diskUsageTotals)) {
+        if (notSameLength(companyReferences, serverNames)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Server (Server_ID, Company_Reference, Server_Name, Ram_Total, CPU_Total, Disk_Usage_Total)" +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Server (Company_Reference, Server_Name) VALUES (?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -175,13 +271,12 @@ public class Database {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all companies to be added.
-            for (int i = 0; i < serverIDs.length; i++) {
-                preparedStatement.setString(1, serverIDs[i]);
-                preparedStatement.setObject(2, UUID.fromString(companyReferences[i]));
-                preparedStatement.setString(3, serverNames[i]);
-                preparedStatement.setDouble(4, ramTotals[i]);
-                preparedStatement.setDouble(5, cpuTotals[i]);
-                preparedStatement.setDouble(6, diskUsageTotals[i]);
+            for (int i = 0; i < companyReferences.length; i++) {
+                // If a server already exists with this server name in this company, skip.
+                if (serverExists(serverNames[i], companyReferences[i])) continue;
+
+                preparedStatement.setObject(1, UUID.fromString(companyReferences[i]));
+                preparedStatement.setString(2, serverNames[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -201,15 +296,10 @@ public class Database {
      * @param containerID The ID of the container being added.
      * @param serverReference The ID of the server running the container.
      * @param containerName The name of the container being added.
-     * @param ramMax The max RAM of the container being added.
-     * @param cpuMax The max CPU of the container being added.
-     * @param diskUsageMax The max Disk Usage of the container being added.
      */
-    public void addContainers(String containerID, String serverReference, String containerName, double ramMax,
-                              double cpuMax, double diskUsageMax) {
+    public void addContainers(String containerID, String serverReference, String containerName) {
         // Reformats the input parameters to fit the signature of the below addContainers method.
-        addContainers(new String[]{containerID}, new String[]{serverReference}, new String[]{containerName},
-                new double[]{ramMax}, new double[]{cpuMax}, new double[]{diskUsageMax});
+        addContainers(new String[]{containerID}, new String[]{serverReference}, new String[]{containerName});
     }
 
     /**
@@ -218,20 +308,15 @@ public class Database {
      * @param containerIDs The IDs of the containers being added.
      * @param serverReferences The IDs of the servers running these containers.
      * @param containerNames the names of the containers being added.
-     * @param ramMaxes The max RAMs of the containers being added.
-     * @param cpuMaxes The max CPUs of the containers being added.
-     * @param diskUsageMaxes The max Disk Usages of the containers being added.
      */
-    public void addContainers(String[] containerIDs, String[] serverReferences, String[] containerNames,
-                              double[] ramMaxes, double[] cpuMaxes, double[] diskUsageMaxes) {
+    public void addContainers(String[] containerIDs, String[] serverReferences, String[] containerNames) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(containerIDs, serverReferences)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Container (Container_ID, Server_Reference, Container_Name, Ram_Max, Cpu_Max, " +
-                "Disk_Usage_Max) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Container (Container_ID, Server_Reference, Container_Name) VALUES (?, ?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -240,12 +325,12 @@ public class Database {
 
             // Queue all containers to be added.
             for (int i = 0; i < serverReferences.length; i++) {
+                // If a container already exists with this container name in this server, skip.
+                if (containerExists(containerNames[i], serverReferences[i])) continue;
+
                 preparedStatement.setString(1, containerIDs[i]);
-                preparedStatement.setString(2, serverReferences[i]);
+                preparedStatement.setObject(2, UUID.fromString(serverReferences[i]));
                 preparedStatement.setString(3, containerNames[i]);
-                preparedStatement.setDouble(4, ramMaxes[i]);
-                preparedStatement.setDouble(5, cpuMaxes[i]);
-                preparedStatement.setDouble(6, diskUsageMaxes[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -263,48 +348,50 @@ public class Database {
      * Adds diagnostics to the database.
      * @param containerReference The ID of the container being diagnosed.
      * @param running If the container is running.
-     * @param ramFree How much RAM is free.
-     * @param cpuFree How much CPU is free.
-     * @param diskUsageFree How much Disk Usage is free.
-     * @param threadCount   How many threads are active.
-     * @param processID     The ID of the process.
-     * @param status        The status of the container.
-     * @param errorLogs     The Error Logs of the container.
+     * @param ramUsage How much RAM is free.
+     * @param cpuUsage CPU Usage in percent.
+     * @param systemCpuUsage System CPU Usage in percent.
+     * @param diskUsage How much Disk Usage is free.
+     * @param threadCount How many threads are active.
+     * @param status The status of the container.
+     * @param errorLogs The Error Logs of the container.
      */
-    public void addDiagnosticsBatch(String containerReference, boolean running, double ramFree, double cpuFree,
-                                    double diskUsageFree, int threadCount, String processID, String status,
-                                    String errorLogs) {
+    public void addDiagnosticsBatch(String containerReference, boolean running, Long ramUsage, Long systemRamUsage,
+                                    Double cpuUsage, Double systemCpuUsage, Long diskUsage, Long systemDiskUsage,
+                                    int threadCount, String status, JSONObject errorLogs) {
         // Reformats the input parameters to fit the signature of the below addDiagnosticsBatch method.
-        addDiagnosticsBatch(new String[]{containerReference}, new boolean[]{running}, new double[]{ramFree},
-                new double[]{cpuFree}, new double[]{diskUsageFree}, new int[]{threadCount}, new String[]{processID},
-                new String[]{status}, new String[]{errorLogs});
+        addDiagnosticsBatch(new String[]{containerReference}, new boolean[]{running}, new Long[]{ramUsage},
+                new Long[]{systemRamUsage}, new Double[]{cpuUsage}, new Double[]{systemCpuUsage},
+                new Long[]{diskUsage}, new Long[]{systemDiskUsage}, new int[]{threadCount}, new String[]{status},
+                new JSONObject[]{errorLogs});
     }
 
     /**
      * Adds a batch of diagnostics to the database.
      * @param containerReferences The IDs of the containers that are diagnosed.
      * @param runningList If the containers are running.
-     * @param ramFrees How much RAM is free.
-     * @param cpuFrees How much CPU is free.
-     * @param diskUsageFrees How much Disk Usage is free.
+     * @param ramUsages How much RAM is free.
+     * @param cpuUsages How much CPU is free.
+     * @param systemCpuUsages System CPU Usage in percent.
+     * @param diskUsages How much Disk Usage is free.
      * @param threadCounts   How many threads are active.
-     * @param processIDs     The IDs of the processes.
      * @param statuses       The statuses of the containers.
      * @param errorLogsList  The Error Logs of the containers.
      */
-    public void addDiagnosticsBatch(String[] containerReferences, boolean[] runningList, double[] ramFrees,
-                                    double[] cpuFrees, double[] diskUsageFrees, int[] threadCounts, String[] processIDs,
-                                    String[] statuses, String[] errorLogsList) {
+    public void addDiagnosticsBatch(String[] containerReferences, boolean[] runningList, Long[] ramUsages,
+                                    Long[] systemRamUsages, Double[] cpuUsages, Double[] systemCpuUsages,
+                                    Long[] diskUsages, Long[] systemDiskUsages, int[] threadCounts, String[] statuses,
+                                    JSONObject[] errorLogsList) {
         // Check that the input parameter arrays are of same length.
-        if (notSameLength(containerReferences, runningList, ramFrees, cpuFrees, diskUsageFrees, threadCounts, processIDs,
-                statuses, errorLogsList)) {
+        if (notSameLength(containerReferences, runningList, ramUsages, systemRamUsages, cpuUsages, systemCpuUsages,
+                diskUsages, systemDiskUsages, threadCounts, statuses, errorLogsList)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Diagnostics (Container_Reference, Timestamp, Running, Ram_Free, CPU_Free, " +
-                "Disk_Usage_Free, Thread_Count, Process_ID, Status, Error_Logs) VALUES " +
-                "(?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Diagnostics (Container_Reference, Timestamp, Running, Ram_Usage, System_Ram_Usage," +
+                "CPU_Usage, System_CPU_Usage, Disk_Usage, System_Disk_Usage, Thread_Count, Status, Error_Logs) VALUES" +
+                "(?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -315,13 +402,25 @@ public class Database {
             for (int i = 0; i < containerReferences.length; i++) {
                 preparedStatement.setString(1, containerReferences[i]);
                 preparedStatement.setBoolean(2, runningList[i]);
-                preparedStatement.setDouble(3, ramFrees[i]);
-                preparedStatement.setDouble(4, cpuFrees[i]);
-                preparedStatement.setDouble(5, diskUsageFrees[i]);
-                preparedStatement.setInt(6, threadCounts[i]);
-                preparedStatement.setString(7, processIDs[i]);
-                preparedStatement.setString(8, statuses[i]);
-                preparedStatement.setString(9, errorLogsList[i]);
+                preparedStatement.setLong(3, ramUsages[i]);
+                preparedStatement.setLong(4, systemRamUsages[i]);
+                preparedStatement.setObject(5, cpuUsages[i], Types.DOUBLE); // Can handle null values.
+                preparedStatement.setDouble(6, systemCpuUsages[i]);
+                preparedStatement.setLong(7, diskUsages[i]);
+                preparedStatement.setLong(8, systemDiskUsages[i]);
+                preparedStatement.setInt(9, threadCounts[i]);
+                preparedStatement.setString(10, statuses[i]);
+
+                PGobject jsonObject;
+                if (isNull(errorLogsList[i])) {
+                    jsonObject = null;
+                } else {
+                    jsonObject = new PGobject();
+                    jsonObject.setType("json");
+                    jsonObject.setValue(errorLogsList[i].toString());
+                }
+
+                preparedStatement.setObject(11, jsonObject);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -421,15 +520,11 @@ public class Database {
                 String serverID = resultSet.getString("Server_ID");
                 String companyReference = resultSet.getString("Company_Reference");
                 String serverName = resultSet.getString("Server_Name");
-                double ramTotal = resultSet.getDouble("Ram_Total");
-                double cpuTotal = resultSet.getDouble("CPU_Total");
-                double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
+                Timestamp latestPing = resultSet.getTimestamp("Latest_Ping");
                 server.put("serverID", serverID);
                 server.put("companyReference", companyReference);
                 server.put("serverName", serverName);
-                server.put("ramTotal", ramTotal);
-                server.put("cpuTotal", cpuTotal);
-                server.put("diskUsageTotal", diskUsageTotal);
+                server.put("latestPing", latestPing);
                 servers.put(serverName, server);
             }
 
@@ -453,7 +548,7 @@ public class Database {
              // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {;
 
-            preparedStatement.setString(1, serverID);
+            preparedStatement.setObject(1, UUID.fromString(serverID));
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Company_Containers View and adds them to the JSON object.
@@ -462,15 +557,9 @@ public class Database {
                 String containerID = resultSet.getString("Container_ID");
                 String serverReference = resultSet.getString("Server_Reference");
                 String containerName = resultSet.getString("Container_Name");
-                double ramMax = resultSet.getDouble("Ram_Max");
-                double cpuMax = resultSet.getDouble("CPU_Max");
-                double diskUsageMax = resultSet.getDouble("Disk_Usage_Max");
                 container.put("containerID", containerID);
                 container.put("serverReference", serverReference);
                 container.put("containerName", containerName);
-                container.put("ramMax", ramMax);
-                container.put("cpuMax", cpuMax);
-                container.put("diskUsageMax", diskUsageMax);
                 containers.put(containerName, container);
             }
 
@@ -489,17 +578,19 @@ public class Database {
             timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
             // System.out.println("Converted time frame from string: " + timeFrameString + " -> " + timeFrameMinutes + " minutes.");
         }
-        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= "+" NOW() - make_interval(mins => ?)";
+        String sql = "SELECT * FROM Diagnostics WHERE Container_Reference = ? AND Diagnostics.TimeStamp >= " +
+                " NOW() - make_interval(mins => ?)";
         JSONObject diagnosticsData = new JSONObject();
 
-         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
             // Use Prepared Statement to help format the SQL string to prevent injections.
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, dockerID);
-            preparedStatement.setInt(2, timeFrameMinutes); 
+            preparedStatement.setInt(2, timeFrameMinutes);
             ResultSet resultSet = preparedStatement.executeQuery();
-            
+
             // Reads all the rows in the Diagnostics table and adds them as Diagnostics classes to their respective container.
             while (resultSet.next()) {
                 JSONObject diagnostics = new JSONObject();
@@ -507,21 +598,25 @@ public class Database {
                 String containerReference = resultSet.getString("Container_Reference");
                 Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                 boolean running = resultSet.getBoolean("Running");
-                double ramFree = resultSet.getDouble("Ram_Free");
-                double cpuFree = resultSet.getDouble("CPU_Free");
-                double diskUsageFree = resultSet.getDouble("Disk_Usage_Free");
+                long ramUsage = resultSet.getLong("Ram_Usage");
+                long systemRamUsage = resultSet.getLong("System_Ram_Usage");
+                double cpuUsage = resultSet.getDouble("CPU_Usage");
+                double systemCpuUsage = resultSet.getDouble("System_CPU_Usage");
+                long diskUsage = resultSet.getLong("Disk_Usage");
+                long systemDiskUsage = resultSet.getLong("System_Disk_Usage");
                 int threadCount = resultSet.getInt("Thread_Count");
-                String processID = resultSet.getString("Process_ID");
                 String status = resultSet.getString("Status");
                 String errorLogs = resultSet.getString("Error_Logs");
                 diagnostics.put("containerReference", containerReference);
                 diagnostics.put("timestamp", timestamp);
                 diagnostics.put("running", running);
-                diagnostics.put("ramFree", ramFree);
-                diagnostics.put("cpuFree", cpuFree);
-                diagnostics.put("diskUsageFree", diskUsageFree);
+                diagnostics.put("ramUsage", ramUsage);
+                diagnostics.put("systemRamUsage", systemRamUsage);
+                diagnostics.put("cpuUsage", cpuUsage);
+                diagnostics.put("systemCpuUsage", systemCpuUsage);
+                diagnostics.put("diskUsage", diskUsage);
+                diagnostics.put("systemDiskUsage", systemDiskUsage);
                 diagnostics.put("threadCount", threadCount);
-                diagnostics.put("processID", processID);
                 diagnostics.put("status", status);
                 diagnostics.put("errorLogs", errorLogs);
                 diagnosticsData.put(diagnosticsID, diagnostics);
@@ -539,13 +634,14 @@ public class Database {
      */
     public JSONObject getDiagnosticsErrors(String timeFrameString) {
         int timeFrameMinutes = Constants.DIAGNOSTICS_TIME_SCOPE;
-        if (timeFrameString != null){
+        if (timeFrameString != null) {
             // Use Helper Function to convert time frame string to minutes.
             timeFrameMinutes = HelperFunctions.getMinutesFromTimeFrame(timeFrameString);
         }
         JSONObject diagnosticsErrors = new JSONObject();
         // Read all data from View Diagnostics_Errors in the selected timeframe.
-        String sql = "SELECT * FROM Diagnostics_Errors WHERE diagnostics_errors.timestamp >= "+" NOW() - make_interval(mins => ?)";
+        String sql = "SELECT * FROM Diagnostics_Errors WHERE diagnostics_errors.timestamp >= " +
+                " NOW() - make_interval(mins => ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -687,14 +783,8 @@ public class Database {
             while (resultSet.next()) {
                 String containerName = resultSet.getString("Container_Name");
                 String serverReference = resultSet.getString("Server_Reference");
-                double ramMax = resultSet.getDouble("Ram_Max");
-                double cpuMax = resultSet.getDouble("CPU_Max");
-                double diskUsageMax = resultSet.getDouble("Disk_Usage_Max");
                 container.put("containerName", containerName);
                 container.put("serverReference", serverReference);
-                container.put("ramMax", ramMax);
-                container.put("cpuMax", cpuMax);
-                container.put("diskUsageMax", diskUsageMax);
             }
 
         } catch (SQLException error) {
@@ -704,6 +794,12 @@ public class Database {
         return container;
     }
 
+    /**
+     * Gets all the server data related to a specific server ID.
+     *
+     * @param serverID The serverID of the server.
+     * @return JSON Object with all the server data.
+     */
     public JSONObject getServerData(String serverID) {
         JSONObject server = new JSONObject();
         String sql = "SELECT * FROM Server WHERE Server_ID = ?";
@@ -713,18 +809,14 @@ public class Database {
              // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, serverID);
+            preparedStatement.setObject(1, UUID.fromString(serverID));
             ResultSet resultSet = preparedStatement.executeQuery();
             // Reads the data from the container and saves it into the JSON object.
             while (resultSet.next()) {
                 String serverName = resultSet.getString("Server_Name");
-                double ramTotal = resultSet.getDouble("Ram_Total");
-                double cpuTotal = resultSet.getDouble("CPU_Total");
-                double diskUsageTotal = resultSet.getDouble("Disk_Usage_Total");
+                Timestamp latestPing = resultSet.getTimestamp("Latest_Ping");
                 server.put("serverName", serverName);
-                server.put("ramTotal", ramTotal);
-                server.put("cpuTotal", cpuTotal);
-                server.put("diskUsageTotal", diskUsageTotal);
+                server.put("latestPing", latestPing);
             }
 
         } catch (SQLException error) {
@@ -734,57 +826,22 @@ public class Database {
         return server;
     }
 
-    // ===============================================================================================
-    // =============================== MAKESHIFT ADDITIONS - NOT FINAL ===============================
-    // ===============================================================================================
-
-    public ArrayList<String> getRegionsTemp() {
-        ArrayList<String> regions = new ArrayList<>();
-        String sql = "SELECT * FROM region";
+    public void pingServer(String serverID) {
+        String sql = "UPDATE Server SET Latest_Ping = NOW() WHERE Server_ID = ?";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user input.
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql)) {
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            // Reads all the rows in the Region table and adds them as Region classes to the ArrayList.
-            while (resultSet.next()) {
-                regions.add(resultSet.getString("Name"));
-            }
+            preparedStatement.setObject(1, UUID.fromString(serverID));
+            int rowsAffected = preparedStatement.executeUpdate();
 
-        } catch (SQLException error) {
-            errorHandling(error);
-        }
-
-        return regions;
-    }
-
-    public ArrayList<String> getCompanyContents(String regionName, String companyName) {
-        companyName = companyName.replaceAll("-", " ");
-        // Select from View
-        String sql = " ";// TO BE FILLED
-
-        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
-        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
-                // Use a normal Statement. No SQL injection protection is necessary when no user input.
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql)) {
-
-            ArrayList<String> servers = new ArrayList<>();
-            // Reads all the rows in the Server table and adds them as Server classes to the ArrayList.
-            while (resultSet.next()) {
-                String serverID = resultSet.getString("Server_ID");
-                servers.add(serverID);
-            }
-            return servers;
+            if (rowsAffected == 0) System.out.println("Ping Error: Could not find Server ID: " + serverID);
+            else System.out.println("Ping updated successfully.");
 
         } catch (SQLException error) {
             errorHandling(error);
-            return null;
         }
     }
 }
-
-
-

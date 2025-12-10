@@ -76,7 +76,7 @@ export default function DiagnosticsView() {
     }, [activeTab, fetchDiagnosticsFor]);
 
     useEffect(() => {
-        if (!containerData ||!containerData.containerData) return;
+        if (!containerData || !containerData.containerData || !Object.keys(containerData.diagnosticsData).length) return;
 
         async function fetchServerData() {
             try {

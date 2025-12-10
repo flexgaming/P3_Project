@@ -1,14 +1,8 @@
 package P3.Backend;
 
-import P3.Backend.Database.*;
-
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Map;
-
-import javax.xml.crypto.Data;
 
 import org.json.JSONObject;
 
@@ -102,9 +96,9 @@ Database database = new Database();
         }
         // Get critical errors data from DB
         Map<String, Object> diagnosticsErrors = database.getDiagnosticsErrors(timeFrame).toMap();
-        // Create an object to asses the severity of the error messages
+        // Create an object to assess the severity of the error messages
         SeverityCalculator severityCalculator = new SeverityCalculator();
-
+        
         //Return the updated map of error messages with severities assigned
         return severityCalculator.assessSeverity(diagnosticsErrors);
     }
