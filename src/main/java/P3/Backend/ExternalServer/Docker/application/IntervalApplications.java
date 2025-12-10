@@ -8,14 +8,11 @@ import P3.Backend.ExternalServer.Docker.manager.WebClientPost;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -34,11 +31,15 @@ public class IntervalApplications {
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
     // The path for where the company info JSON file is stored.
-    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
+    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + SERVER_INFO);
 
     private static ContainerClass[] containerArr;
     private static ContainerClass[] containerArrTemp;
     private static IntervalClass[] intervalArr;
+
+    private static String regionName;
+    private static String companyName;
+    private static String serverName;
 
     /** This function is used for initiating the interval application.
      * 
@@ -92,6 +93,11 @@ public class IntervalApplications {
             // Create the length for the array based on the active container count.
             containerArr = new ContainerClass[activeContainerCount];
             containerArrTemp = new ContainerClass[activeContainerCount];
+
+            // Get company info data.
+            regionName = companyInfoObj.getString("region");
+            companyName = companyInfoObj.getString("company");
+            serverName = companyInfoObj.getString("server");
     
             int index = 0;
             for (String key : JSONFileObj.keySet()) { // Go through each of the keys in the JSON file.
@@ -106,20 +112,14 @@ public class IntervalApplications {
                 String id = tempContainer.getString("id");
                 Integer interval = tempContainer.getInt("interval");
                 Integer publicPort = tempContainer.getInt("publicPort");
-
-                // Get company info data.
-                String companyRegion = companyInfoObj.getString("CompanyRegion");
-                String companyName = companyInfoObj.getString("CompanyName");
-                String companyServer = companyInfoObj.getString("CompanyServer");
                 
                 // Make a new ContainerClass and add it to the containerArr.
                 ContainerClass newContainer = new ContainerClass(name, id, interval, publicPort, 
-                                                                    companyRegion, companyName, companyServer);
+                                                                    regionName, companyName, serverName);
                 containerArr[index] = newContainer;
     
                 index++; // Make sure to move the index.
             }
-
             
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
@@ -215,8 +215,7 @@ public class IntervalApplications {
                             WebClientPost.sendData(webClient, containerArr[i], BACKEND_SERVER_URL + "/upload-json");
                             containerArrTemp[i] = (ContainerClass) containerArr[i].clone();
 
-                            System.out.println("JSON data has been send from: " + containerArr[i].getContainerName());
-                            System.out.println(containerArr[i].getJVMRamUsage());
+                            System.out.println("JSON data has been sent from: " + containerArr[i].getContainerName());
                         } catch (Exception e) {
                             // Print the error if the POST request fails.
                             System.err.println("Failed to POST container data: " + e.getMessage());
@@ -232,7 +231,11 @@ public class IntervalApplications {
                 // After the default time for heartbeat has passed, it sends a post to the backend server.
                 if (heartbeatTimer == 0) {
                     heartbeatTimer = DEFAULT_HEARTBEAT_TIME;
-                    WebClientPost.sendHeartbeat(webClient, BACKEND_SERVER_URL + "/heartbeat");
+                    Map<String, String> requestBody = new HashMap<>();
+                    requestBody.put("region", regionName);
+                    requestBody.put("company", companyName);
+                    requestBody.put("server", serverName);
+                    WebClientPost.sendData(webClient, requestBody, BACKEND_SERVER_URL + "/heartbeat");
                 }
 
                 // Wait 1 second.
@@ -311,8 +314,8 @@ public class IntervalApplications {
             container.setContainerRunning(response.getState().getRunning()); // Is the container running or not.
             container.setContainerStatus(response.getState().getStatus()); // Current status of the container (running or exited).
             container.setContainerPid(response.getState().getPidLong()); // PID of the container process.
-            container.setContainerCpuCount(stats.getCpuCount());
-            container.setContainerRamLimit(stats.getMemoryLimit());
+            container.setContainerCpuCount(stats.getCpuCount()); // Amount of CPU available to the container.
+            container.setContainerRamLimit(stats.getMemoryLimit()); // How much RAM the container has access to.
 
             // Add logs to container class.
             LogFetcher logFetcher = new LogFetcher();
@@ -327,8 +330,6 @@ public class IntervalApplications {
                 container.setContainerExitCode(null); // No exit code if the container is running.
             
         } catch (Exception e) {
-            // If anything goes wrong, it is printed.
-            // e.printStackTrace();
             container.setContainerRunning(false); // Is the container running or not.
             container.setContainerStatus("exited"); // Current status of the container (running or exited).
         }

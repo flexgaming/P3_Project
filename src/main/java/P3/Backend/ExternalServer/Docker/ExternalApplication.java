@@ -1,7 +1,7 @@
 package P3.Backend.ExternalServer.Docker;
 
 import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
-import static P3.Backend.ExternalServer.Docker.Persistent.COMPANY_INFO;
+import static P3.Backend.ExternalServer.Docker.Persistent.SERVER_INFO;
 import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import P3.Backend.ExternalServer.Docker.application.IntervalApplications;
 import P3.Backend.ExternalServer.Docker.application.SetupApplications;
@@ -26,7 +26,7 @@ public class ExternalApplication {
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
     // The path for where the company info JSON file is stored.
-    private static final Path companyInfoPath = Path.of(CURRENT_CONTAINER_PATH + COMPANY_INFO);
+    private static final Path serverInfoPath = Path.of(CURRENT_CONTAINER_PATH + SERVER_INFO);
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(ExternalApplication.class, args);
@@ -42,7 +42,7 @@ public class ExternalApplication {
         checkFileCreated();
         try {
             // Get all of the company information from the JSON file with all company info.
-            String info = Files.readString(companyInfoPath);
+            String info = Files.readString(serverInfoPath);
 
             // Convert all of the company info back into a JSON format.
             JSONObject companyInfoObj = new JSONObject(info);
@@ -53,7 +53,7 @@ public class ExternalApplication {
 
                     // If any of the company info fields are empty, then give a warning and exit the application.
                     System.out.println("==============================================================");
-                    System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + COMPANY_INFO + "\n");
+                    System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + SERVER_INFO + "\n");
                     System.out.println("It is " + "\u001B[1;4;31m" +  "VERY important" + "\u001B[0;37m" + " that the fields are correctly filled out!" + "\n\n\n");
                     System.out.println("==============================================================");
                     System.exit(0);
@@ -124,7 +124,7 @@ public class ExternalApplication {
                 e.printStackTrace();
             }
         }
-        if (!Files.exists(companyInfoPath)) {
+        if (!Files.exists(serverInfoPath)) {
             // If the file does not exist, then it has to be created.
             try {
                 // In order for it to be considered a JSON file, it has to contain a template.
@@ -132,11 +132,11 @@ public class ExternalApplication {
 
                 // Create a template for the company info JSON file.
                 JSONObject template = new JSONObject();
-                template.put("CompanyName", "");
-                template.put("CompanyRegion", "");
-                template.put("CompanyServer", "");
+                template.put("region", "");
+                template.put("company", "");
+                template.put("server", "");
 
-                Files.writeString(companyInfoPath, template.toString(4));
+                Files.writeString(serverInfoPath, template.toString(4));
 
             } catch (Exception e) {
                 // If anything goes wrong, it is printed.

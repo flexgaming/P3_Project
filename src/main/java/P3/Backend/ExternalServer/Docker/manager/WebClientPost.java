@@ -17,16 +17,9 @@ public class WebClientPost {
         webClient.post()
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody);
-    }
-
-    /** Sends a ping to the given URI (asynchronous), without expecting a return from the receiver.
-     *
-     * @param webClient Is used to send the POST request.
-     * @param uri Is used as the destination of the POST request.
-     */
-    public static void sendHeartbeat(WebClient webClient, String uri) {
-        webClient.post()
-                .uri(uri);
+                .bodyValue(requestBody)
+                .retrieve()
+                .toBodilessEntity()
+                .subscribe();
     }
 }

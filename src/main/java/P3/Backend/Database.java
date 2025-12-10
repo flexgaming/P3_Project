@@ -45,6 +45,112 @@ public class Database {
     }
 
     /**
+     * Checks if a region already exists in the Database.
+     *
+     * @param regionName The name of the region being checked for.
+     * @return True if the region exists. False otherwise.
+     */
+    private boolean regionExists(String regionName) {
+        String sql = "SELECT (Region_ID) FROM Region WHERE Region_Name = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, regionName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a company already exists in the Database.
+     *
+     * @param companyName The name of the company being checked for.
+     * @param regionReference The ID of the region the company resides in.
+     * @return True if the company exists. False otherwise.
+     */
+    private boolean companyExists(String companyName, String regionReference) {
+        String sql = "SELECT (Company_ID) FROM Company WHERE Company_Name = ? AND Region_Reference = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, companyName);
+            preparedStatement.setObject(2, UUID.fromString(regionReference));
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a server already exists in the Database.
+     *
+     * @param serverName The name of the server being checked for.
+     * @param companyReference The ID of the company the server resides in.
+     * @return True if the server exists. False otherwise.
+     */
+    private boolean serverExists(String serverName, String companyReference) {
+        String sql = "SELECT (Server_ID) FROM Server WHERE Server_Name = ? AND Company_Reference = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, serverName);
+            preparedStatement.setObject(2, UUID.fromString(companyReference));
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a container already exists in the Database.
+     *
+     * @param containerName The name of the container being checked for.
+     * @param serverReference The ID of the server the container resides in.
+     * @return True if the container exists. False otherwise.
+     */
+    private boolean containerExists(String containerName, String serverReference) {
+        String sql = "SELECT (Container_ID) FROM Container WHERE Container_Name = ? AND Server_Reference = ?";
+
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, containerName);
+            preparedStatement.setObject(2, UUID.fromString(serverReference));
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next();
+
+        } catch (SQLException sqlException) {
+            errorHandling(sqlException);
+
+            return false;
+        }
+    }
+
+    /**
      * Adds a region to the database.
      * 
      * @param regionName The name of the region being added.
@@ -69,6 +175,9 @@ public class Database {
 
             // Queue all regions to be added.
             for (String regionName : regionNames) {
+                // If a region already exists with this region name, skip.
+                if (regionExists(regionName)) continue;
+
                 preparedStatement.setString(1, regionName);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
@@ -114,6 +223,9 @@ public class Database {
 
             // Queue all companies to be added.
             for (int i = 0; i < regionReferences.length; i++) {
+                // If a company already exists with this company name in this region, skip.
+                if (companyExists(companyNames[i], regionReferences[i])) continue;
+
                 preparedStatement.setObject(1, UUID.fromString(regionReferences[i]));
                 preparedStatement.setString(2, companyNames[i]);
                 // Add the prepared statement to the batch.
@@ -131,29 +243,27 @@ public class Database {
 
     /**
      * Adds a server to the database.
-     * @param serverID The ID of the server being added.
      * @param companyReference The ID of the company owning the server.
      * @param serverName The name of the server being added.
      */
-    public void addServers(String serverID, String companyReference, String serverName) {
+    public void addServers(String companyReference, String serverName) {
         // Reformats the input parameters to fit the signature of the below addServers method.
-        addServers(new String[]{serverID}, new String[]{companyReference}, new String[]{serverName});
+        addServers(new String[]{companyReference}, new String[]{serverName});
     }
 
     /**
      * Adds servers to the database.
-     * @param serverIDs The IDs of the servers being added.
      * @param companyReferences The IDs of the companies owning the servers.
      * @param serverNames The names of the servers being added.
      */
-    public void addServers(String[] serverIDs, String[] companyReferences, String[] serverNames) {
+    public void addServers(String[] companyReferences, String[] serverNames) {
         // Check that the input parameter arrays are of same length.
-        if (notSameLength(serverIDs, companyReferences)) {
+        if (notSameLength(companyReferences, serverNames)) {
             errorHandling(new Error(Constants.ARRAY_LENGTH_ERROR));
             return;
         }
 
-        String sql = "INSERT INTO Server (Server_ID, Company_Reference, Server_Name) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Server (Company_Reference, Server_Name) VALUES (?, ?)";
 
         // Encapsulate the Database connection in a try-catch to catch any SQL errors.
         try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
@@ -161,10 +271,12 @@ public class Database {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // Queue all companies to be added.
-            for (int i = 0; i < serverIDs.length; i++) {
-                preparedStatement.setString(1, serverIDs[i]);
-                preparedStatement.setObject(2, UUID.fromString(companyReferences[i]));
-                preparedStatement.setString(3, serverNames[i]);
+            for (int i = 0; i < companyReferences.length; i++) {
+                // If a server already exists with this server name in this company, skip.
+                if (serverExists(serverNames[i], companyReferences[i])) continue;
+
+                preparedStatement.setObject(1, UUID.fromString(companyReferences[i]));
+                preparedStatement.setString(2, serverNames[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
             }
@@ -213,8 +325,11 @@ public class Database {
 
             // Queue all containers to be added.
             for (int i = 0; i < serverReferences.length; i++) {
+                // If a container already exists with this container name in this server, skip.
+                if (containerExists(containerNames[i], serverReferences[i])) continue;
+
                 preparedStatement.setString(1, containerIDs[i]);
-                preparedStatement.setString(2, serverReferences[i]);
+                preparedStatement.setObject(2, UUID.fromString(serverReferences[i]));
                 preparedStatement.setString(3, containerNames[i]);
                 // Add the prepared statement to the batch.
                 preparedStatement.addBatch();
@@ -241,13 +356,13 @@ public class Database {
      * @param status The status of the container.
      * @param errorLogs The Error Logs of the container.
      */
-    public void addDiagnosticsBatch(String containerReference, boolean running, long ramUsage, long systemRamUsage,
-                                    double cpuUsage, double systemCpuUsage, long diskUsage, long systemDiskUsage,
+    public void addDiagnosticsBatch(String containerReference, boolean running, Long ramUsage, Long systemRamUsage,
+                                    Double cpuUsage, Double systemCpuUsage, Long diskUsage, Long systemDiskUsage,
                                     int threadCount, String status, JSONObject errorLogs) {
         // Reformats the input parameters to fit the signature of the below addDiagnosticsBatch method.
-        addDiagnosticsBatch(new String[]{containerReference}, new boolean[]{running}, new long[]{ramUsage},
-                new long[]{systemRamUsage}, new double[]{cpuUsage}, new double[]{systemCpuUsage},
-                new long[]{diskUsage}, new long[]{systemDiskUsage}, new int[]{threadCount}, new String[]{status},
+        addDiagnosticsBatch(new String[]{containerReference}, new boolean[]{running}, new Long[]{ramUsage},
+                new Long[]{systemRamUsage}, new Double[]{cpuUsage}, new Double[]{systemCpuUsage},
+                new Long[]{diskUsage}, new Long[]{systemDiskUsage}, new int[]{threadCount}, new String[]{status},
                 new JSONObject[]{errorLogs});
     }
 
@@ -263,9 +378,9 @@ public class Database {
      * @param statuses       The statuses of the containers.
      * @param errorLogsList  The Error Logs of the containers.
      */
-    public void addDiagnosticsBatch(String[] containerReferences, boolean[] runningList, long[] ramUsages,
-                                    long[] systemRamUsages, double[] cpuUsages, double[] systemCpuUsages,
-                                    long[] diskUsages, long[] systemDiskUsages, int[] threadCounts, String[] statuses,
+    public void addDiagnosticsBatch(String[] containerReferences, boolean[] runningList, Long[] ramUsages,
+                                    Long[] systemRamUsages, Double[] cpuUsages, Double[] systemCpuUsages,
+                                    Long[] diskUsages, Long[] systemDiskUsages, int[] threadCounts, String[] statuses,
                                     JSONObject[] errorLogsList) {
         // Check that the input parameter arrays are of same length.
         if (notSameLength(containerReferences, runningList, ramUsages, systemRamUsages, cpuUsages, systemCpuUsages,
@@ -289,7 +404,7 @@ public class Database {
                 preparedStatement.setBoolean(2, runningList[i]);
                 preparedStatement.setLong(3, ramUsages[i]);
                 preparedStatement.setLong(4, systemRamUsages[i]);
-                preparedStatement.setDouble(5, cpuUsages[i]);
+                preparedStatement.setObject(5, cpuUsages[i], Types.DOUBLE); // Can handle null values.
                 preparedStatement.setDouble(6, systemCpuUsages[i]);
                 preparedStatement.setLong(7, diskUsages[i]);
                 preparedStatement.setLong(8, systemDiskUsages[i]);
@@ -405,9 +520,11 @@ public class Database {
                 String serverID = resultSet.getString("Server_ID");
                 String companyReference = resultSet.getString("Company_Reference");
                 String serverName = resultSet.getString("Server_Name");
+                Timestamp latestPing = resultSet.getTimestamp("Latest_Ping");
                 server.put("serverID", serverID);
                 server.put("companyReference", companyReference);
                 server.put("serverName", serverName);
+                server.put("latestPing", latestPing);
                 servers.put(serverName, server);
             }
 
@@ -431,7 +548,7 @@ public class Database {
              // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {;
 
-            preparedStatement.setString(1, serverID);
+            preparedStatement.setObject(1, UUID.fromString(serverID));
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Reads all the rows in the Company_Containers View and adds them to the JSON object.
@@ -677,6 +794,12 @@ public class Database {
         return container;
     }
 
+    /**
+     * Gets all the server data related to a specific server ID.
+     *
+     * @param serverID The serverID of the server.
+     * @return JSON Object with all the server data.
+     */
     public JSONObject getServerData(String serverID) {
         JSONObject server = new JSONObject();
         String sql = "SELECT * FROM Server WHERE Server_ID = ?";
@@ -686,12 +809,14 @@ public class Database {
              // Use Prepared Statement to help format the SQL string to prevent injections.
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setString(1, serverID);
+            preparedStatement.setObject(1, UUID.fromString(serverID));
             ResultSet resultSet = preparedStatement.executeQuery();
             // Reads the data from the container and saves it into the JSON object.
             while (resultSet.next()) {
                 String serverName = resultSet.getString("Server_Name");
+                Timestamp latestPing = resultSet.getTimestamp("Latest_Ping");
                 server.put("serverName", serverName);
+                server.put("latestPing", latestPing);
             }
 
         } catch (SQLException error) {
@@ -699,5 +824,24 @@ public class Database {
         }
 
         return server;
+    }
+
+    public void pingServer(String serverID) {
+        String sql = "UPDATE Server SET Latest_Ping = NOW() WHERE Server_ID = ?";
+
+        // Encapsulate the Database connection in a try-catch to catch any SQL errors.
+        try (Connection connection = DriverManager.getConnection(this.url, this.user, this.password);
+             // Use Prepared Statement to help format the SQL string to prevent injections.
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setObject(1, UUID.fromString(serverID));
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected == 0) System.out.println("Ping Error: Could not find Server ID: " + serverID);
+            else System.out.println("Ping updated successfully.");
+
+        } catch (SQLException error) {
+            errorHandling(error);
+        }
     }
 }

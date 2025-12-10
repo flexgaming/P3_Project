@@ -136,7 +136,7 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
                 labels,
                 datasets: [
                     {
-                        label: "CPU usage of the container resources",
+                        label: "CPU usage of the container resources (%)",
                         data: cpuContainer,
                         backgroundColor: lineColorContainer,
                         borderColor: typeof lineColorServer === "string"
@@ -146,7 +146,7 @@ export default function CpuView({ containerData, serverData, timeAgo, isActive, 
                         tension: 0.1,
                     },
                     {
-                        label: "Total CPU usage of the server resources",
+                        label: "Total CPU usage of the server resources (%)",
                         data: cpuServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"

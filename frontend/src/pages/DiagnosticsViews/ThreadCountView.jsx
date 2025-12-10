@@ -73,7 +73,7 @@ export default function ThreadCountView({ containerData, serverData, timeAgo, is
                 labels,
                 datasets: [
                     {
-                        label: "Thread count",
+                        label: "Amount of threads running in the Java Virtual Machine",
                         data: threadCount,
                         backgroundColor: lineColor,
                         borderColor: typeof lineColorServer === "string"

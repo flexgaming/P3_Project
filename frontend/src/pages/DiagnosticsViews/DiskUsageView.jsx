@@ -112,8 +112,8 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
         // Data is present — clear the no-data state so chart can render
         setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
-        const diskUsageContainer = diagnosticsData.map(item => item.diskUsage / 1000000);
-        const diskUsageServer = diagnosticsData.map(item => item.systemDiskUsage / 1000000);
+        const diskUsageContainer = diagnosticsData.map(item => (item.diskUsage / 1000000).toFixed(1));
+        const diskUsageServer = diagnosticsData.map(item => (item.systemDiskUsage / 1000000).toFixed(1));
 
     const lineColorContainer = diagnosticsData.map(() => "blue");
     const lineColorServer = diagnosticsData.map(() => "red");
@@ -124,7 +124,7 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
                 labels,
                 datasets: [
                     {
-                        label: "Disk usage of the container resources",
+                        label: "Disk usage of the container resources (MB)",
                         data: diskUsageContainer,
                         backgroundColor: lineColorContainer,
                         borderColor: typeof lineColorServer === "string"
@@ -134,7 +134,7 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
                         tension: 0.1
                     },
                     {
-                        label: "Total Disk usage of the server resources",
+                        label: "Total Disk usage of the server resources (MB)",
                         data: diskUsageServer,
                         backgroundColor: lineColorServer,
                         borderColor: typeof lineColorServer === "string"

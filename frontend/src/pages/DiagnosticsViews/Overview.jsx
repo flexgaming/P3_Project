@@ -42,14 +42,20 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
         } else {
             const latest = safeDiagnostics[safeDiagnostics.length - 1] || {};
             const latestPing = latest.timestamp ? String(timeAgo(latest.timestamp)) : "Unknown";
+            console.log(latest);
             rows.push(["Container ID:", latest.containerReference]);
             rows.push(["Latest Ping:", latestPing]);
             rows.push(["Status:", latest.status || "Unknown"]);
-            rows.push(["Running:", typeof latest.running !== 'undefined' ? String(latest.running) : "Unknown"]);
-            rows.push(["CPU Usage:", containerData.containerData && latest.cpuUsage != null ? String(containerData.containerData.cpuUsage) + "B" : "N/A"]);
-            rows.push(["RAM Usage:", containerData.containerData && latest.ramUsage != null ? String(containerData.containerData.ramUsage) + "B" : "N/A"]);
-            rows.push(["Disk Usage:", containerData.containerData && latest.diskUsage != null ? String(containerData.containerData.diskUsage) + "B" : "N/A"]);
-            rows.push(["Thread Count:", typeof latest.threadCount !== 'undefined' ? String(latest.threadCount) : "Unknown"]);
+            rows.push(["Running:", typeof latest.running !== 'undefined'
+                ? String(latest.running) : "Unknown"]);
+            rows.push(["CPU Usage:", containerData.containerData && latest.cpuUsage != null
+                ? String(latest.cpuUsage.toFixed(3)) + "%" : "N/A"]);
+            rows.push(["RAM Usage:", containerData.containerData && latest.ramUsage != null
+                ? String((latest.ramUsage / 1000000).toFixed(1)) + "MB" : "N/A"]);
+            rows.push(["Disk Usage:", containerData.containerData && latest.diskUsage != null
+                ? String((latest.diskUsage / 1000000).toFixed(1)) + "MB" : "N/A"]);
+            rows.push(["Thread Count:", typeof latest.threadCount !== 'undefined'
+                ? String(latest.threadCount) : "Unknown"]);
         }
 
     // update local UI state only via dataTable

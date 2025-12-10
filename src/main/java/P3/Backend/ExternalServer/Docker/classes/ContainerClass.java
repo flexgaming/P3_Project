@@ -10,9 +10,9 @@ public class ContainerClass implements Cloneable {
     private String containerId;             // Is the id of the docker container.
     private Integer publicPort;             // Is the port number of the docker container.    
     private Integer containerInterval;      // Is the interval for sending data to another server. 
-    private String companyRegion;          // Is the region of the company using the application.
-    private String companyName;            // Is the name of the company using the application.
-    private String companyServer;          // Is the server of the company using the application.
+    private String region;          // Is the region of the company using the application.
+    private String company;            // Is the name of the company using the application.
+    private String server;          // Is the server of the company using the application.
 
     private LogsClass logs;
 
@@ -71,13 +71,13 @@ public class ContainerClass implements Cloneable {
     //      CLASS CONSTRUCTOR     //
     ////////////////////////////////
 
-    public ContainerClass(String name, String id, Integer interval, Integer publicPort,
-                                    String companyRegion, String companyName, String companyServer) {
+    public ContainerClass(String name, String id, Integer interval, Integer publicPort, String region, String company,
+                          String server) {
         this.containerName = name;
         this.containerId = id;
-        this.companyRegion = companyRegion;
-        this.companyName = companyName;
-        this.companyServer = companyServer;
+        this.region = region;
+        this.company = company;
+        this.server = server;
         this.containerInterval = interval;
         this.publicPort = publicPort;
     }
@@ -106,20 +106,20 @@ public class ContainerClass implements Cloneable {
     
     public void setContainerInterval(Integer interval) { this.containerInterval = interval; }
 
-    // CompanyRegion
-    public String getCompanyRegion() { return companyRegion; }
+    // Region
+    public String getRegion() { return region; }
 
-    public void setCompanyRegion(String companyRegion) { this.companyRegion = companyRegion; }
+    public void setRegion(String region) { this.region = region; }
     
-    // CompanyName
-    public String getCompanyName() { return companyName; }
+    // Company
+    public String getCompany() { return company; }
 
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public void setCompany(String company) { this.company = company; }
 
-    // CompanyServer
-    public String getCompanyServer() { return companyServer; }
+    // Server
+    public String getServer() { return server; }
     
-    public void setCompanyServer(String companyServer) { this.companyServer = companyServer; }
+    public void setServer(String server) { this.server = server; }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
