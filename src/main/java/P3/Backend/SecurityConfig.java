@@ -6,9 +6,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-// |||||||||||||||||||||||||||||||||||||||||||||||||||
-// |||  Security Configuration  (wtf is going on)  |||
-// |||||||||||||||||||||||||||||||||||||||||||||||||||
 
 @Configuration
 @EnableWebSecurity
@@ -17,10 +14,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())  // Disable CSRF for REST API
+            .csrf(csrf -> csrf.disable())  
             .authorizeHttpRequests(auth -> auth
-            //     .requestMatchers("/dockers/**").permitAll()  // Allow all Docker endpoints
-            //     .requestMatchers("/dashboard/**").permitAll() // Allow all Dashboard endpoints
                 .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             );

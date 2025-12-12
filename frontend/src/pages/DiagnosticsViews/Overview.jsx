@@ -6,7 +6,7 @@ import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 export default function Overview({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [dataTable, setDataTable] = useState(null);
-    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.overviewTimeFrame); // Change this for the timeframe of the overview table
+    const [localTimeFrame, setLocalTimeFrame] = useState(defaultTimeFrames.overviewTimeFrame); 
     useEffect(() => {
         if (!isActive) return;
         if (typeof fetchDiagnostics === "function") fetchDiagnostics(localTimeFrame);
@@ -21,7 +21,6 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
             ? (!Array.isArray(containerData.diagnosticsData) ? Object.values(containerData.diagnosticsData) : containerData.diagnosticsData)
             : [];
 
-        // Ensure we have an array we can safely operate on
         const safeDiagnostics = Array.isArray(diagnosticsData) ? diagnosticsData : [];
         safeDiagnostics.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
@@ -31,7 +30,6 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
         rows.push(["Server Name:", serverData.serverName]);
         rows.push(["Container Name:", containerData.containerData.containerName]);
 
-        // If there are no diagnostics in the selected timeframe show friendly placeholders
         if (safeDiagnostics.length === 0) {
             rows.push(["Container ID:", "No data in selected timeframe"]);
             rows.push(["Latest Update:", "No data in selected timeframe"]);
@@ -63,7 +61,6 @@ export default function Overview({ containerData, serverData, timeAgo, isActive,
                 ? String(latest.threadCount) : "Unknown"]);
         }
 
-    // update local UI state only via dataTable
         setDataTable(
             <>
                 <div id="overview-table" className="shadow rounded-4">

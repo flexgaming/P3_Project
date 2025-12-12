@@ -24,36 +24,27 @@ import com.github.dockerjava.api.DockerClient;
 @ComponentScan(basePackages = {"P3.Backend.ExternalServer"})
 public class ExternalApplication {
 
-    // The path for where the JSON file is stored.
     private static final Path containerListPath = Path.of(CURRENT_CONTAINER_PATH + CONTAINER_NAME);
 
-    // The path for where the company info JSON file is stored.
     private static final Path serverInfoPath = Path.of(CURRENT_CONTAINER_PATH + SERVER_INFO);
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(ExternalApplication.class, args);
         DockerClient dockerClient = DockerClientBuilder.dockerConnection();
 
-        // Get WebClient from Spring context
         WebClient webClient = context.getBean(WebClient.class);
 
-        // Get user input for selecting application mode.
         Scanner scanner = new Scanner(System.in);
 
-        // Check if the JSON file that contains all of the containers exists, if not create one.
         checkFileCreated();
         try {
-            // Get all of the company information from the JSON file with all company info.
             String info = Files.readString(serverInfoPath);
 
-            // Convert all of the company info back into a JSON format.
             JSONObject companyInfoObj = new JSONObject(info);
 
-            // Go through each of the company info fields and check if any of them are empty.
             for (String key : companyInfoObj.keySet()) {
                 if (companyInfoObj.getString(key).isEmpty()) {
 
-                    // If any of the company info fields are empty, then give a warning and exit the application.
                     System.out.println("==============================================================");
                     System.out.println("\n\n\n" + "Remember to fill in the company info in the JSON file: " + SERVER_INFO + "\n");
                     System.out.println("It is " + "\u001B[1;4;31m" +  "VERY important" + "\u001B[0;37m" + " that the fields are correctly filled out!" + "\n\n\n");
@@ -61,10 +52,8 @@ public class ExternalApplication {
                     System.exit(0);
                 }
             }
-            // Get all of the content within the file.
             String content = Files.readString(containerListPath);
 
-            // Convert all of the content back into a JSON format.
             JSONObject JSONFileObj = new JSONObject(content);
 
             if (JSONFileObj.length() == 0) {
@@ -72,67 +61,51 @@ public class ExternalApplication {
                 SetupApplications.initiation(dockerClient, scanner);
             }
         } catch (Exception e) {
-            // If anything goes wrong, it is printed.
             e.printStackTrace();
         }
 
-        // Decide what part of the application user want to use:
         outer: while (true) {
-            printApplicationChoices(); // Print the choices
+            printApplicationChoices(); 
             String choice;
             while (true) {
                 choice = scanner.nextLine();
                 if (choice.equals("1")) {
                     System.out.println("You selected option " + choice);
 
-                    // If user selects Setup Applications, then proceed.
                     SetupApplications.initiation(dockerClient, scanner);
 
-                    printApplicationChoices(); // Print the choices
+                    printApplicationChoices(); 
                 } else if (choice.equals("2")) {
                     System.out.println("You selected option " + choice);
 
-                    // If user selects Interval Applications, then proceed.
                     IntervalApplications.initiation(dockerClient, webClient, scanner);
 
-                    printApplicationChoices(); // Print the choices
+                    printApplicationChoices(); 
                 } else if (choice.equals("3")) {
                     System.out.println("You selected option " + choice);
 
-                    // If user selects exit, then proceed.
                     break outer;
                 } else {
                     System.out.print("Invalid choice. Please enter 1, 2 or 3: ");
                 }
             }
         }
-        // Close the scanner after use.
         scanner.close();
         System.exit(0);
     }
 
-    /**
-     * This function is used to check if the JSON file that contains all of the containers exists,
-     * if it does not exist then create one.
-     */
     public static void checkFileCreated() {
         if (!Files.exists(containerListPath)) {
-            // If the file does not exist, then it has to be created.
             try {
-                // In order for it to be considered a JSON file, it has to contain {}.
                 Files.writeString(containerListPath, "{}");
             } catch (Exception e) {
-                // If anything goes wrong, it is printed.
                 e.printStackTrace();
             }
         }
         if (!Files.exists(serverInfoPath)) {
-            // If the file does not exist, then it has to be created.
             try {
-                // In order for it to be considered a JSON file, it has to contain a template.
                 System.out.println("Creating company info JSON file.");
 
-                // Create a template for the company info JSON file.
                 JSONObject template = new JSONObject();
                 template.put("region", "");
                 template.put("company", "");
@@ -141,15 +114,11 @@ public class ExternalApplication {
                 Files.writeString(serverInfoPath, template.toString(4));
 
             } catch (Exception e) {
-                // If anything goes wrong, it is printed.
                 e.printStackTrace();
             }
         }
     }
 
-    /**
-     * This function is used to print out the options for the user to navigate the program.
-     */
     private static void printApplicationChoices() {
         System.out.println("\nSelect application mode:");
         System.out.println("1. Setup Applications");

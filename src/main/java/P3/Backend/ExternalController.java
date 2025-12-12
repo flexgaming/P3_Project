@@ -1,6 +1,5 @@
 package P3.Backend;
 
-//import P3.Backend.DTO.ContainerClass;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,13 +15,9 @@ public class ExternalController {
     public void uploadJson(@RequestBody String json) {
         try {
             JSONObject containerData = new JSONObject(json);
-            /* System.out.println("CONTAINER DATA --------------------");
-            System.out.println(containerData.toString(4)); */
 
-            // Prepare the database.
             Database database = new Database();
 
-            // Check if region, company and server exists in the database.
             String regionName = containerData.getString("region");
             String companyName = containerData.getString("company");
             String serverName = containerData.getString("server");
@@ -46,7 +41,6 @@ public class ExternalController {
 
             database.addContainers(containerID, serverID, containerName);
 
-            // Send data
             String containerReference = containerData.isNull("containerId")
                     ? null : containerData.getString("containerId");
             boolean running = containerData.isNull("containerRunning")
@@ -87,13 +81,9 @@ public class ExternalController {
     @PostMapping(value = "/heartbeat", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void heartbeatController(@RequestBody String json) {
         JSONObject serverData = new JSONObject(json);
-        /* System.out.println("HEARTBEAT DATA --------------------");
-        System.out.println(serverData.toString(4)); */
 
-        // Prepare the database.
         Database database = new Database();
 
-        // Get serverID.
         String regionName = serverData.getString("region");
         String companyName = serverData.getString("company");
         String serverName = serverData.getString("server");
@@ -107,7 +97,6 @@ public class ExternalController {
         JSONObject servers = database.getServers(companyID);
         String serverID = servers.getJSONObject(serverName).getString("serverID");
 
-        // Update the latest ping in the database.
         database.pingServer(serverID);
     }
 }

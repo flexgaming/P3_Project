@@ -14,21 +14,18 @@ import { defaultTimeFrames } from "../../config/ConfigurationConstants.js";
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
-// Plugin to render dashed lines in legend
 const dashedLegendPlugin = {
     id: "dashedLegendPlugin",
 
     afterUpdate(chart) {
         const legend = chart.legend;
-        // chart.ctx is available if needed for drawing, not required here
 
         legend.legendItems.forEach((item) => {
             const dataset = chart.data.datasets[item.datasetIndex];
 
             if (!dataset.borderDash) return;
 
-            // Override the default draw
-            item.fillStyle = "transparent"; // hide the filled box
+            item.fillStyle = "transparent"; 
             item.strokeStyle = dataset.borderColor;
             item.lineWidth = dataset.borderWidth || 2;
 
@@ -37,7 +34,6 @@ const dashedLegendPlugin = {
         });
     },
 
-    // Actual drawing of the legend item
     afterDraw(chart) {
         const ctx = chart.ctx;
         const legend = chart.legend;
@@ -63,23 +59,6 @@ const dashedLegendPlugin = {
     },
 };
 
-/**
- * DiskUsageView
- *
- * Props:
- * - containerData: object containing container diagnostics and container metadata
- * - serverData: object containing server totals (diskUsageTotal, ramTotal, etc.)
- * - timeAgo: function(timestamp) -> string used to render human-friendly labels
- * - isActive: boolean indicating whether this view is currently visible/active
- * - fetchDiagnostics: function(timeFrameKey) -> triggers a diagnostics fetch for this view
- *
- * Renders a line chart comparing container and server disk usage. When the view
- * becomes active or the local timeframe changes, it calls `fetchDiagnostics`
- * with the selected timeframe.
- *
- * @param {{containerData: object, serverData: object, timeAgo: function, isActive: boolean, fetchDiagnostics: function}} param0
- * @returns {JSX.Element}
- */
 export default function DiskUsageView({ containerData, serverData, timeAgo, isActive, fetchDiagnostics }) {
     const [diskUsageChart, setDiskUsageChart] = useState(null);
     const [noData, setNoData] = useState(false);
@@ -109,7 +88,6 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
             return;
         }
 
-        // Data is present — clear the no-data state so chart can render
         setNoData(false);
         const labels = diagnosticsData.map(item => timeAgo(item.timestamp));
         const diskUsageContainer = diagnosticsData.map(item => (item.diskUsage / 1000000).toFixed(1));
@@ -174,18 +152,15 @@ export default function DiskUsageView({ containerData, serverData, timeAgo, isAc
         }); 
     }, [containerData, serverData, timeAgo, localTimeFrame, isActive, fetchDiagnostics]);
 
-    // Render the component 
     return (
         <>
             {noData ? (
-                // No data error message
                 <div className="chart-container shadow rounded-4">
                     <br></br>
                     <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />
                     <div style={{ padding: 20 }}>Error: No data in the selected timeframe.</div>
                 </div>
             ) : diskUsageChart ? (
-                // Chart is ready and data is available
                 <div className="chart-container shadow rounded-4">
                     <br></br>
                     <TimeRangeDropdown id="disk-usage-view-dropdown" timeFrame={localTimeFrame} onChange={setLocalTimeFrame} />

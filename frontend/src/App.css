@@ -13,13 +13,11 @@
     margin: 0 auto;
     box-sizing: border-box;
     text-align: center;
-    /* subtle drop shadow to lift the app off the page */
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
     border-radius: 8px;
 }
 
 
-/* Make an element span the full viewport width even when inside a centered container */
 .full-bleed {
     width: 100vw;
     margin-left: calc(50% - 50vw);
@@ -27,11 +25,11 @@
 }
 
 .fixed-status {
-    min-width: 45px; /* minimum width so content fits */
-    width: 45px; /* optional: make it fixed exactly 45px */
+    min-width: 45px; 
+    width: 45px; 
     text-align: right;
-    flex-shrink: 0; /* prevents it from shrinking in a flex row */
-    white-space: nowrap; /* avoid wrapping if the text is long */
+    flex-shrink: 0; 
+    white-space: nowrap; 
 }
 
 .Container-Name-Container {

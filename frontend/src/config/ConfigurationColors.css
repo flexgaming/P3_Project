@@ -1,95 +1,71 @@
-/* ----------------------------
-   Global / Dashboard colors
-   (used by the main App container and dashboard pages)
-   ---------------------------- */
 .App {
-    background-color: #9ED3E8; /* Background color of the app container */
+    background-color: #9ED3E8; 
 }
 
 :root {
-    background-color: #5C7C89; /* Background color of the webpage */
+    background-color: #5C7C89; 
 }
 
 
-/* ----------------------------
-   Navbar colors
-   (top navigation bar and brand)
-   ---------------------------- */
 #main-navbar {
-    background-color: #011425; /* Background color of the navbar */
+    background-color: #011425; 
 }
 
 #main-navbar .navbar-brand,
 #main-navbar .nav-link {
-    color: #ffffff; /* Text color of the navbar brand and links */
+    color: #ffffff; 
 }
 
 #main-navbar .nav-link:hover {
-    color: #ffffff; /* Text color of the navbar links on hover */
-    opacity: 0.9; /* Slightly reduce opacity on hover for effect */
+    color: #ffffff; 
+    opacity: 0.9; 
 }
 
 
-/* ----------------------------
-   Regions tabs colors
-   (used by the Navigate / regions tabs UI)
-   ---------------------------- */
 #regions-tabs {
-    background-color: #011425; /* Background color of the regions tabs */
+    background-color: #011425; 
 }
 
 #regions-tabs .nav-link {
-    color: #ffffff; /* Text color of the regions tab nav links */
+    color: #ffffff; 
 }
 
 #regions-tabs .nav-link.active {
-    background-color: #1F4959; /* Background color of the active regions tab nav link */
-    color: #ffffff; /* Text color of the active regions tab nav link */
+    background-color: #1F4959; 
+    color: #ffffff; 
 }
 
 
-/* ----------------------------
-   Manage tabs colors
-   (used by the Manage pages)
-   ---------------------------- */
 #manage-tabs {
-    background-color: #011425; /* Background color of the manage tabs */
+    background-color: #011425; 
 }
 
 #manage-tabs .nav-link {
-    color: #ffffff; /* Text color of the manage tab nav links */
+    color: #ffffff; 
 }
 
 #manage-tabs .nav-link.active {
-    background-color: #1F4959; /* Background color of the active manage tab nav link */
-    color: #ffffff; /* Text color of the active manage tab nav link */
-    font-weight: bold; /* Font weight of the active manage tab nav link */
+    background-color: #1F4959; 
+    color: #ffffff; 
+    font-weight: bold; 
 }
 
 
-/* ----------------------------
-   Sidebar / Navigation items colors
-   (vertical nav used in regions/companies lists)
-   ---------------------------- */
 .flex-column .nav-link{
-    background-color: #011425; /* Background color of the nav links */
-    color: #ffffff; /* Text color of the nav links */
+    background-color: #011425; 
+    color: #ffffff; 
 }
 
 .flex-column .nav-link.active {
-    background-color: #1F4959; /* Background color of the active nav link */
-    color: #ffffff; /* Text color of the active nav link */
+    background-color: #1F4959; 
+    color: #ffffff; 
 }
 
 
-/* ----------------------------
-   Diagnostics View colors
-   (timeframe / error dropdowns used on diagnostics pages)
-   ---------------------------- */
 .error-dropdown .btn {
-    color: #ffffff; /* Text color of the error dropdown button */
+    color: #ffffff; 
 }
 
 .time-interval-dropdown .btn {
-    color: #ffffff; /* Text color of the time interval dropdown button */
+    color: #ffffff; 
 }

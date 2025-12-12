@@ -7,33 +7,19 @@ import org.springframework.boot.SpringApplication;
 @SpringBootApplication
 public class App {
     public static void main(String[] args) {
-        // Run main using Spring Boot
         SpringApplication.run(App.class, args);
 
         Database database = new Database();
-        //addDummyData(database);
-        // printData(database);
 
-        // Test getting diagnostics data for a specific container
-        /* Container dockerTst = new Container("40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c");
-        Container testData = database.getDiagnosticsData(dockerTst);
-        System.out.println(testData.getDiagnosticsData()); */
     }
 
     private static void printData(Database database) {
         JSONObject regions = database.getRegions();
-//        System.out.println(regions.toString(4));
         JSONObject companies = database.getCompanies(regions.getJSONObject("North America").getString("regionID"));
-//        System.out.println(companies.toString(4));
         JSONObject servers = database.getServers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
-//        System.out.println(servers.toString(4));
         JSONObject containers = database.getContainers(companies.getJSONObject("TechNova Inc.").getString("companyID"));
-//        System.out.println(containers.toString(4));
         JSONObject diagnosticsData = database.getDiagnosticsData(companies.getJSONObject("TechNova Inc.").getString("companyID"),
                                                             Constants.DIAGNOSTICS_TIME_SCOPE_LABEL);
-//        System.out.println(diagnosticsData.toString(4));
-        //JSONObject diagnosticsErrors = database.getDiagnosticsErrors();
-//        System.out.println(diagnosticsErrors.toString(4));
         JSONObject allCompanyData = database.getRecentCompanyData(companies.getJSONObject("TechNova Inc.").getString("companyID"));
         System.out.println(allCompanyData.toString(4));
     }
@@ -102,11 +88,9 @@ public class App {
         );
         database.addDiagnosticsBatch(
                 new String[] {
-                        // 15 dummy entries for 40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c
                         "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
                         "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
                         "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c","40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
-                        // original data follows
                         "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c", "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c", "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
                         "ctr-002", "ctr-002", "ctr-002",
                         "ctr-003", "ctr-003", "ctr-003",
@@ -124,11 +108,9 @@ public class App {
                         "ctr-015", "ctr-015", "ctr-015"
                 },
                 new boolean[] {
-                        // 15 dummy booleans
                         true, false, true, false, true,
                         true, false, true, false, true,
                         true, false, true, false, true,
-                        // original data
                         true, true, false,
                         false, true, true,
                         true, true, false,
@@ -146,11 +128,9 @@ public class App {
                         true, true, true
                 },
                 new Long[] {
-                        // 15 dummy longs
                         1L, 2L, 3L, 4L, 5L,
                         6L, 7L, 8L, 9L, 10L,
                         11L, 12L, 13L, 14L, 15L,
-                        // original data
                         8L, 7L, 6L,
                         4L, 6L, 8L,
                         16L, 15L, 10L,
@@ -168,11 +148,9 @@ public class App {
                         12L, 11L, 11L
                 },
                 new Long[] {
-                        // 15 dummy longs
                         1L, 2L, 3L, 4L, 5L,
                         6L, 7L, 8L, 9L, 10L,
                         11L, 12L, 13L, 14L, 15L,
-                        // original data
                         8L, 7L, 6L,
                         4L, 6L, 8L,
                         16L, 15L, 10L,
@@ -190,11 +168,9 @@ public class App {
                         12L, 11L, 11L
                 },
                 new Double[] {
-                        // 15 dummy doubles
                         0.5,0.6,0.7,0.8,0.9,
                         1.0,1.1,1.2,1.3,1.4,
                         1.5,1.6,1.7,1.8,1.9,
-                        // original data
                         4.0, 3.8, 3.0,
                         2.0, 3.0, 4.0,
                         8.0, 7.5, 5.0,
@@ -212,11 +188,9 @@ public class App {
                         6.0, 5.8, 5.5
                 },
                 new Double[] {
-                        // 15 dummy doubles
                         0.5,0.6,0.7,0.8,0.9,
                         1.0,1.1,1.2,1.3,1.4,
                         1.5,1.6,1.7,1.8,1.9,
-                        // original data
                         4.0, 3.8, 3.0,
                         2.0, 3.0, 4.0,
                         8.0, 7.5, 5.0,
@@ -234,12 +208,10 @@ public class App {
                         6.0, 5.8, 5.5
                 },
                 new Long[] {
-                        // 15 dummy longs
                         100L,110L,120L,130L,140L,
                         150L,160L,170L,180L,190L,
                         200L,210L,220L,230L,240L,
 
-                        // original data
                         500L, 480L, 400L,
                         250L, 300L, 350L,
                         1000L, 980L, 700L,
@@ -257,12 +229,10 @@ public class App {
                         800L, 780L, 750L
                 },
                 new Long[] {
-                        // 15 dummy longs
                         100L,110L,120L,130L,140L,
                         150L,160L,170L,180L,190L,
                         200L,210L,220L,230L,240L,
 
-                        // original data
                         500L, 480L, 400L,
                         250L, 300L, 350L,
                         1000L, 980L, 700L,
@@ -280,11 +250,9 @@ public class App {
                         800L, 780L, 750L
                 },
                 new int[] {
-                        // 15 dummy ints
                         10,11,12,13,14,
                         15,16,17,18,19,
                         20,21,22,23,24,
-                        // original data
                         120, 118, 110,
                         90, 95, 105,
                         200, 198, 180,
@@ -302,11 +270,9 @@ public class App {
                         150, 145, 140
                 },
                 new String[] {
-                        // 15 dummy statuses
                         "Healthy","Warning","Crashed","Recovered","Healthy",
                         "Warning","Healthy","Crashed","Healthy","Recovered",
                         "Warning","Healthy","Crashed","Healthy","Warning",
-                        // original data
                         "Healthy", "Healthy", "Warning",
                         "Crashed", "Recovered", "Healthy",
                         "Healthy", "Healthy", "Warning",
@@ -324,7 +290,6 @@ public class App {
                         "Crashed", "Recovered", "Healthy"
                 },
                 new JSONObject[] {
-                        // 15 dummy notes
                         new JSONObject().put("value", "Small pp"),
                         null,
                         new JSONObject().put("value", "Chicken"),
@@ -343,7 +308,6 @@ public class App {
                         null,
                         null,
 
-                        // original data
                         null,
                         null,
                         new JSONObject().put("value", "High memory usage"),

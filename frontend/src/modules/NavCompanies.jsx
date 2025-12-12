@@ -5,21 +5,12 @@ import "../pages/css/Nav.css";
 import { getCompanies } from "../utils/FetchCompanies";
 import { useNavigate } from "react-router-dom";
 
-/**
- * NavCompanies component
- * - Fetches company names from /data/{regionID}/companies on mount
- * - Renders one ListGroup block per company name
- */
 function NavCompanies({ regionID, regionName, selectedCompanyName }) {
     const [companies, setCompanies] = useState([]);
     const [activeKey, setActiveKey] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    // companies: array of company objects for this region
-    // activeKey: currently selected Tab eventKey (companyName)
-    // error: error message when fetching fails
 
-    // Fetch companies for the given region on mount
     useEffect(() => {
         let mounted = true;
 
@@ -28,7 +19,6 @@ function NavCompanies({ regionID, regionName, selectedCompanyName }) {
                 const companyList = await getCompanies(regionID);
                 if (mounted) {
                     setCompanies(companyList);
-                    // If a company name was provided via route, try to select it (support slug or case-insensitive match)
                     if (selectedCompanyName) {
                         const requested = String(selectedCompanyName).toLowerCase();
                         const match = companyList.find(c => {
@@ -50,7 +40,6 @@ function NavCompanies({ regionID, regionName, selectedCompanyName }) {
         return () => { mounted = false; };
     }, [regionID, selectedCompanyName]);
 
-    // Render error if fetch failed
     if (error)
         return (
             <div className="p-2">
@@ -59,7 +48,6 @@ function NavCompanies({ regionID, regionName, selectedCompanyName }) {
         );
 
     return (
-        // Tab.Container to hold company tabs and their content
         <Tab.Container
             id={`${regionID}`}
             className="nav-companies-container"
@@ -67,12 +55,10 @@ function NavCompanies({ regionID, regionName, selectedCompanyName }) {
             onSelect={(k) => setActiveKey(k)}
             defaultActiveKey={companies.length ? `${companies[0].companyName}` : null}
         >
-            {/* Layout with Row and Cols */}
             <Row>
                 <Col sm={3}>
                     <Nav variant="pills" className="flex-column">
                         <h4 style={{marginBottom: "28px"}}><b>Companies in {regionName}</b></h4>
-                        {/* Render Nav.Items for each company */}
                         {companies.map(company => (
                             <Nav.Item key={company.companyID}>
                                 <Nav.Link
@@ -80,7 +66,6 @@ function NavCompanies({ regionID, regionName, selectedCompanyName }) {
                                     onClick={() => {
                                         const companySlug = String(company.companyName || "").toLowerCase().replace(/\s+/g, "-");
                                         const regionSlug = String(regionName || "").toLowerCase().replace(/\s+/g, "-");
-                                        // Update the URL to /nav/<regionSlug>/<companySlug>
                                         navigate(`/nav/${regionSlug}/${companySlug}`);
                                         setActiveKey(company.companyName);
                                     }}
@@ -93,11 +78,9 @@ function NavCompanies({ regionID, regionName, selectedCompanyName }) {
                 </Col>
                 <Col sm={9}>
                     <Tab.Content>
-                        {/* Render Tab.Pane for each company */}
                         {companies.map(company => (
                             <Tab.Pane eventKey={`${company.companyName}`} key={company.companyID}>
                                 <h4><b>Servers & Containers in {company.companyName}</b></h4>
-                                {/* Request and render servers and containers for this company */}
                                 <NavServers companyID={company.companyID} />
                             </Tab.Pane>
                         ))}

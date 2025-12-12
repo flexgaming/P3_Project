@@ -9,13 +9,11 @@ import DiagnosticsView from "./pages/DiagnosticsView.jsx";
 import NavRegions from "./modules/NavRegions.jsx";
 import { BsArrowLeftSquare } from "react-icons/bs";
 
-// The main application component
 const App = () => {
     const navigate = useNavigate();
 
     return (
         <div className="App">
-            {/* Navbar */}
             <Navbar expand="lg" sticky="top" className="full-bleed" id="main-navbar">
                 <Container fluid>
                     <Navbar.Brand href="/dashboard">Container Diagnostics Platform</Navbar.Brand>

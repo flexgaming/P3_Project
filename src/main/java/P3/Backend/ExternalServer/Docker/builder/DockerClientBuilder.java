@@ -20,12 +20,11 @@ import com.github.dockerjava.transport.DockerHttpClient;
 public class DockerClientBuilder {
     @Bean
     public DockerClient dockerClient () {
-        // Detect platform and select appropriate socket/pipe
         String dockerHost;
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            dockerHost = WINDOWS_DOCKER_SOCKET;     // Windows named pipe
+            dockerHost = WINDOWS_DOCKER_SOCKET;     
         } else {
-            dockerHost = LINUX_MAC_DOCKER_SOCKET;   // Linux/macOS socket
+            dockerHost = LINUX_MAC_DOCKER_SOCKET;   
         }
 
         DockerClientConfig config = DockerClientManager.initializeDockerClient(dockerHost);
