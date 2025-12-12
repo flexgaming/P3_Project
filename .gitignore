@@ -34,4 +34,4 @@ build/
 
 ### JSON File ###
 currentContainers.json
-currentCompany.json
+serverInfo.json

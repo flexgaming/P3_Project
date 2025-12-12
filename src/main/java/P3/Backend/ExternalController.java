@@ -4,7 +4,6 @@ package P3.Backend;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +16,8 @@ public class ExternalController {
     public void uploadJson(@RequestBody String json) {
         try {
             JSONObject containerData = new JSONObject(json);
-//            System.out.println("CONTAINER DATA --------------------");
-//            System.out.println(containerData.toString(4));
+            /* System.out.println("CONTAINER DATA --------------------");
+            System.out.println(containerData.toString(4)); */
 
             // Prepare the database.
             Database database = new Database();
@@ -88,8 +87,8 @@ public class ExternalController {
     @PostMapping(value = "/heartbeat", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void heartbeatController(@RequestBody String json) {
         JSONObject serverData = new JSONObject(json);
-        System.out.println("HEARTBEAT DATA --------------------");
-        System.out.println(serverData.toString(4));
+        /* System.out.println("HEARTBEAT DATA --------------------");
+        System.out.println(serverData.toString(4)); */
 
         // Prepare the database.
         Database database = new Database();

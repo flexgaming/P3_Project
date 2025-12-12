@@ -4,7 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static P3.Backend.ExternalServer.Docker.builder.DockerClientBuilder.dockerConnection;
-
+import static P3.Backend.ExternalServer.application.SetupApplications.updateJSONFile;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,12 +17,11 @@ import org.json.JSONObject;
 
 import com.github.dockerjava.api.DockerClient;
 
+import P3.Backend.ExternalServer.application.ExternalApplication;
 import P3.Project.util.TestResult;
-import P3.Backend.ExternalServer.Docker.ExternalApplication;
 
 import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
 import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
-import static P3.Backend.ExternalServer.Docker.application.SetupApplications.updateJSONFile;
 
 
 @SpringBootTest(classes = ExternalApplication.class)

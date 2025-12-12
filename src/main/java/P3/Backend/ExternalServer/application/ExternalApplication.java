@@ -1,11 +1,11 @@
-package P3.Backend.ExternalServer.Docker;
+package P3.Backend.ExternalServer.application;
 
 import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
 import static P3.Backend.ExternalServer.Docker.Persistent.SERVER_INFO;
 import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
-import P3.Backend.ExternalServer.Docker.application.IntervalApplications;
-import P3.Backend.ExternalServer.Docker.application.SetupApplications;
+
 import P3.Backend.ExternalServer.Docker.builder.DockerClientBuilder;
+import P3.Backend.ExternalServer.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,11 +15,13 @@ import org.json.JSONObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.github.dockerjava.api.DockerClient;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"P3.Backend.ExternalServer"})
 public class ExternalApplication {
 
     // The path for where the JSON file is stored.
@@ -67,7 +69,7 @@ public class ExternalApplication {
 
             if (JSONFileObj.length() == 0) {
                 System.out.println("\n\nThe container JSON file is empty. Proceeding to Setup Applications.\n\n");
-                SetupApplications.Initiation(dockerClient, scanner);
+                SetupApplications.initiation(dockerClient, scanner);
             }
         } catch (Exception e) {
             // If anything goes wrong, it is printed.
@@ -84,14 +86,14 @@ public class ExternalApplication {
                     System.out.println("You selected option " + choice);
 
                     // If user selects Setup Applications, then proceed.
-                    SetupApplications.Initiation(dockerClient, scanner);
+                    SetupApplications.initiation(dockerClient, scanner);
 
                     printApplicationChoices(); // Print the choices
                 } else if (choice.equals("2")) {
                     System.out.println("You selected option " + choice);
 
                     // If user selects Interval Applications, then proceed.
-                    IntervalApplications.Initiation(dockerClient, webClient, scanner);
+                    IntervalApplications.initiation(dockerClient, webClient, scanner);
 
                     printApplicationChoices(); // Print the choices
                 } else if (choice.equals("3")) {

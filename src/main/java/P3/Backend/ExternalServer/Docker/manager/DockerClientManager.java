@@ -29,7 +29,7 @@ public class DockerClientManager {
      * @param dockerClient Is used to establish a connection between Docker backend and the application.
      * @return Is a JSONArray containg all of the containers and their data.
      */
-    public static JSONArray ListAllContainers(DockerClient dockerClient) {
+    public static JSONArray listAllContainers(DockerClient dockerClient) {
         List<Container> containersTemp = dockerClient.listContainersCmd().withShowAll(true).exec();
         JSONArray containers = new JSONArray(containersTemp);
         return containers;

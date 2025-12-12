@@ -4,6 +4,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import reactor.core.publisher.Mono;
+
 @Component
 public class WebClientPost {
 
@@ -18,8 +20,8 @@ public class WebClientPost {
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
-                .retrieve()
-                .toBodilessEntity()
+                .exchangeToMono(response -> response.releaseBody())
+                .onErrorResume(e -> Mono.empty())
                 .subscribe();
     }
 }

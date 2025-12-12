@@ -1,10 +1,8 @@
-package P3.Backend.ExternalServer.Docker.application;
+package P3.Backend.ExternalServer.application;
 
 import static P3.Backend.ExternalServer.Docker.Persistent.*;
 import P3.Backend.ExternalServer.Docker.classes.*;
-import P3.Backend.ExternalServer.Docker.manager.DockerStatsService;
-import P3.Backend.ExternalServer.Docker.manager.DockerStatsService.ContainerStats;
-import P3.Backend.ExternalServer.Docker.manager.WebClientPost;
+import P3.Backend.ExternalServer.Docker.manager.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,13 +44,13 @@ public class IntervalApplications {
      * @param dockerClient Is used for sending and receiving data from the docker.
      * @param webClient Is used for sending and getting HTTP requests.
      */
-    public static void Initiation(DockerClient dockerClient, WebClient webClient, Scanner scanner) {
+    public static void initiation(DockerClient dockerClient, WebClient webClient, Scanner scanner) {
 
         // Set up array of container classes (get data from JSON file).
-        SetupContainerArray();
+        setupContainerArray();
         
         // Set up interval array (with id, interval, tempInterval)
-        SetupIntervalArray(containerArr);
+        setupIntervalArray(containerArr);
 
         // Create an AtomicBoolean to be used in different threads.
         AtomicBoolean userInputDetected = new AtomicBoolean(false);
@@ -67,7 +65,7 @@ public class IntervalApplications {
     /**
      *  This function is used to set up the containerArr based on the JSON file that contains all of the containers.
      */
-    private static void SetupContainerArray() { 
+    private static void setupContainerArray() { 
         try {
             // Get all of the content within the currentContainers JSON file.
             String content = Files.readString(containerListPath);
@@ -132,7 +130,7 @@ public class IntervalApplications {
      * 
      * This can be used in order to keep track of when to fetch data from each container. 
      */
-    private static void SetupIntervalArray(ContainerClass[] containerArr) {
+    private static void setupIntervalArray(ContainerClass[] containerArr) {
         // Create the length for the array based on the containerArr's length.
         intervalArr = new IntervalClass[containerArr.length];
 
@@ -374,8 +372,8 @@ public class IntervalApplications {
         // RAM
         OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 
-        long systemTotalMemory = osBean.getTotalPhysicalMemorySize();
-        long systemFreeMemory = osBean.getFreePhysicalMemorySize();
+        long systemTotalMemory = osBean.getTotalMemorySize();
+        long systemFreeMemory = osBean.getFreeMemorySize();
         long systemUsedMemory = systemTotalMemory - systemFreeMemory;
 
         container.setSystemRamUsage(systemUsedMemory);

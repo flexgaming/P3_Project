@@ -1,4 +1,4 @@
-package P3.Backend.ExternalServer.Docker.application;
+package P3.Backend.ExternalServer.application;
 
 import static P3.Backend.ExternalServer.Docker.Persistent.CURRENT_CONTAINER_PATH;
 import static P3.Backend.ExternalServer.Docker.Persistent.CONTAINER_NAME;
@@ -33,7 +33,7 @@ public class SetupApplications {
      * @param dockerClient Is used for sending and receiving data from the docker.
      * @param scanner Is used is used to scan all of the input from the user.
      */
-    public static void Initiation(DockerClient dockerClient, Scanner scanner) {
+    public static void initiation(DockerClient dockerClient, Scanner scanner) {
         // Gets all of the containers that is in the system and puts it into an array (containers).
         List<Container> containersTemp = dockerClient.listContainersCmd().withShowAll(true).exec();
         JSONArray fetchedContainersArr = new JSONArray(containersTemp);

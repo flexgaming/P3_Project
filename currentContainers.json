@@ -1,9 +1,8 @@
-{"elated_sinoussi": {
+{"objective_roentgen": {
     "image": "springcommunity/spring-petclinic:3.5.6",
-    "privatePort": 8080,
-    "name": "elated_sinoussi",
+    "name": "objective_roentgen",
     "publicPort": 9090,
-    "interval": 3,
-    "id": "40641bf7b8e28599fb9bfb1a8e44be2222eae9336bd6360b31f42520f15fd65c",
+    "interval": 20,
+    "id": "93b92c8133ff0ccf35c65d7e8af957d2bfbfd181a73cc709ae679cb17a7eb35d",
     "state": "active"
 }}
