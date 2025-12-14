@@ -110,7 +110,7 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
         const errorValues = hasError.map(h => (h ? [0.02, 1] : [0, 0]));
 
         const barColors = diagArray.map(item =>
-            item.running ? pattern.draw("dot", "green") : pattern.draw("cross-dash", "red")
+            item.running ? pattern.draw("dot", "green") : "red"
         );
         const errorColors = hasError.map(h => (h ? "yellow" : "rgba(0,0,0,0)"));
 

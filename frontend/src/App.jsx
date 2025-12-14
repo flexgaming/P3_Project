@@ -45,7 +45,7 @@ const App = () => {
                     padding: 0,
                 }}
             >
-                <BsArrowLeftSquare size={35} />
+                <BsArrowLeftSquare size={35} color={"#011425"} />
             </button>
             <div className="Body">
                 <Routes>
