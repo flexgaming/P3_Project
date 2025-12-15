@@ -112,7 +112,7 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
         const barColors = diagArray.map(item =>
             item.running ? pattern.draw("dot", "green") : "red"
         );
-        const errorColors = hasError.map(h => (h ? "yellow" : "rgba(0,0,0,0)"));
+        const errorColors = hasError.map(h => (h ? "#FFD700" : "rgba(0,0,0,0)"));
 
         if (diagArray.length === 0) {
             setNoData(true);
@@ -164,13 +164,13 @@ export default function RunningView({ diagnosticsData, timeAgo, isActive, fetchD
                                     },
                                     {
                                         text: "Stopped",
-                                        fillStyle: pattern.draw("cross-dash", "red"),
+                                        fillStyle: "red",
                                         strokeStyle: "black",
                                         lineWidth: 2.5
                                     },
                                     {
                                         text: "Error",
-                                        fillStyle: "yellow",
+                                        fillStyle: "#FFD700",
                                         strokeStyle: "black",
                                         lineWidth: 2.5
                                     }
